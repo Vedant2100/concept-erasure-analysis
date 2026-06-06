@@ -1,0 +1,7 @@
+Place experiment output images here after running experiments/exp2_collateral.py
+
+Expected files:
+  {key}_seed{N}_baseline.jpg
+  {key}_seed{N}_mace.jpg
+  {key}_strip.jpg         ← side-by-side comparison strip
+  lpips_results.json      ← quantitative LPIPS table

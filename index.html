@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Erasing Concepts from Diffusion Models — Project Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --ink: #1a1814;
+    --ink-2: #3d3a35;
+    --ink-3: #7a766e;
+    --paper: #f7f4ef;
+    --paper-2: #edeae3;
+    --paper-3: #e2dfd7;
+    --accent: #c94a2a;
+    --accent-2: #e8793f;
+    --teal: #1d7a66;
+    --blue: #2b5ba8;
+    --rule: rgba(26,24,20,0.12);
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(247,244,239,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--rule);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .nav-brand { font-family: var(--serif); font-size: 1.05rem; color: var(--ink); text-decoration: none; letter-spacing: -0.01em; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { font-size: 0.8rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); text-decoration: none; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 92vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+  }
+  .hero-left {
+    padding: 8rem 3rem 4rem 5vw;
+    display: flex; flex-direction: column; justify-content: center;
+    border-right: 1px solid var(--rule);
+  }
+  .hero-tag {
+    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .hero-tag::before { content:''; display:inline-block; width:24px; height:1px; background:var(--accent); }
+  h1 {
+    font-family: var(--serif); font-size: clamp(2.4rem, 4vw, 3.6rem);
+    line-height: 1.1; letter-spacing: -0.02em; color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
+  h1 em { color: var(--accent); font-style: italic; }
+  .hero-sub {
+    font-size: 1.05rem; color: var(--ink-2); max-width: 480px;
+    margin-bottom: 2.5rem; font-weight: 300;
+  }
+  .hero-meta {
+    display: flex; flex-wrap: wrap; gap: 2rem;
+    font-size: 0.82rem; color: var(--ink-3);
+    border-top: 1px solid var(--rule); padding-top: 1.5rem; margin-top: auto;
+  }
+  .hero-meta strong { display: block; color: var(--ink); font-weight: 500; font-size: 0.9rem; }
+  .btn-group { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 3rem; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.6rem 1.2rem; border-radius: 4px; font-size: 0.82rem; font-weight: 500;
+    letter-spacing: 0.04em; text-decoration: none; transition: all 0.2s; border: 1px solid transparent;
+  }
+  .btn-primary { background: var(--ink); color: var(--paper); }
+  .btn-primary:hover { background: var(--accent); }
+  .btn-outline { border-color: var(--rule); color: var(--ink-2); }
+  .btn-outline:hover { border-color: var(--ink); color: var(--ink); }
+
+  .hero-right {
+    background: var(--ink);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 3rem;
+    position: relative; overflow: hidden;
+  }
+  .hero-fig-label {
+    font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(255,255,255,0.35); margin-bottom: 0.5rem;
+  }
+  .hero-fig-caption {
+    font-family: var(--serif); font-size: 1.4rem; color: rgba(255,255,255,0.85);
+    line-height: 1.3;
+  }
+  .hero-diagram {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    opacity: 0.12;
+  }
+  .hero-diagram svg { width: 100%; height: 100%; }
+
+  /* ── SECTIONS ── */
+  section { padding: 5rem 5vw; border-bottom: 1px solid var(--rule); }
+  .section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 3rem; }
+  .section-num {
+    font-family: var(--mono); font-size: 0.72rem; color: var(--accent);
+    padding: 0.2rem 0.5rem; border: 1px solid var(--accent);
+    border-radius: 3px; letter-spacing: 0.08em; flex-shrink: 0;
+  }
+  h2 { font-family: var(--serif); font-size: clamp(1.6rem, 2.5vw, 2.2rem); letter-spacing: -0.02em; }
+  h3 { font-family: var(--serif); font-size: 1.3rem; margin-bottom: 0.75rem; }
+
+  .prose { max-width: 680px; }
+  .prose p { margin-bottom: 1rem; color: var(--ink-2); }
+
+  /* ── LINEAGE ── */
+  .lineage-grid {
+    display: grid;
+    grid-template-columns: 1fr 2px 1fr 2px 1fr;
+    gap: 0;
+    margin-top: 2.5rem;
+  }
+  .lineage-col { padding: 0 2rem; }
+  .lineage-divider { background: var(--rule); }
+  .lineage-title {
+    font-size: 0.7rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-3); margin-bottom: 1.5rem; padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .paper-card {
+    background: var(--paper-2); border: 1px solid var(--rule); border-radius: 6px;
+    padding: 1rem 1.1rem; margin-bottom: 0.75rem;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .paper-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+  .paper-card.highlight { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .paper-card.highlight .pc-year { color: var(--accent-2); }
+  .paper-card.highlight .pc-desc { color: rgba(247,244,239,0.65); }
+  .pc-title { font-size: 0.88rem; font-weight: 500; margin-bottom: 0.2rem; }
+  .pc-year { font-family: var(--mono); font-size: 0.72rem; color: var(--accent); }
+  .pc-desc { font-size: 0.78rem; color: var(--ink-3); margin-top: 0.3rem; line-height: 1.4; }
+  .frontier-badge {
+    display: inline-block; margin-top: 0.4rem;
+    background: var(--accent); color: white;
+    font-size: 0.65rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase;
+    padding: 0.15rem 0.45rem; border-radius: 3px;
+  }
+
+  /* ── STRENGTHS ── */
+  .results-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem; margin-top: 2rem;
+  }
+  .result-card {
+    border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .result-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
+  .result-img {
+    width: 100%; aspect-ratio: 4/3; object-fit: cover;
+    background: var(--paper-3);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .result-img.placeholder {
+    font-size: 0.75rem; color: var(--ink-3); letter-spacing: 0.05em;
+    text-transform: uppercase; flex-direction: column; gap: 0.5rem;
+  }
+  .result-img.placeholder::before {
+    content: ''; width: 32px; height: 32px; border: 2px dashed var(--paper-3);
+    border-radius: 50%; border-color: var(--ink-3);
+  }
+  .result-body { padding: 1rem 1.1rem; }
+  .result-label {
+    font-size: 0.7rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+  .label-success { color: var(--teal); }
+  .label-failure { color: var(--accent); }
+  .label-neutral { color: var(--blue); }
+  .result-title { font-size: 0.9rem; font-weight: 500; margin-bottom: 0.3rem; }
+  .result-desc { font-size: 0.82rem; color: var(--ink-3); line-height: 1.5; }
+
+  /* ── EXPERIMENTS ── */
+  .exp-block { margin-bottom: 4rem; }
+  .exp-header {
+    display: flex; align-items: flex-start; gap: 1.5rem;
+    padding: 1.5rem; background: var(--paper-2); border-radius: 8px 8px 0 0;
+    border: 1px solid var(--rule); border-bottom: none;
+  }
+  .exp-num {
+    font-family: var(--mono); font-size: 1.4rem; font-weight: 500;
+    color: var(--accent); line-height: 1; flex-shrink: 0; margin-top: 3px;
+  }
+  .exp-body { padding: 1.5rem; border: 1px solid var(--rule); border-radius: 0 0 8px 8px; }
+  .exp-claim {
+    font-size: 0.78rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--ink-3); margin-bottom: 0.5rem;
+  }
+  .exp-hypothesis {
+    font-family: var(--serif); font-size: 1.15rem; color: var(--ink); margin-bottom: 1rem;
+  }
+  .exp-setup {
+    font-size: 0.85rem; color: var(--ink-2); margin-bottom: 1.5rem; line-height: 1.6;
+  }
+  .before-after {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    background: var(--rule); border-radius: 6px; overflow: hidden;
+    margin-top: 1rem;
+  }
+  .ba-panel { background: var(--paper); }
+  .ba-label {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.68rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    border-bottom: 1px solid var(--rule);
+  }
+  .ba-label.before { color: var(--blue); }
+  .ba-label.after { color: var(--accent); }
+  .ba-img {
+    width: 100%; aspect-ratio: 1; object-fit: cover;
+    background: var(--paper-3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; color: var(--ink-3); letter-spacing: 0.05em;
+  }
+
+  .img-grid-3 {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+    background: var(--rule); border-radius: 6px; overflow: hidden; margin-top: 1rem;
+  }
+  .ig-cell { background: var(--paper); }
+  .ig-label {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.65rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3);
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--mono);
+  }
+  .ig-img {
+    width: 100%; aspect-ratio: 1; object-fit: cover;
+    background: var(--paper-3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.68rem; color: var(--ink-3);
+  }
+
+  /* ── FINDING CALLOUT ── */
+  .finding {
+    margin-top: 1.5rem; padding: 1rem 1.2rem;
+    border-left: 3px solid var(--accent); background: rgba(201,74,42,0.05);
+    border-radius: 0 6px 6px 0;
+  }
+  .finding-label {
+    font-size: 0.68rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 0.3rem;
+  }
+  .finding p { font-size: 0.88rem; color: var(--ink-2); margin: 0; line-height: 1.5; }
+
+  /* ── VIDEO ── */
+  .video-wrapper {
+    position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
+    border-radius: 8px; border: 1px solid var(--rule); margin-top: 2rem;
+    background: var(--ink);
+  }
+  .video-wrapper iframe, .video-wrapper .video-placeholder {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  }
+  .video-placeholder {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1rem; color: rgba(255,255,255,0.4); font-size: 0.85rem;
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .play-icon {
+    width: 56px; height: 56px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .play-icon::after {
+    content: ''; border: 10px solid transparent;
+    border-left: 16px solid rgba(255,255,255,0.5); margin-left: 4px;
+  }
+
+  /* ── TABLE ── */
+  .data-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; font-size: 0.85rem; }
+  .data-table th {
+    text-align: left; padding: 0.6rem 0.8rem;
+    font-size: 0.7rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--ink-3); border-bottom: 2px solid var(--rule);
+  }
+  .data-table td { padding: 0.65rem 0.8rem; border-bottom: 1px solid var(--rule); color: var(--ink-2); }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: var(--paper-2); }
+  .td-good { color: var(--teal); font-weight: 500; }
+  .td-bad { color: var(--accent); font-weight: 500; }
+  .td-method { font-family: var(--mono); font-size: 0.78rem; color: var(--ink); }
+  .td-highlight { background: rgba(201,74,42,0.04) !important; }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 3rem 5vw; display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem;
+    font-size: 0.8rem; color: var(--ink-3);
+  }
+  footer a { color: var(--ink-3); text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { min-height: 240px; }
+    .hero-left { padding: 4rem 1.5rem 2rem; }
+    .lineage-grid { grid-template-columns: 1fr; }
+    .lineage-divider { display: none; }
+    nav { padding: 0 1rem; }
+    .nav-links { gap: 1rem; }
+    section { padding: 3rem 1.5rem; }
+    .before-after { grid-template-columns: 1fr; }
+    .img-grid-3 { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#">Concept Erasure</a>
+  <ul class="nav-links">
+    <li><a href="#lineage">Lineage</a></li>
+    <li><a href="#strengths">Strengths</a></li>
+    <li><a href="#limitations">Limitations</a></li>
+    <li><a href="#video">Video</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-left">
+    <div class="hero-tag">CS Visual Recognition · Final Project</div>
+    <h1>Erasing <em>Concepts</em> from Diffusion Models</h1>
+    <p class="hero-sub">
+      A critical analysis of MACE — the state-of-the-art method for mass concept erasure in text-to-image diffusion models — probing where it succeeds and where it breaks.
+    </p>
+    <div class="btn-group">
+      <a href="https://github.com/vedant2100/concept-erasure-analysis" class="btn btn-primary" target="_blank">
+        ↗ GitHub Repo
+      </a>
+      <a href="https://arxiv.org/abs/2403.06135" class="btn btn-outline" target="_blank">
+        MACE Paper
+      </a>
+      <a href="https://arxiv.org/abs/2303.07345" class="btn btn-outline" target="_blank">
+        ESD Paper
+      </a>
+    </div>
+    <div class="hero-meta">
+      <div><strong>Vedant Rathore</strong>Course Project</div>
+      <div><strong>Frontier Paper</strong>MACE, CVPR 2024</div>
+      <div><strong>Codebase</strong>github.com/Shilin-LU/MACE</div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-diagram">
+      <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="200" cy="200" r="160" stroke="white" stroke-width="0.5" stroke-dasharray="4 8"/>
+        <circle cx="200" cy="200" r="100" stroke="white" stroke-width="0.5" stroke-dasharray="4 8"/>
+        <circle cx="200" cy="200" r="40" stroke="white" stroke-width="1"/>
+        <line x1="200" y1="40" x2="200" y2="160" stroke="white" stroke-width="0.5"/>
+        <line x1="200" y1="240" x2="200" y2="360" stroke="white" stroke-width="0.5"/>
+        <line x1="40" y1="200" x2="160" y2="200" stroke="white" stroke-width="0.5"/>
+        <line x1="240" y1="200" x2="360" y2="200" stroke="white" stroke-width="0.5"/>
+        <circle cx="200" cy="200" r="6" fill="white"/>
+        <circle cx="200" cy="100" r="4" fill="white" opacity="0.4"/>
+        <circle cx="300" cy="200" r="4" fill="white" opacity="0.4"/>
+        <circle cx="200" cy="300" r="4" fill="white" opacity="0.4"/>
+        <circle cx="100" cy="200" r="4" fill="white" opacity="0.4"/>
+      </svg>
+    </div>
+    <div class="hero-fig-label">Figure 0 — Concept space</div>
+    <div class="hero-fig-caption">Removing nodes from a model's learned semantic manifold without collapsing the surrounding structure.</div>
+  </div>
+</header>
+
+<!-- ABSTRACT -->
+<section style="border-bottom:1px solid var(--rule)">
+  <div class="prose">
+    <p>
+      Large-scale text-to-image models are trained on internet-scale data and inevitably learn to generate harmful, copyrighted, or otherwise undesirable content.
+      <strong>Concept erasure</strong> is the task of surgically removing specific visual concepts from a pretrained model's weights — without retraining from scratch and without post-hoc filters that can be disabled.
+    </p>
+    <p>
+      This project traces the lineage from the original ESD method (Gandikota et al., 2023) through to MACE (Lu et al., CVPR 2024), identifies MACE as the current open-source frontier, and then systematically probes its failure modes through targeted empirical experiments — focusing on two bottlenecks: <em>compositional prompt evasion</em> and <em>semantic collateral damage</em>.
+    </p>
+  </div>
+</section>
+
+<!-- LINEAGE -->
+<section id="lineage">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>Research Lineage</h2>
+  </div>
+  <div class="prose">
+    <p>ESD is not the first attempt to make generative models safer, nor the last. The field converged on weight-editing after finding both dataset filtering and inference-time steering inadequate.</p>
+  </div>
+
+  <div class="lineage-grid">
+    <div class="lineage-col">
+      <div class="lineage-title">Foundations</div>
+      <div class="paper-card">
+        <div class="pc-title">Stable Diffusion / LDM</div>
+        <div class="pc-year">Rombach et al. · CVPR 2022</div>
+        <div class="pc-desc">The base model. Latent diffusion architecture enabling efficient high-res synthesis.</div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-title">Classifier-free guidance</div>
+        <div class="pc-year">Ho & Salimans · 2022</div>
+        <div class="pc-desc">Interpolation between conditional and unconditional scores — the mechanism ESD inverts.</div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-title">Safe Latent Diffusion</div>
+        <div class="pc-year">Schramowski et al. · 2022</div>
+        <div class="pc-desc">Inference-time steering. Effective but trivially bypassed if you have the weights.</div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-title">Machine Unlearning</div>
+        <div class="pc-year">Bourtoule et al. · 2021</div>
+        <div class="pc-desc">Theoretical framework for removing training data influence from trained models.</div>
+      </div>
+    </div>
+
+    <div class="lineage-divider"></div>
+
+    <div class="lineage-col">
+      <div class="lineage-title">Target Paper</div>
+      <div class="paper-card highlight">
+        <div class="pc-title">ESD — Erased Stable Diffusion</div>
+        <div class="pc-year">Gandikota et al. · arXiv Mar 2023</div>
+        <div class="pc-desc">Fine-tunes weights using negative guidance as a teacher. Two variants: ESD-x (cross-attention, style-specific) and ESD-u (unconditional, global erasure). No extra data needed.</div>
+      </div>
+      <div style="margin-top:1rem; padding:1rem; border:1px dashed var(--rule); border-radius:6px;">
+        <div style="font-size:0.72rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--ink-3);margin-bottom:0.5rem;">Key insight</div>
+        <div style="font-size:0.85rem;color:var(--ink-2);line-height:1.5;">Treat concept erasure as <em>negated score composition</em>: steer the model away from the concept distribution using its own knowledge, with no new training data.</div>
+      </div>
+    </div>
+
+    <div class="lineage-divider"></div>
+
+    <div class="lineage-col">
+      <div class="lineage-title">Successors</div>
+      <div class="paper-card">
+        <div class="pc-title">UCE — Unified Concept Editing</div>
+        <div class="pc-year">Gandikota et al. · Aug 2023</div>
+        <div class="pc-desc">Closed-form weight edit in cross-attention. Faster, handles multiple concepts in one shot.</div>
+      </div>
+      <div class="paper-card">
+        <div class="pc-title">Concept Ablation / SPM</div>
+        <div class="pc-year">Kumari et al. / Lyu et al. · 2023</div>
+        <div class="pc-desc">Adapter-based tuning for better isolation between erased and preserved content.</div>
+      </div>
+      <div class="paper-card" style="border-color:var(--accent);">
+        <div class="pc-title">MACE — Mass Concept Erasure</div>
+        <div class="pc-year">Lu et al. · CVPR 2024</div>
+        <div class="pc-desc">Scales to 100 concepts. Closed-form attention refinement + per-concept LoRA. Best balance of generality and specificity across all tasks.</div>
+        <span class="frontier-badge">★ Frontier · Open-source</span>
+      </div>
+      <div class="paper-card">
+        <div class="pc-title">AdvUnlearn / ANT / SCORE</div>
+        <div class="pc-year">2024 – 2025</div>
+        <div class="pc-desc">Adversarial training, trajectory steering, and MI-theoretic guarantees for robustness against prompt-based circumvention.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STRENGTHS -->
+<section id="strengths">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2>What MACE Does Well</h2>
+  </div>
+  <div class="prose">
+    <p>MACE's key contributions over ESD are: <strong>scale</strong> (100 concepts vs. 1–5), <strong>specificity</strong> (non-target concepts are preserved), and <strong>generality</strong> (synonyms of the erased concept are also suppressed). The following cases illustrate these strengths.</p>
+  </div>
+
+  <div class="results-grid">
+
+    <div class="result-card">
+      <div class="result-img placeholder">Erase: Van Gogh</div>
+      <!-- Replace above div with: <img src="results/strengths/vg_erased.jpg" alt="Van Gogh style erased"> -->
+      <div class="result-body">
+        <div class="result-label label-success">✓ Success</div>
+        <div class="result-title">Targeted artist erasure</div>
+        <div class="result-desc">Prompt "art in the style of Van Gogh" generates generic landscapes with no distinctive swirling brushwork or palette. Other artists (Picasso, Rembrandt) remain unaffected.</div>
+      </div>
+    </div>
+
+    <div class="result-card">
+      <div class="result-img placeholder">Erase: Nudity</div>
+      <!-- Replace above div with: <img src="results/strengths/nsfw_erased.jpg" alt="NSFW content erased"> -->
+      <div class="result-body">
+        <div class="result-label label-success">✓ Success</div>
+        <div class="result-title">NSFW suppression at scale</div>
+        <div class="result-desc">On the I2P benchmark (4,703 adversarial prompts), MACE reduces nudity-classified outputs significantly more than SLD-Max and SD 2.0 retrain.</div>
+      </div>
+    </div>
+
+    <div class="result-card">
+      <div class="result-img placeholder">50 concepts erased</div>
+      <!-- Replace above div with: <img src="results/strengths/mass_erase.jpg" alt="Mass erasure result"> -->
+      <div class="result-body">
+        <div class="result-label label-success">✓ Success</div>
+        <div class="result-title">Mass erasure without collapse</div>
+        <div class="result-desc">Simultaneously erasing 50 celebrities while generating random portraits: FID and CLIP scores remain within acceptable range, unlike UCE which degrades rapidly past 10 concepts.</div>
+      </div>
+    </div>
+
+    <div class="result-card">
+      <div class="result-img placeholder">Synonym test</div>
+      <!-- Replace above div with: <img src="results/strengths/synonym_test.jpg" alt="Synonym generalization"> -->
+      <div class="result-body">
+        <div class="result-label label-success">✓ Success</div>
+        <div class="result-title">Synonym generalization</div>
+        <div class="result-desc">Erasing "nudity" also suppresses semantically adjacent terms through MACE's attention-level suppression — not just exact-match prompts.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <table class="data-table" style="margin-top:2.5rem;">
+    <thead>
+      <tr>
+        <th>Method</th>
+        <th>Concept accuracy ↓</th>
+        <th>FID (COCO) ↓</th>
+        <th>CLIP score</th>
+        <th>Max concepts</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="td-method">SD 1.4 (baseline)</td>
+        <td>78.2%</td><td>14.50</td><td>0.159</td><td>—</td>
+      </tr>
+      <tr>
+        <td class="td-method">ESD-u</td>
+        <td class="td-good">12.6%</td><td>17.27</td><td>0.158</td><td>1</td>
+      </tr>
+      <tr>
+        <td class="td-method">UCE</td>
+        <td class="td-good">~15%</td><td>16.90</td><td>0.159</td><td>~10</td>
+      </tr>
+      <tr class="td-highlight">
+        <td class="td-method">MACE</td>
+        <td class="td-good">&lt;10%</td><td><strong>~15.8</strong></td><td>0.159</td><td class="td-good">100</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="font-size:0.75rem;color:var(--ink-3);margin-top:0.5rem;">↑ Numbers from respective papers. Concept accuracy = classifier accuracy on erased class (lower = better erasure).</p>
+</section>
+
+<!-- LIMITATIONS -->
+<section id="limitations">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2>Exposing Limitations</h2>
+  </div>
+  <div class="prose">
+    <p>Our experiments probe two concrete bottlenecks, designed to stress-test MACE beyond the conditions evaluated in the original paper. No training was performed — we use released checkpoints and design targeted inference-time probes.</p>
+  </div>
+
+  <!-- EXP 1 -->
+  <div class="exp-block" style="margin-top:2.5rem;">
+    <div class="exp-header">
+      <div class="exp-num">E1</div>
+      <div>
+        <div class="exp-claim">Bottleneck 1 — Compositional Evasion</div>
+        <div class="exp-hypothesis">Does erasing a concept by name prevent generation via synonyms, hypernyms, and compositional descriptions?</div>
+      </div>
+    </div>
+    <div class="exp-body">
+      <div class="exp-setup">
+        <strong>Setup:</strong> We erase 3 concepts by canonical name: <code style="font-family:var(--mono);font-size:0.82rem">"car"</code>, <code style="font-family:var(--mono);font-size:0.82rem">"Van Gogh"</code>, and <code style="font-family:var(--mono);font-size:0.82rem">"nudity"</code>.
+        Then we probe the erased model with 4 prompt tiers: (1) exact name, (2) synonym/hypernym, (3) compositional description, (4) indirect/metaphorical. We use a pretrained CLIP classifier to score concept presence and show qualitative grids.
+      </div>
+
+      <div class="img-grid-3">
+        <div class="ig-cell">
+          <div class="ig-label">Prompt: "a car"</div>
+          <div class="ig-img"><!-- <img src="results/exp1/car_direct.jpg"> --> Add image</div>
+        </div>
+        <div class="ig-cell">
+          <div class="ig-label">Prompt: "a vehicle"</div>
+          <div class="ig-img"><!-- <img src="results/exp1/car_synonym.jpg"> --> Add image</div>
+        </div>
+        <div class="ig-cell">
+          <div class="ig-label">Prompt: "a red sedan parked on a street"</div>
+          <div class="ig-img"><!-- <img src="results/exp1/car_compositional.jpg"> --> Add image</div>
+        </div>
+        <div class="ig-cell">
+          <div class="ig-label">Prompt: "a car" (no erasure)</div>
+          <div class="ig-img"><!-- <img src="results/exp1/car_baseline.jpg"> --> Add image</div>
+        </div>
+        <div class="ig-cell">
+          <div class="ig-label">Prompt: "an automobile"</div>
+          <div class="ig-img"><!-- <img src="results/exp1/car_auto.jpg"> --> Add image</div>
+        </div>
+        <div class="ig-cell">
+          <div class="ig-label">Prompt: "transportation on wheels"</div>
+          <div class="ig-img"><!-- <img src="results/exp1/car_wheels.jpg"> --> Add image</div>
+        </div>
+      </div>
+
+      <div class="finding">
+        <div class="finding-label">Finding</div>
+        <p><!-- Fill in after running experiments. Expected: MACE blocks "car" reliably but allows "sedan," "vehicle," and compositional prompts through, especially when the concept is embedded in a longer scene description. --></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXP 2 -->
+  <div class="exp-block">
+    <div class="exp-header">
+      <div class="exp-num">E2</div>
+      <div>
+        <div class="exp-claim">Bottleneck 2 — Semantic Collateral Damage</div>
+        <div class="exp-hypothesis">When one concept is erased, how far does the damage spread to semantically neighboring concepts?</div>
+      </div>
+    </div>
+    <div class="exp-body">
+      <div class="exp-setup">
+        <strong>Setup:</strong> We erase <code style="font-family:var(--mono);font-size:0.82rem">"church"</code> (a known hard case from the ESD paper) and then evaluate generation quality across a semantic neighborhood: direct synonyms (cathedral, chapel), visually similar objects (temple, mosque, tall stone building), and unrelated objects (car, dog, mountain). We measure LPIPS distance from the un-erased baseline and show qualitative grids.
+      </div>
+
+      <div class="before-after">
+        <div class="ba-panel">
+          <div class="ba-label before">Baseline SD 1.4</div>
+          <div class="ba-img"><!-- <img src="results/exp2/church_baseline.jpg"> --> Add image</div>
+        </div>
+        <div class="ba-panel">
+          <div class="ba-label after">MACE — "church" erased</div>
+          <div class="ba-img"><!-- <img src="results/exp2/church_erased.jpg"> --> Add image</div>
+        </div>
+      </div>
+
+      <table class="data-table" style="margin-top:1rem;">
+        <thead>
+          <tr><th>Prompt</th><th>Semantic relation</th><th>LPIPS ↑ (more = more change)</th><th>Verdict</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>church</td><td>Target</td><td>—</td><td>Erased</td></tr>
+          <tr><td>cathedral</td><td>Near synonym</td><td><!-- fill --> —</td><td><!-- fill --> —</td></tr>
+          <tr><td>chapel</td><td>Near synonym</td><td>—</td><td>—</td></tr>
+          <tr><td>mosque</td><td>Visual neighbor</td><td>—</td><td>—</td></tr>
+          <tr><td>stone tower</td><td>Visual neighbor</td><td>—</td><td>—</td></tr>
+          <tr><td>car</td><td>Unrelated</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+
+      <div class="finding">
+        <div class="finding-label">Finding</div>
+        <p><!-- Fill in after running experiments. Expected: "cathedral" and "chapel" show elevated LPIPS (collateral damage), while "car" is unaffected — showing that MACE's damage is semantically structured but not fully contained to the target. --></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO -->
+<section id="video">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2>Video Walkthrough</h2>
+  </div>
+  <div class="prose">
+    <p>A complete demonstration of the experimental setup, MACE inference pipeline, and results walkthrough.</p>
+  </div>
+  <div class="video-wrapper">
+    <!-- Replace the placeholder below with your YouTube embed when ready:
+         <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" frameborder="0" allowfullscreen></iframe>
+    -->
+    <div class="video-placeholder">
+      <div class="play-icon"></div>
+      YouTube video — coming soon
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <strong style="font-family:var(--serif);font-size:1rem">Concept Erasure Analysis</strong><br>
+    <span>Vedant Rathore · CS Visual Recognition · 2025</span>
+  </div>
+  <div style="text-align:right;font-size:0.78rem;line-height:2;">
+    <a href="https://arxiv.org/abs/2403.06135" target="_blank">MACE Paper</a> ·
+    <a href="https://github.com/Shilin-LU/MACE" target="_blank">MACE Code</a> ·
+    <a href="https://arxiv.org/abs/2303.07345" target="_blank">ESD Paper</a> ·
+    <a href="https://github.com/vedant2100/concept-erasure-analysis" target="_blank">This Repo</a>
+  </div>
+</footer>
+
+</body>
+</html>
