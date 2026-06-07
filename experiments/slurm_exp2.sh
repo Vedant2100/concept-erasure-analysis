@@ -16,7 +16,7 @@ conda activate mace_env
 
 echo "Starting Experiment 2: Semantic Collateral Damage..."
 # Ensure we are in the project root directory
-cd "$(dirname "$0")/.."
+cd $SLURM_SUBMIT_DIR
 
 # Generate the erased church checkpoint first if it doesn't exist
 if [ ! -d "checkpoints/mace_church" ]; then

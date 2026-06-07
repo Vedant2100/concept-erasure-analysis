@@ -16,7 +16,7 @@ conda activate mace_env
 
 echo "Starting Experiment 1: Compositional Evasion..."
 # Ensure we are in the project root directory
-cd "$(dirname "$0")/.."
+cd $SLURM_SUBMIT_DIR
 
 python experiments/exp1_compositional.py
 echo "Experiment 1 Complete."

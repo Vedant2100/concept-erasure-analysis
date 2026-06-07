@@ -13,7 +13,7 @@ conda activate mace_env
 
 echo "Starting MACE Setup..."
 # Ensure we are in the project root directory
-cd "$(dirname "$0")/.."
+cd $SLURM_SUBMIT_DIR
 
 bash experiments/setup_mace.sh
 echo "Setup Complete."
