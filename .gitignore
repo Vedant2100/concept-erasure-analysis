@@ -1,1 +1,8 @@
 hpc_login.exp
+plans/
+.env
+SPEED_repo/
+checkpoints/
+results/
+__pycache__/
+*.pyc

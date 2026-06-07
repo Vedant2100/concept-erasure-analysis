@@ -15,5 +15,6 @@ echo "Starting MACE Setup..."
 # Ensure we are in the project root directory
 cd $SLURM_SUBMIT_DIR
 
-bash experiments/setup_mace.sh
+echo "Starting SPEED Setup..."
+bash experiments/setup_speed.sh
 echo "Setup Complete."
