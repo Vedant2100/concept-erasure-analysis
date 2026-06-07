@@ -7,8 +7,7 @@ if [ ! -d "MACE" ]; then
     git clone https://github.com/Shilin-LU/MACE.git
 fi
 
-echo "==> Installing MACE dependencies..."
-pip install -r MACE/requirements.txt
+# MACE doesn't have a requirements.txt file, we install project requirements next
 
 echo "==> Installing project dependencies..."
 pip install -r requirements.txt
