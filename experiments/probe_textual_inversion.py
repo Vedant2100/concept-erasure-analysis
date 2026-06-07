@@ -150,8 +150,7 @@ def train_textual_inversion(args):
                 encoder_hidden_states = text_encoder(text_inputs.input_ids)[0]
                 
                 # Predict noise
-                with torch.no_grad():
-                    noise_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
+                noise_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
                 
                 loss = F.mse_loss(noise_pred, noise, reduction="mean")
                 
