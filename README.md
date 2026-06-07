@@ -1,7 +1,7 @@
 # Erasing Concepts from Diffusion Models — Project Analysis
 
-**Course:** CS Visual Recognition  
-**Student:** Vedant Rathore  
+**Course:** EE243  
+**Student:** Vedant   
 **Frontier paper:** MACE — Mass Concept Erasure in Text-to-Image Diffusion Models (Lu et al., CVPR 2024)
 
 🌐 **[Project Webpage](https://vedant2100.github.io/concept-erasure-analysis)**  
