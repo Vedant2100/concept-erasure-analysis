@@ -1,69 +1,97 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #SBATCH --job-name=probe_all
 #SBATCH --output=slurm_probe_all_%j.log
-#SBATCH --partition=gpu
-#SBATCH --gpus=1
 #SBATCH --time=08:00:00
+#SBATCH --partition=gpu
+#SBATCH --gres=gpu:1
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=32G
 
-source ~/miniconda/etc/profile.d/conda.sh
-conda activate base
+source ~/.bashrc
+if [ -f ~/miniconda/etc/profile.d/conda.sh ]; then
+    source ~/miniconda/etc/profile.d/conda.sh
+elif [ -f ~/miniconda3/etc/profile.d/conda.sh ]; then
+    source ~/miniconda3/etc/profile.d/conda.sh
+fi
+conda activate speed_env || conda activate mace_env
 
-cd ~/concept-erasure-project/experiments
+cd $SLURM_SUBMIT_DIR
 
-echo "Running Baseline Probes..."
-python probe_compositional.py --method baseline \
+# ============================================================
+# Experiment 2a: Compositional Evasion Probe (Snoopy)
+# ============================================================
+echo "=== Compositional Probe: Baseline ==="
+python experiments/probe_compositional.py --method baseline \
     --prompt_direct "a photo of Snoopy" \
     --prompt_synonym "a photo of the beagle from Peanuts" \
     --prompt_compositional "a white dog with black ears sleeping on a red doghouse" \
-    --out_dir "../results/comp_snoopy"
+    --out_dir "results/comp_snoopy"
 
-python probe_textual_inversion.py --method baseline \
+echo "=== Compositional Probe: SPEED ==="
+python experiments/probe_compositional.py --method speed \
+    --ckpt_path "checkpoints/speed/Snoopy.pt" \
+    --prompt_direct "a photo of Snoopy" \
+    --prompt_synonym "a photo of the beagle from Peanuts" \
+    --prompt_compositional "a white dog with black ears sleeping on a red doghouse" \
+    --out_dir "results/comp_snoopy"
+
+echo "=== Compositional Probe: ESD ==="
+python experiments/probe_compositional.py --method esd \
+    --ckpt_path "rohitgandikota/erasing-snoopy" \
+    --prompt_direct "a photo of Snoopy" \
+    --prompt_synonym "a photo of the beagle from Peanuts" \
+    --prompt_compositional "a white dog with black ears sleeping on a red doghouse" \
+    --out_dir "results/comp_snoopy"
+
+# ============================================================
+# Experiment 2b: Compositional Evasion Probe (Van Gogh)
+# ============================================================
+echo "=== Compositional Probe: Baseline (Van Gogh) ==="
+python experiments/probe_compositional.py --method baseline \
+    --prompt_direct "a painting in the style of Van Gogh" \
+    --prompt_synonym "a painting in the style of a post-impressionist Dutch painter" \
+    --prompt_compositional "a painting with thick impasto brushstrokes and swirling night skies over a village" \
+    --out_dir "results/comp_vangogh"
+
+echo "=== Compositional Probe: SPEED (Van Gogh) ==="
+python experiments/probe_compositional.py --method speed \
+    --ckpt_path "checkpoints/speed/Van Gogh.pt" \
+    --prompt_direct "a painting in the style of Van Gogh" \
+    --prompt_synonym "a painting in the style of a post-impressionist Dutch painter" \
+    --prompt_compositional "a painting with thick impasto brushstrokes and swirling night skies over a village" \
+    --out_dir "results/comp_vangogh"
+
+echo "=== Compositional Probe: ESD (Van Gogh) ==="
+python experiments/probe_compositional.py --method esd \
+    --ckpt_path "rohitgandikota/erasing-vangogh" \
+    --prompt_direct "a painting in the style of Van Gogh" \
+    --prompt_synonym "a painting in the style of a post-impressionist Dutch painter" \
+    --prompt_compositional "a painting with thick impasto brushstrokes and swirling night skies over a village" \
+    --out_dir "results/comp_vangogh"
+
+# ============================================================
+# Experiment 1b: TI Recovery Probe on ESD
+# ============================================================
+echo "=== TI Recovery: ESD Snoopy ==="
+python experiments/probe_textual_inversion.py --method esd \
+    --ckpt_path "rohitgandikota/erasing-snoopy" \
     --reference_prompt "a photo of Snoopy" \
     --learned_token "<snoopy>" \
     --anchor_concept "dog" \
     --template_type "instance" \
-    --out_dir "../results/ti_baseline_snoopy"
+    --budget_grid 0 50 200 500 1000 \
+    --out_dir results/ti_esd_snoopy
 
-echo "Running SPEED Probes..."
-python probe_compositional.py --method speed --ckpt_path "../checkpoints/snoopy.pt" \
-    --prompt_direct "a photo of Snoopy" \
-    --prompt_synonym "a photo of the beagle from Peanuts" \
-    --prompt_compositional "a white dog with black ears sleeping on a red doghouse" \
-    --out_dir "../results/comp_snoopy"
-
-python probe_textual_inversion.py --method speed --ckpt_path "../checkpoints/snoopy.pt" \
-    --reference_prompt "a photo of Snoopy" \
-    --learned_token "<snoopy>" \
-    --anchor_concept "dog" \
-    --template_type "instance" \
-    --out_dir "../results/ti_speed_snoopy"
-
-echo "Running ESD Probes..."
-python probe_compositional.py --method esd --ckpt_path "rohitgandikota/erasing-snoopy" \
-    --prompt_direct "a photo of Snoopy" \
-    --prompt_synonym "a photo of the beagle from Peanuts" \
-    --prompt_compositional "a white dog with black ears sleeping on a red doghouse" \
-    --out_dir "../results/comp_snoopy"
-
-python probe_textual_inversion.py --method esd --ckpt_path "rohitgandikota/erasing-snoopy" \
-    --reference_prompt "a photo of Snoopy" \
-    --learned_token "<snoopy>" \
-    --anchor_concept "dog" \
-    --template_type "instance" \
-    --out_dir "../results/ti_esd_snoopy"
-
-echo "Running MACE Probes..."
-python probe_compositional.py --method mace --ckpt_path "../MACE_weights/snoopy" \
-    --prompt_direct "a photo of Snoopy" \
-    --prompt_synonym "a photo of the beagle from Peanuts" \
-    --prompt_compositional "a white dog with black ears sleeping on a red doghouse" \
-    --out_dir "../results/comp_snoopy"
-
-python probe_textual_inversion.py --method mace --ckpt_path "../MACE_weights/snoopy" \
-    --reference_prompt "a photo of Snoopy" \
-    --learned_token "<snoopy>" \
-    --anchor_concept "dog" \
-    --template_type "instance" \
-    --out_dir "../results/ti_mace_snoopy"
+echo "=== TI Recovery: ESD Van Gogh ==="
+python experiments/probe_textual_inversion.py --method esd \
+    --ckpt_path "rohitgandikota/erasing-vangogh" \
+    --reference_prompt "a painting in the style of Van Gogh" \
+    --learned_token "<vangogh>" \
+    --anchor_concept "art" \
+    --template_type "style" \
+    --budget_grid 0 50 200 500 1000 \
+    --out_dir results/ti_esd_vangogh
 
 echo "All Probes Completed!"

@@ -1,8 +1,13 @@
 #!/bin/bash
-# setup_esd.sh
+# setup_esd.sh — Pre-cache ESD erased model weights from HuggingFace
 
-source ~/miniconda/etc/profile.d/conda.sh
-conda activate base
+source ~/.bashrc
+if [ -f ~/miniconda/etc/profile.d/conda.sh ]; then
+    source ~/miniconda/etc/profile.d/conda.sh
+elif [ -f ~/miniconda3/etc/profile.d/conda.sh ]; then
+    source ~/miniconda3/etc/profile.d/conda.sh
+fi
+conda activate speed_env || conda activate mace_env
 
 echo "Pre-caching ESD models from HuggingFace..."
 python -c "
