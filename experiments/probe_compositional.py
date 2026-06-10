@@ -5,14 +5,15 @@ from diffusers import StableDiffusionPipeline
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-def load_pipeline(base_model_id, method, ckpt_path):
+def load_pipeline(base_model_id, method, ckpt_path, esd_model_path=None):
     print(f"Loading pipeline for {method}...")
     
     if method == "esd":
         # ESD checkpoints are full diffusers models on HuggingFace
-        if not ckpt_path:
-            raise ValueError("ESD requires a ckpt_path to the huggingface model (e.g. rohitgandikota/erasing-snoopy)")
-        pipe = StableDiffusionPipeline.from_pretrained(ckpt_path, torch_dtype=torch.float16).to(DEVICE)
+        model_path = esd_model_path if esd_model_path else ckpt_path
+        if not model_path:
+            raise ValueError("ESD requires a ckpt_path or esd_model_path to the huggingface model")
+        pipe = StableDiffusionPipeline.from_pretrained(model_path, torch_dtype=torch.float16).to(DEVICE)
     else:
         pipe = StableDiffusionPipeline.from_pretrained(base_model_id, torch_dtype=torch.float16).to(DEVICE)
         

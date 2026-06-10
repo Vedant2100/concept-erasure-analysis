@@ -39,7 +39,7 @@ python experiments/probe_compositional.py --method speed \
 
 echo "=== Compositional Probe: ESD ==="
 python experiments/probe_compositional.py --method esd \
-    --ckpt_path "rohitgandikota/erasing-snoopy" \
+    --esd_model_path "$ESD_SNOOPY" \
     --prompt_direct "a photo of Snoopy" \
     --prompt_synonym "a photo of the beagle from Peanuts" \
     --prompt_compositional "a white dog with black ears sleeping on a red doghouse" \
@@ -65,7 +65,7 @@ python experiments/probe_compositional.py --method speed \
 
 echo "=== Compositional Probe: ESD (Van Gogh) ==="
 python experiments/probe_compositional.py --method esd \
-    --ckpt_path "rohitgandikota/erasing-vangogh" \
+    --esd_model_path "$ESD_VANGOGH" \
     --prompt_direct "a painting in the style of Van Gogh" \
     --prompt_synonym "a painting in the style of a post-impressionist Dutch painter" \
     --prompt_compositional "a painting with thick impasto brushstrokes and swirling night skies over a village" \
@@ -74,9 +74,13 @@ python experiments/probe_compositional.py --method esd \
 # ============================================================
 # Experiment 1b: TI Recovery Probe on ESD
 # ============================================================
+# Find ESD paths dynamically
+ESD_SNOOPY=$(find ../erasing -maxdepth 2 -type d -name "*Snoopy*" | head -n 1)
+ESD_VANGOGH=$(find ../erasing -maxdepth 2 -type d -name "*Van_Gogh*" -o -name "*Van Gogh*" | head -n 1)
+
 echo "=== TI Recovery: ESD Snoopy ==="
 python experiments/probe_textual_inversion.py --method esd \
-    --ckpt_path "rohitgandikota/erasing-snoopy" \
+    --esd_model_path "$ESD_SNOOPY" \
     --reference_prompt "a photo of Snoopy" \
     --learned_token "<snoopy>" \
     --anchor_concept "dog" \
@@ -86,7 +90,7 @@ python experiments/probe_textual_inversion.py --method esd \
 
 echo "=== TI Recovery: ESD Van Gogh ==="
 python experiments/probe_textual_inversion.py --method esd \
-    --ckpt_path "rohitgandikota/erasing-vangogh" \
+    --esd_model_path "$ESD_VANGOGH" \
     --reference_prompt "a painting in the style of Van Gogh" \
     --learned_token "<vangogh>" \
     --anchor_concept "art" \
