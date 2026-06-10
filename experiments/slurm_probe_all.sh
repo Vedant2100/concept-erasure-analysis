@@ -19,6 +19,10 @@ conda activate speed_env || conda activate mace_env
 
 cd $SLURM_SUBMIT_DIR
 
+# Find ESD paths dynamically
+ESD_SNOOPY=$(find ../erasing -maxdepth 2 -type d -name "*Snoopy*" | head -n 1)
+ESD_VANGOGH=$(find ../erasing -maxdepth 2 -type d -name "*Van_Gogh*" -o -name "*Van Gogh*" | head -n 1)
+
 # ============================================================
 # Experiment 2a: Compositional Evasion Probe (Snoopy)
 # ============================================================
@@ -90,9 +94,6 @@ python experiments/probe_compositional.py --method mace \
 # ============================================================
 # Experiment 1b: TI Recovery Probe on ESD
 # ============================================================
-# Find ESD paths dynamically
-ESD_SNOOPY=$(find ../erasing -maxdepth 2 -type d -name "*Snoopy*" | head -n 1)
-ESD_VANGOGH=$(find ../erasing -maxdepth 2 -type d -name "*Van_Gogh*" -o -name "*Van Gogh*" | head -n 1)
 
 echo "=== TI Recovery: ESD Snoopy ==="
 python experiments/probe_textual_inversion.py --method esd \
