@@ -1,6 +1,9 @@
 #!/bin/bash
 # setup_esd.sh
 
+source ~/miniconda/etc/profile.d/conda.sh
+conda activate base
+
 echo "Pre-caching ESD models from HuggingFace..."
 python -c "
 from diffusers import StableDiffusionPipeline

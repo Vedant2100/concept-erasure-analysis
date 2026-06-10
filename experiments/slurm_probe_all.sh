@@ -8,7 +8,7 @@
 source ~/miniconda/etc/profile.d/conda.sh
 conda activate base
 
-cd /Users/EndUser/Downloads/Repos/concept-erasure-project/experiments
+cd ~/concept-erasure-project/experiments
 
 echo "Running Baseline Probes..."
 python probe_compositional.py --method baseline \

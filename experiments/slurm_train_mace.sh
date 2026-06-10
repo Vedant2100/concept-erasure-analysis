@@ -9,7 +9,7 @@ source ~/miniconda/etc/profile.d/conda.sh
 conda activate base
 
 echo "Starting MACE training for Snoopy..."
-cd ../MACE
+cd ~/concept-erasure-project/MACE
 # Assuming a standard MACE training signature based on their repo structure
 python train_mace.py \
   --pretrained_model_name_or_path "CompVis/stable-diffusion-v1-4" \
