@@ -24,7 +24,7 @@ cd MACE
 
 # Ensure dependencies are installed in the activated conda environment
 pip install -r requirements.txt
-pip install omegaconf
+pip install omegaconf openai
 
 # MACE's actual training script is training.py
 python training.py \
