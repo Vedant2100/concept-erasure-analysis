@@ -34,12 +34,29 @@ def generate_reference_images(base_model_id, prompt, num_images=5):
     torch.cuda.empty_cache()
     return images
 
-def load_speed_pipeline(base_model_id, speed_ckpt):
-    print(f"Loading base pipeline {base_model_id}...")
-    pipe = StableDiffusionPipeline.from_pretrained(base_model_id, torch_dtype=torch.float16).to(DEVICE)
-    if speed_ckpt and os.path.exists(speed_ckpt):
-        print(f"Applying SPEED erased weights from {speed_ckpt}...")
-        pipe.unet.load_state_dict(torch.load(speed_ckpt, map_location="cpu"), strict=False)
+def load_pipeline(base_model_id, method, ckpt_path):
+    print(f"Loading pipeline for {method}...")
+    
+    if method == "esd":
+        if not ckpt_path:
+            raise ValueError("ESD requires a ckpt_path to the huggingface model")
+        pipe = StableDiffusionPipeline.from_pretrained(ckpt_path, torch_dtype=torch.float16).to(DEVICE)
+    else:
+        pipe = StableDiffusionPipeline.from_pretrained(base_model_id, torch_dtype=torch.float16).to(DEVICE)
+        
+        if method == "baseline":
+            pass
+        elif method == "speed":
+            if ckpt_path and os.path.exists(ckpt_path):
+                print(f"Applying SPEED weights from {ckpt_path}...")
+                pipe.unet.load_state_dict(torch.load(ckpt_path, map_location="cpu"), strict=False)
+        elif method == "mace":
+            if ckpt_path and os.path.exists(ckpt_path):
+                print(f"Applying MACE LoRA from {ckpt_path}...")
+                pipe.unet.load_attn_procs(ckpt_path)
+        else:
+            raise ValueError(f"Unknown method {method}")
+            
     pipe.set_progress_bar_config(disable=True)
     return pipe
 
@@ -70,14 +87,14 @@ def train_textual_inversion(args):
 
     # Pre-generate un-erased baseline for LPIPS comparison
     print("Generating un-erased baseline images for LPIPS comparison...")
-    base_pipe = load_speed_pipeline(args.base_model, speed_ckpt=None)
+    base_pipe = load_pipeline(args.base_model, "baseline", None)
     templates = template_dict[args.template_type][:5]
     sample_images(base_pipe, templates, args.anchor_concept, os.path.join(args.out_dir, "baseline"), seeds=[0, 1, 2, 3])
     del base_pipe
     torch.cuda.empty_cache()
 
-    # 2. Load SPEED erased model
-    pipe = load_speed_pipeline(args.base_model, args.speed_ckpt)
+    # 2. Load erased model
+    pipe = load_pipeline(args.base_model, args.method, args.ckpt_path)
     tokenizer = pipe.tokenizer
     text_encoder = pipe.text_encoder
     unet = pipe.unet
@@ -179,7 +196,8 @@ def train_textual_inversion(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--base_model", type=str, default="CompVis/stable-diffusion-v1-4")
-    parser.add_argument("--speed_ckpt", type=str, required=True, help="Path to SPEED .pt weights")
+    parser.add_argument("--method", type=str, choices=["baseline", "speed", "esd", "mace"], required=True)
+    parser.add_argument("--ckpt_path", type=str, help="Path to weights (SPEED .pt, MACE lora dir, or ESD hf repo)")
     parser.add_argument("--reference_prompt", type=str, required=True, help="Prompt to generate reference images (e.g. 'a photo of Snoopy')")
     parser.add_argument("--learned_token", type=str, required=True, help="Token to optimize (e.g. '<snoopy>')")
     parser.add_argument("--anchor_concept", type=str, required=True, help="Concept to initialize the token (e.g. 'dog' or 'art')")
