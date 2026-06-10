@@ -1,0 +1,14 @@
+/var/spool/slurmd/job107587/slurm_script: line 11: cd: /Users/EndUser/Downloads/Repos/concept-erasure-project/experiments: No such file or directory
+Running Baseline Probes...
+python: can't open file '/home/vbork001/concept-erasure-project/probe_compositional.py': [Errno 2] No such file or directory
+python: can't open file '/home/vbork001/concept-erasure-project/probe_textual_inversion.py': [Errno 2] No such file or directory
+Running SPEED Probes...
+python: can't open file '/home/vbork001/concept-erasure-project/probe_compositional.py': [Errno 2] No such file or directory
+python: can't open file '/home/vbork001/concept-erasure-project/probe_textual_inversion.py': [Errno 2] No such file or directory
+Running ESD Probes...
+python: can't open file '/home/vbork001/concept-erasure-project/probe_compositional.py': [Errno 2] No such file or directory
+python: can't open file '/home/vbork001/concept-erasure-project/probe_textual_inversion.py': [Errno 2] No such file or directory
+Running MACE Probes...
+python: can't open file '/home/vbork001/concept-erasure-project/probe_compositional.py': [Errno 2] No such file or directory
+python: can't open file '/home/vbork001/concept-erasure-project/probe_textual_inversion.py': [Errno 2] No such file or directory
+All Probes Completed!

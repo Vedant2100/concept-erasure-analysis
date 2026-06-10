@@ -1,0 +1,28 @@
+
+EnvironmentNameNotFound: Could not find conda environment: speed_env
+You can list all discoverable environments with `conda info --envs`.
+
+
+Starting Evaluation for Snoopy (Instance)...
+/home/vbork001/miniconda/envs/mace_env/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/home/vbork001/miniconda/envs/mace_env/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+Downloading: "https://download.pytorch.org/models/vgg16-397923af.pth" to /home/vbork001/.cache/torch/hub/checkpoints/vgg16-397923af.pth
+Loading CLIP and LPIPS models...
+Setting up [LPIPS] perceptual loss: trunk [vgg], v[0.1], spatial [off]
+  0%|          | 0.00/528M [00:00<?, ?B/s]  1%|▏         | 7.38M/528M [00:00<00:07, 77.1MB/s]  3%|▎         | 17.6M/528M [00:00<00:05, 93.1MB/s]  6%|▌         | 29.9M/528M [00:00<00:04, 109MB/s]   8%|▊         | 41.0M/528M [00:00<00:04, 112MB/s] 10%|▉         | 51.8M/528M [00:00<00:04, 109MB/s] 12%|█▏        | 63.1M/528M [00:00<00:04, 112MB/s] 14%|█▍        | 74.9M/528M [00:00<00:04, 116MB/s] 16%|█▋        | 86.2M/528M [00:00<00:03, 117MB/s] 18%|█▊        | 97.5M/528M [00:00<00:03, 114MB/s] 21%|██        | 109M/528M [00:01<00:03, 114MB/s]  23%|██▎       | 120M/528M [00:01<00:03, 114MB/s] 25%|██▍       | 131M/528M [00:01<00:03, 114MB/s] 27%|██▋       | 142M/528M [00:01<00:03, 114MB/s] 29%|██▉       | 153M/528M [00:01<00:03, 115MB/s] 31%|███       | 164M/528M [00:01<00:03, 114MB/s] 33%|███▎      | 175M/528M [00:01<00:03, 115MB/s] 35%|███▌      | 186M/528M [00:01<00:03, 114MB/s] 38%|███▊      | 198M/528M [00:01<00:02, 116MB/s] 40%|███▉      | 209M/528M [00:01<00:02, 114MB/s] 42%|████▏     | 221M/528M [00:02<00:02, 116MB/s] 44%|████▍     | 232M/528M [00:02<00:02, 115MB/s] 46%|████▌     | 243M/528M [00:02<00:02, 116MB/s] 48%|████▊     | 254M/528M [00:02<00:02, 115MB/s] 50%|█████     | 266M/528M [00:02<00:02, 116MB/s] 53%|█████▎    | 277M/528M [00:02<00:02, 115MB/s] 55%|█████▍    | 289M/528M [00:02<00:02, 116MB/s] 57%|█████▋    | 300M/528M [00:02<00:02, 114MB/s] 59%|█████▉    | 312M/528M [00:02<00:01, 116MB/s] 61%|██████    | 323M/528M [00:02<00:01, 114MB/s] 63%|██████▎   | 334M/528M [00:03<00:01, 117MB/s] 66%|██████▌   | 346M/528M [00:03<00:01, 115MB/s] 68%|██████▊   | 357M/528M [00:03<00:01, 113MB/s] 70%|██████▉   | 369M/528M [00:03<00:01, 115MB/s] 72%|███████▏  | 380M/528M [00:03<00:01, 114MB/s] 74%|███████▍  | 391M/528M [00:03<00:01, 115MB/s] 76%|███████▌  | 402M/528M [00:03<00:01, 115MB/s] 78%|███████▊  | 413M/528M [00:03<00:01, 115MB/s] 80%|████████  | 424M/528M [00:03<00:00, 115MB/s] 82%|████████▏ | 435M/528M [00:04<00:00, 114MB/s] 85%|████████▍ | 446M/528M [00:04<00:00, 113MB/s] 87%|████████▋ | 458M/528M [00:04<00:00, 115MB/s] 89%|████████▉ | 470M/528M [00:04<00:00, 117MB/s] 91%|█████████ | 481M/528M [00:04<00:00, 115MB/s] 93%|█████████▎| 492M/528M [00:04<00:00, 117MB/s] 95%|█████████▌| 504M/528M [00:04<00:00, 115MB/s] 98%|█████████▊| 515M/528M [00:04<00:00, 117MB/s]100%|█████████▉| 526M/528M [00:04<00:00, 115MB/s]100%|██████████| 528M/528M [00:04<00:00, 114MB/s]
+Loading model from: /home/vbork001/miniconda/envs/mace_env/lib/python3.10/site-packages/lpips/weights/v0.1/vgg.pth
+budget_0: {'budget': 0, 'recovery_rate': 0.0, 'cs_target': 0.1577619832009077, 'lpips': 0.4779986247420311}
+Saved evaluation metrics to results/probe_ti/snoopy/evaluation_metrics.csv
+Starting Evaluation for Van Gogh (Style)...
+/home/vbork001/miniconda/envs/mace_env/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/home/vbork001/miniconda/envs/mace_env/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+Loading CLIP and LPIPS models...
+Setting up [LPIPS] perceptual loss: trunk [vgg], v[0.1], spatial [off]
+Loading model from: /home/vbork001/miniconda/envs/mace_env/lib/python3.10/site-packages/lpips/weights/v0.1/vgg.pth
+budget_0: {'budget': 0, 'recovery_rate': 0.4, 'cs_target': 0.16054741218686103, 'lpips': 0.5667445242404938}
+Saved evaluation metrics to results/probe_ti/vangogh/evaluation_metrics.csv
+Evaluation complete! Check results/probe_ti/snoopy/evaluation_metrics.csv and results/probe_ti/vangogh/evaluation_metrics.csv

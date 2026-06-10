@@ -1,0 +1,88 @@
+
+EnvironmentNameNotFound: Could not find conda environment: speed_env
+You can list all discoverable environments with `conda info --envs`.
+
+
+=== Compositional Probe: Baseline ===
+Loading pipeline for baseline...
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:01,  3.28it/s]Loading pipeline components...:  43%|████▎     | 3/7 [00:00<00:00,  4.50it/s]Loading pipeline components...:  86%|████████▌ | 6/7 [00:00<00:00,  7.58it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.39it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.30it/s]
+Generating direct: a photo of Snoopy
+Generating synonym: a photo of the beagle from Peanuts
+Generating compositional: a white dog with black ears sleeping on a red doghouse
+Done! Results saved to results/comp_snoopy
+=== Compositional Probe: SPEED ===
+Loading pipeline for speed...
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:01,  3.80it/s]Loading pipeline components...:  43%|████▎     | 3/7 [00:00<00:01,  3.31it/s]Loading pipeline components...:  57%|█████▋    | 4/7 [00:01<00:00,  3.71it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  7.40it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.60it/s]
+Traceback (most recent call last):
+  File "/home/vbork001/concept-erasure-project/experiments/probe_compositional.py", line 72, in <module>
+    run_compositional_probe(args)
+  File "/home/vbork001/concept-erasure-project/experiments/probe_compositional.py", line 40, in run_compositional_probe
+    pipe = load_pipeline(args.base_model, args.method, args.ckpt_path)
+  File "/home/vbork001/concept-erasure-project/experiments/probe_compositional.py", line 24, in load_pipeline
+    raise ValueError("SPEED requires a valid ckpt_path")
+ValueError: SPEED requires a valid ckpt_path
+=== Compositional Probe: ESD ===
+usage: probe_compositional.py [-h] [--base_model BASE_MODEL] --method
+                              {baseline,speed,esd,mace}
+                              [--ckpt_path CKPT_PATH] --prompt_direct
+                              PROMPT_DIRECT --prompt_synonym PROMPT_SYNONYM
+                              --prompt_compositional PROMPT_COMPOSITIONAL
+                              [--seeds SEEDS [SEEDS ...]] --out_dir OUT_DIR
+probe_compositional.py: error: unrecognized arguments: --esd_model_path 
+=== Compositional Probe: Baseline (Van Gogh) ===
+Loading pipeline for baseline...
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:00, 16.11it/s]Loading pipeline components...:  57%|█████▋    | 4/7 [00:00<00:00,  5.86it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:00<00:00,  5.36it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.20it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.64it/s]
+Generating direct: a painting in the style of Van Gogh
+Generating synonym: a painting in the style of a post-impressionist Dutch painter
+Generating compositional: a painting with thick impasto brushstrokes and swirling night skies over a village
+Done! Results saved to results/comp_vangogh
+=== Compositional Probe: SPEED (Van Gogh) ===
+Loading pipeline for speed...
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:02,  2.56it/s]Loading pipeline components...:  43%|████▎     | 3/7 [00:00<00:00,  7.23it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:01<00:00,  4.00it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.51it/s]
+Traceback (most recent call last):
+  File "/home/vbork001/concept-erasure-project/experiments/probe_compositional.py", line 72, in <module>
+    run_compositional_probe(args)
+  File "/home/vbork001/concept-erasure-project/experiments/probe_compositional.py", line 40, in run_compositional_probe
+    pipe = load_pipeline(args.base_model, args.method, args.ckpt_path)
+  File "/home/vbork001/concept-erasure-project/experiments/probe_compositional.py", line 24, in load_pipeline
+    raise ValueError("SPEED requires a valid ckpt_path")
+ValueError: SPEED requires a valid ckpt_path
+=== Compositional Probe: ESD (Van Gogh) ===
+usage: probe_compositional.py [-h] [--base_model BASE_MODEL] --method
+                              {baseline,speed,esd,mace}
+                              [--ckpt_path CKPT_PATH] --prompt_direct
+                              PROMPT_DIRECT --prompt_synonym PROMPT_SYNONYM
+                              --prompt_compositional PROMPT_COMPOSITIONAL
+                              [--seeds SEEDS [SEEDS ...]] --out_dir OUT_DIR
+probe_compositional.py: error: unrecognized arguments: --esd_model_path 
+=== TI Recovery: ESD Snoopy ===
+Generating 5 reference images from base model...
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:01,  3.54it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:01,  3.00it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:00<00:00,  7.51it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.48it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.29it/s]
+Generating un-erased baseline images for LPIPS comparison...
+Loading pipeline for baseline...
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:01,  4.17it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:01,  3.16it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:00<00:00,  7.86it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.69it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.55it/s]
+Loading pipeline for esd...
+Traceback (most recent call last):
+  File "/home/vbork001/concept-erasure-project/experiments/probe_textual_inversion.py", line 213, in <module>
+    train_textual_inversion(args)
+  File "/home/vbork001/concept-erasure-project/experiments/probe_textual_inversion.py", line 98, in train_textual_inversion
+    pipe = load_pipeline(args.base_model, args.method, args.ckpt_path)
+  File "/home/vbork001/concept-erasure-project/experiments/probe_textual_inversion.py", line 43, in load_pipeline
+    raise ValueError("ESD requires a ckpt_path or esd_model_path to the huggingface model")
+ValueError: ESD requires a ckpt_path or esd_model_path to the huggingface model
+=== TI Recovery: ESD Van Gogh ===
+Generating 5 reference images from base model...
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:01,  4.74it/s]Loading pipeline components...:  43%|████▎     | 3/7 [00:00<00:01,  3.09it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:01<00:00,  5.31it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  6.52it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.52it/s]
+Generating un-erased baseline images for LPIPS comparison...
+Loading pipeline for baseline...
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:00,  5.39it/s]Loading pipeline components...:  43%|████▎     | 3/7 [00:00<00:01,  3.24it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:00<00:00,  5.53it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  6.72it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.77it/s]
+Loading pipeline for esd...
+Traceback (most recent call last):
+  File "/home/vbork001/concept-erasure-project/experiments/probe_textual_inversion.py", line 213, in <module>
+    train_textual_inversion(args)
+  File "/home/vbork001/concept-erasure-project/experiments/probe_textual_inversion.py", line 98, in train_textual_inversion
+    pipe = load_pipeline(args.base_model, args.method, args.ckpt_path)
+  File "/home/vbork001/concept-erasure-project/experiments/probe_textual_inversion.py", line 43, in load_pipeline
+    raise ValueError("ESD requires a ckpt_path or esd_model_path to the huggingface model")
+ValueError: ESD requires a ckpt_path or esd_model_path to the huggingface model
+All Probes Completed!
