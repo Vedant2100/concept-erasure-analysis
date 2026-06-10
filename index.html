@@ -90,7 +90,16 @@ graph TD
   </div>
 </div>
 
-<p><em>Observation:</em> <strong>Mixed Robustness based on Concept Type.</strong> The results reveal a stark contrast in how SPEED handles different concept types. For the instance concept (<em>Snoopy</em>), the recovery rate remained at <strong>0% even after 1,000 Textual Inversion steps</strong>, suggesting the specific visual features of Snoopy were deeply disrupted. However, for the style concept (<em>Van Gogh</em>), the erasure was leaky from the start (40% recovery at 0 steps) and shot up to a <strong>100% recovery rate in just 50 steps</strong>. This proves that for broad style concepts, SPEED merely hides the concept from the standard text encoder, leaving the visual knowledge completely intact and easily recoverable.</p>
+<div class="highlight-box" style="background-color: var(--bg-alt); padding: 1.5em; border-left: 4px solid var(--fg); margin: 1.5em 0; border-radius: 4px;">
+  <h4 style="margin-top: 0; color: var(--fg);">The Reversibility Blindspot in Current Literature</h4>
+  <p>Neither <strong>ESD</strong> nor <strong>SPEED</strong> test whether their erasures can be reversed. They assume that if the standard prompt (e.g., <em>“A painting in the style of Van Gogh”</em>) fails to generate the concept, the knowledge is successfully destroyed.</p>
+  <p><strong>Our Finding:</strong> Our Textual Inversion (TI) experiment directly attacks this assumption.</p>
+  <ul>
+    <li>We found that SPEED's null-space projection permanently destroys the visual features of instance concepts (e.g., <strong>Snoopy remains at 0% recovery</strong> even after 1,000 TI steps).</li>
+    <li>However, for distributed style concepts, the erasure is purely lexical. <strong>Van Gogh recovered to 100% within just 50 TI steps</strong>.</li>
+  </ul>
+  <p style="margin-bottom: 0;"><strong>Analysis:</strong> SPEED claims precise erasure for Van Gogh in their paper (Table 1) based purely on zero-shot CLIP scores. However, our probe proves that SPEED only severs the text-to-image mapping for the specific token "Van Gogh". The actual visual knowledge of the style is fully intact in the U-Net and trivially recoverable by a malicious (or curious) user.</p>
+</div>
 
 <h3 id="exp2">Experiment 2: Compositional Prompt Evasion</h3>
 <p><strong>Hypothesis:</strong> Does erasing a concept by its canonical name prevent generation via synonyms, hypernyms, and compositional scene descriptions?</p>
