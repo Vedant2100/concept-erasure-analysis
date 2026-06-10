@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ttm</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="blog.css" />
+  <script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<h1
+id="test-time-matching-unlocking-compositional-reasoning-in-multimodal-models">Test-Time
+Matching:<br>Unlocking Compositional Reasoning<br>in Multimodal
+Models</h1>
+<p style="text-align: center; margin: 1.5em 0;">
+<span
+style="color: var(--fg);"><a href="https://yinglunz.com/" target="_blank" style="color: inherit; text-decoration: none;">Yinglun
+Zhu</a>, Jiancheng Zhang, Fuzhi Tang<br> University of California,
+Riverside<br></span> <span style="color: #666;">October 28, 2025 • 8 min
+read</span><br>
+<a href="https://arxiv.org/pdf/2510.07632" target="_blank">Paper</a> |
+<a href="https://github.com/yinglunz/test-time-matching" target="_blank">Code</a><br>
+<span
+style="color: #666; font-size: 0.9em; margin-top: 0.5em; display: inline-block;">Correspondence:
+<a href="mailto:yzhu@ucr.edu">yzhu@ucr.edu</a></span>
+</p>
+<p><img src="figs/ttm/image1.png" /></p>
+<h2 id="tldr">TL;DR</h2>
+<p>Modern multimodal models often appear to perform no better than
+random guessing on compositional reasoning tasks. We revisit this puzzle
+and find that part of the limitation arises from overly rigid evaluation
+metrics that systematically underestimate model capability. We introduce
+a new GroupMatch metric that reveals hidden capability—enabling GPT-4.1
+to surpass human performance on Winoground. Building on this insight, we
+propose Test-Time Matching (TTM), an iterative, self-improving algorithm
+that further boosts model performance without external supervision. TTM
+enables SigLIP-B16, a model with only 0.2B parameters, to outperform
+GPT-4.1 on MMVP-VLM, establishing a new state of the art.</p>
+<h2 id="background">Background</h2>
+<p>Compositional reasoning provides
+<a href="https://arxiv.org/pdf/1604.00289" target="_blank">a stringent
+test</a> of frontier AI models, assessing their ability to combine
+primitive elements—such as objects, attributes, and relations—to
+interpret or reason about novel configurations. Recent benchmarks
+evaluate this capability by organizing examples into small
+<em>groups</em> of images and captions that differ in subtle yet
+systematic ways. For example,
+<a href="https://arxiv.org/pdf/2204.03162" target="_blank">Winoground</a>
+consists of <span class="math inline">\(2 \times 2\)</span> groups where
+both captions contain the same words but in different orders, such that
+each caption correctly describes only one of the two images.</p>
+<p>Despite their broad capabilities, both contrastive vision-language
+models (VLMs) and multimodal large language models (MLLMs) have been
+<a href="https://arxiv.org/pdf/2401.06209" target="_blank">reported</a>
+to perform <em>at or below random guessing</em> on these benchmarks. On
+Winoground, even frontier AI models still trail behind the estimated
+human performance of 85.5, with the previous state of the art reaching
+only 58.75—achieved through
+<a href="https://arxiv.org/pdf/2501.13620" target="_blank">scaffolding</a>
+and <a href="https://arxiv.org/pdf/2311.09193" target="_blank">prompt
+tuning</a> GPT-4V.</p>
+<h2
+id="revisiting-evaluation-metrics-from-random-guessing-to-group-matching">Revisiting
+Evaluation Metrics: From Random Guessing to Group Matching</h2>
+<p>We find that part of the difficulty arises from the <em>metric</em>
+itself. The widely used<a href="#fn1" class="footnote-ref" id="fnref1"
+role="doc-noteref"><sup>1</sup></a> <strong>GroupScore</strong> metric
+is extremely strict: it requires each image to align with its correct
+caption and each caption with its correct image, <em>without enforcing
+global consistency across the group</em>. Any collision in assignment
+results in a score of 0. Suppose the ground-truth pairings are <span
+class="math inline">\(\{(I_i, C_i)\}_{i=1}^k\)</span>. Let <span
+class="math inline">\(s \in {\mathbb R}^{k \times k}\)</span> denote the
+similarity matrix where <span class="math inline">\(s_{ij} := s(I_i,
+C_j)\)</span> represents the similarity score between image <span
+class="math inline">\(I_i\)</span> and caption <span
+class="math inline">\(C_j\)</span>. The GroupScore is then computed
+through separate row-wise and column-wise checks: <img
+src="figs/ttm/eq1.png" /> With random scores, the success rate for a
+<span class="math inline">\(k\times k\)</span> group is <span
+class="math inline">\(\frac{(k-1)!}{(2k-1)!}\)</span>—only 1/6 when
+<span class="math inline">\(k=2\)</span>.</p>
+<p>To address this, we introduce a new <strong>GroupMatch</strong>
+score, which evaluates the <em>best overall matching</em> instead of
+isolated pairwise comparisons. GroupMatch considers all <span
+class="math inline">\(k!\)</span> possible bijective matchings <span
+class="math inline">\(\pi\)</span> and selects the most likely one. Let
+<span class="math inline">\(\pi^\star: i \mapsto i\)</span> denote the
+ground-truth matching. The GroupMatch score is defined as: <img
+src="figs/ttm/eq2.png" /> The GroupMatch metric <em>increases</em> the
+random-guess success probability to <span
+class="math inline">\(\frac{1}{k!}\)</span> (for <span
+class="math inline">\(2\times2\)</span> groups, from 1/6 to 1/2).</p>
+<p>Crucially, if the correct matching is identified under GroupMatch,
+simply overfitting to that matching at test time guarantees a perfect
+GroupScore. This reveals an <em>arbitrage opportunity</em>—we can
+improve model performance under the original metric through a simple
+two-step <strong>SimpleMatch</strong> procedure:</p>
+<ul>
+<li>Select the most likely matching using GroupMatch.</li>
+<li>Overfit to that matching at test time.</li>
+</ul>
+<p>As shown in Fig. 1 above, SimpleMatch reveals substantial hidden
+capability: it enables
+<a href="https://arxiv.org/pdf/2303.15343" target="_blank">SigLIP-B16</a>
+to surpass all previous results and <strong>GPT-4.1 to yield the first
+result surpassing human performance on Winoground.</strong><a
+href="#fn2" class="footnote-ref" id="fnref2"
+role="doc-noteref"><sup>2</sup></a></p>
+<h2
+id="test-time-matching-iterative-bootstrapping-of-model-performance">Test-Time
+Matching: Iterative Bootstrapping of Model Performance</h2>
+<p>To further improve model performance, we introduce <strong>Test-Time
+Matching (TTM)</strong>—an iterative, self-improving algorithm that
+bootstraps performance without external supervision.</p>
+<p>Each iteration of TTM proceeds as follows:</p>
+<ul>
+<li>The current model predicts matchings for all groups.</li>
+<li>Only confident predictions—those with margin scores above a
+threshold—are kept as pseudo-labels. The model finetunes itself on these
+pseudo-labels.</li>
+<li>The threshold is gradually relaxed to include more pseudo-labels for
+the next iteration.</li>
+</ul>
+<p>Two key components make TTM effective: (i) <strong>GroupMatch-based
+pseudo-labels</strong>, which provide stronger supervision than
+GroupScore by leveraging group structures, and (ii) <strong>a decaying
+threshold schedule</strong>, which allows the model to first learn from
+high-precision pseudo-labels before gradually expanding coverage over
+the test set.</p>
+<p>Our TTM algorithm is a form of
+<a href="https://arxiv.org/pdf/1909.13231" target="_blank">test-time
+training</a>, drawing inspiration from
+<a href="https://arxiv.org/pdf/2002.11361" target="_blank">self-training</a>,
+<a href="https://arxiv.org/pdf/2001.07685" target="_blank">semi-supervised
+learning</a>, and
+<a href="https://arxiv.org/pdf/2204.00043" target="_blank">active
+learning</a>.</p>
+<p><img src="figs/ttm/image2.png" /></p>
+<p>As shown in Table 1, TTM consistently improves over SimpleMatch
+across datasets and models—achieving up to 10.5% relative gains and
+54.8% relative error reduction. Remarkably, TTM lifts SigLIP-L16 to
+GPT-4.1’s level on
+<a href="https://arxiv.org/pdf/2402.04492" target="_blank">ColorSwap</a>
+and <strong>enables SigLIP-B16, a model with only 0.2B parameters, to
+surpass GPT-4.1 on MMVP-VLM, establishing a new state of the
+art.</strong></p>
+<h2 id="broad-applicability-of-test-time-matching">Broad Applicability
+of Test-Time Matching</h2>
+<p>While results above are obtained on compositional benchmarks with
+<span class="math inline">\(k \times k\)</span> groups, TTM generalizes
+to rectangular groups and non-grouped settings.</p>
+<p><strong>TTM improves models without metric-induced boosts.</strong>
+For <span class="math inline">\(1 \times k\)</span> groups, GroupMatch
+coincides with GroupScore, so metric changes alone bring no benefit.
+Even so, TTM consistently delivers substantial test-time improvements on
+<a href="https://arxiv.org/pdf/2306.14610" target="_blank">SugarCrepe</a>
+and
+<a href="https://arxiv.org/pdf/2310.19785" target="_blank">WhatsUp</a>
+datasets. The gains are especially striking on the WhatsUp datasets,
+where performance improves by up to 85.7%, turning previously
+challenging tasks into tractable ones.</p>
+<p><img src="figs/ttm/image3.png" /></p>
+<p><strong>TTM improves models without group structures.</strong> TTM
+can be extended to datasets without predefined groups by treating the
+entire dataset as a
+<a href="https://en.wikipedia.org/wiki/Assignment_problem" target="_blank">global
+assignment problem</a> between all images and captions—solved
+efficiently in polynomial time. Flattening Winoground, MMVP-VLM, and
+ColorSwap into ungrouped sets, the global variant of TTM still improves
+performance, achieving up to 33.3% relative error reduction.</p>
+<p><img src="figs/ttm/image4.png" /></p>
+<h2 id="discussion">Discussion</h2>
+<p>We revisit the long-standing puzzle of compositional reasoning,
+showing that much of the apparent failure of multimodal models arises
+from overly rigid evaluation metrics that systematically underestimate
+model capability. Our proposed <strong>GroupMatch</strong> metric and
+<strong>Test-Time Matching (TTM)</strong> algorithm reveal that
+substantial compositional reasoning capability already exists within
+current models—it simply needs to be unlocked at test time with the
+right methods. Experiments across 16 dataset variants spanning diverse
+setups demonstrate the robustness and effectiveness of TTM. For more
+details, please see our
+<a href="https://arxiv.org/pdf/2510.07632" target="_blank">paper</a>.</p>
+<p>Moving forward, we highlight two promising directions:</p>
+<ul>
+<li><p><strong>Rethinking model evaluation.</strong> The same model can
+appear drastically different under different metrics—highlighting the
+need for more robust and reliable evaluation protocols.</p></li>
+<li><p><strong>Extending TTM beyond compositional reasoning.</strong>
+While developed in the context of compositional reasoning, the core
+principle of TTM—iterative, matching-based self-training at test time—is
+general. Exploring it in broader multimodal or language-only settings
+may open new directions in test-time adaptation and self-improving
+AI.</p></li>
+</ul>
+<h2 id="citation">Citation</h2>
+<p>If you find this work useful, please consider citing:</p>
+<pre><code>@article{zhu2025test,
+  title={Test-Time Matching: Unlocking Compositional Reasoning in Multimodal Models},
+  author={Zhu, Yinglun and Zhang, Jiancheng and Tang, Fuzhi},
+  journal={arXiv preprint arXiv:2510.07632},
+  year={2025}
+}</code></pre>
+<section id="footnotes" class="footnotes footnotes-end-of-document"
+role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>The GroupScore metric has been widely adopted in
+compositional reasoning benchmarks; as of October 2025, benchmarks such
+as
+<a href="https://arxiv.org/pdf/2204.03162" target="_blank">Winoground</a>
+and
+<a href="https://arxiv.org/pdf/2401.06209" target="_blank">MMVP-VLM</a>
+have each received over 500 citations, reflecting their broad use in
+multimodal reasoning research.<a href="#fnref1" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>We use GPT-4.1-2025-04-14, the latest GPT model that
+provides log probabilities, enabling more accurate computation of
+similarities scores via
+<a href="https://arxiv.org/pdf/2404.01291" target="_blank">VQAScore</a>.
+As of October 2025, GPT-5 does not support log probability outputs.<a
+href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+</body>
+</html>

@@ -13,6 +13,7 @@
 <body>
 
 <h1>SPEED: Scalable, Precise, and Efficient Concept Erasure<br>Project Analysis</h1>
+<!--
 <p style="text-align: center; margin: 1.5em 0;">
 <span style="color: var(--fg);"><strong>Vedant Rathore</strong><br> CS Visual Recognition · EE 243 2026<br></span>
 <span style="color: #666;">June 12, 2026 • Course Project</span><br>
@@ -24,6 +25,7 @@
 <h2 id="tldr">TL;DR</h2>
 <p>Large-scale text-to-image models are trained on internet-scale data and inevitably learn to generate harmful, copyrighted, or otherwise undesirable content. <strong>Concept erasure</strong> is the task of surgically removing specific visual concepts from a pretrained model's weights — without retraining from scratch and without post-hoc filters that can be bypassed.</p>
 <p>This project traces the lineage from the original ESD method (Gandikota et al., 2023) through to <strong>SPEED</strong> (Gupta et al., ICLR 2026), identifying SPEED as the current open-source frontier. We systematically probe its failure modes through targeted empirical experiments, focusing on two concrete bottlenecks: <em>Textual Inversion Recovery</em> and <em>Compositional Prompt Evasion</em>.</p>
+-->
 
 <h2 id="lineage">Research Lineage</h2>
 <p>ESD was not the first attempt to make generative models safer, nor the last. The field converged on weight-editing after finding dataset filtering too expensive and inference-time steering inadequate. The following diagram traces the lineage from foundations to the current frontier.</p>
@@ -88,7 +90,7 @@ graph TD
   </div>
 </div>
 
-<p><em>Observation:</em> [Fill in result — typically, concepts recover rapidly within just a few hundred steps, proving the visual knowledge remains in the U-Net.]</p>
+<p><em>Observation:</em> <strong>Mixed Robustness based on Concept Type.</strong> The results reveal a stark contrast in how SPEED handles different concept types. For the instance concept (<em>Snoopy</em>), the recovery rate remained at <strong>0% even after 1,000 Textual Inversion steps</strong>, suggesting the specific visual features of Snoopy were deeply disrupted. However, for the style concept (<em>Van Gogh</em>), the erasure was leaky from the start (40% recovery at 0 steps) and shot up to a <strong>100% recovery rate in just 50 steps</strong>. This proves that for broad style concepts, SPEED merely hides the concept from the standard text encoder, leaving the visual knowledge completely intact and easily recoverable.</p>
 
 <h3 id="exp2">Experiment 2: Compositional Prompt Evasion</h3>
 <p><strong>Hypothesis:</strong> Does erasing a concept by its canonical name prevent generation via synonyms, hypernyms, and compositional scene descriptions?</p>
