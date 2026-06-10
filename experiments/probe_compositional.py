@@ -9,11 +9,16 @@ def load_pipeline(base_model_id, method, ckpt_path, esd_model_path=None):
     print(f"Loading pipeline for {method}...")
     
     if method == "esd":
-        # ESD checkpoints are full diffusers models on HuggingFace
         model_path = esd_model_path if esd_model_path else ckpt_path
         if not model_path:
-            raise ValueError("ESD requires a ckpt_path or esd_model_path to the huggingface model")
-        pipe = StableDiffusionPipeline.from_pretrained(model_path, torch_dtype=torch.float16).to(DEVICE)
+            raise ValueError("ESD requires a ckpt_path or esd_model_path")
+        
+        if model_path.endswith(".pt"):
+            pipe = StableDiffusionPipeline.from_pretrained(base_model_id, torch_dtype=torch.float16).to(DEVICE)
+            print(f"Applying ESD U-Net weights from {model_path}...")
+            pipe.unet.load_state_dict(torch.load(model_path, map_location="cpu"), strict=False)
+        else:
+            pipe = StableDiffusionPipeline.from_pretrained(model_path, torch_dtype=torch.float16).to(DEVICE)
     else:
         pipe = StableDiffusionPipeline.from_pretrained(base_model_id, torch_dtype=torch.float16).to(DEVICE)
         
