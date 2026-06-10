@@ -21,6 +21,11 @@ cd $SLURM_SUBMIT_DIR
 
 echo "Starting MACE training for Snoopy..."
 cd MACE
+
+# Ensure dependencies are installed in the activated conda environment
+pip install -r requirements.txt
+pip install omegaconf
+
 # MACE's actual training script is training.py
 python training.py \
   --pretrained_model_name_or_path "CompVis/stable-diffusion-v1-4" \
