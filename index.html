@@ -199,7 +199,25 @@
           </div>
         </div>
 
-        <h3>Visual Proof: The Golden Wheat Test</h3>
+        <h3>Visual Proof 1: The Explicit Name Test (Sanity Check)</h3>
+        <p>Prompt: <em>"a painting in the style of Van Gogh"</em></p>
+        <div class="image-grid">
+          <div class="image-card">
+            <img src="experiment4/results/paraphrase/baseline/named/named_vangogh/seed0.png" alt="Baseline">
+            <div class="image-label">Baseline (Unerased)</div>
+          </div>
+          <div class="image-card">
+            <img src="experiment4/results/paraphrase/speed_1c/named/named_vangogh/seed0.png" alt="SPEED" style="border: 3px solid var(--success);">
+            <div class="image-label" style="color: var(--success);">SPEED (Erased) — Successfully suppressed</div>
+          </div>
+          <div class="image-card">
+            <img src="experiment4/results/paraphrase/esd_x/named/named_vangogh/seed0.png" alt="ESD-x" style="border: 3px solid var(--success);">
+            <div class="image-label" style="color: var(--success);">ESD-x (Erased) — Successfully suppressed</div>
+          </div>
+        </div>
+        <p style="margin-bottom: 25px; color: var(--text-muted); font-size: 0.9em;">Both methods successfully erase the style when the exact target tokens are used in the prompt.</p>
+
+        <h3>Visual Proof 2: The Paraphrase Evasion Test</h3>
         <p>Prompt: <em>"a painting of golden wheat fields under a turbulent blue sky with heavy expressive brushwork"</em></p>
         <div class="image-grid">
           <div class="image-card">
