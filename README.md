@@ -1,44 +1,54 @@
-# Erasing Concepts from Diffusion Models — Project Analysis
+# Erasing Concepts from Diffusion Models — Semantic Neighbor Damage
 
 **Course:** EE243  
 **Student:** Vedant  
-**Frontier paper:** SPEED: Scalable, Precise, and Efficient Concept Erasure for Diffusion Models (Gupta et al., ICLR 2026)
+**Frontier paper:** SPEED: Scalable, Precise, and Efficient Concept Erasure for Diffusion Models (Li et al., ICLR 2026)
 
-🌐 **[Project Webpage](https://vedant2100.github.io/concept-erasure-analysis)**  
-▶️ **[Video Walkthrough](#)** *(link added after recording)*
-
----
-
-## Overview
-
-This project traces the research lineage from ESD (Gandikota et al., 2023) through to SPEED (Gupta et al., ICLR 2026), identifies SPEED as the current open-source frontier for training-free concept erasure in diffusion models, and then empirically exposes its limitations through three targeted bottleneck probes:
-
-1. **Textual Inversion Recovery** — evaluating if erased concepts can be "re-learned" with few-shot optimization, proving that stylistic erasures under SPEED are merely lexical, not visual.
-2. **Compositional Prompt Evasion** — demonstrating that erasing a concept by its canonical name does not prevent generation via synonyms or compositional descriptions.
-3. **Retain-Set Horizon (Semantic Collateral Damage)** — investigating whether the null-space projection safely preserves semantic neighbors outside of the explicit retain set (SPEED) compared to unconstrained gradient updates (ESD-x).
-
-All experiments use independently written evaluation code in `diffusers` testing the official released checkpoints.
+🌐 **[Project Webpage](https://vedant2100.github.io/concept-erasure-analysis)**
 
 ---
 
-## Repo Structure
+## Experiment 3: Semantic Neighbor Collateral Damage (The "Blast Radius" Test)
 
+This branch hosts the codebase and visual results specifically for **Experiment 3** (Semantic Neighbor Collateral Damage).
+
+We investigate the **retain-set horizon** of SPEED's null-space projection:
+* **The Goal:** Test if SPEED's null-space projection edits bleed into semantic neighbors (similar artists) that fall outside the explicit protected list (retain set).
+* **Key Discovery:** It is not a binary damage-vs-no-damage landscape, but a spectrum. Artists with high mathematical footprints (displacement) under SPEED's edit suffer noticeable visual style suppression (e.g., Theo van Rysselberghe and Jan Toorop) even when not in the retain set, while low-similarity adjacent artists (Monticelli, van Rappard) remain perfectly preserved.
+
+---
+
+## Branch Structure
+
+* `experiments/`
+  * `footprint_analysis.py` — Calculates mathematical footprint / weight displacement for unprotected style concepts.
+  * `probe_neighbor_damage.py` — Evaluates neighbor visual damage by generating images from baseline, SPEED, and ESD-x.
+  * `neighbor_prompts.json` — Prompt library containing target artists.
+  * `setup_speed.sh` / `setup_esd_neighbor.sh` — Downloads weights.
+  * `slurm_probe_neighbor.sh` — Executes the neighbor damage probe on cluster.
+* `results/neighbor_damage/` — PNG outputs for baseline, SPEED, and ESD-x across target artists.
+
+To run the footprint analysis:
+```bash
+python experiments/footprint_analysis.py \
+    --speed_ckpt checkpoints/speed/few-concept/style/Van\ Gogh.pt \
+    --base_model CompVis/stable-diffusion-v1-4 \
+    --retain_set SPEED_repo/data/style.csv \
+    --out footprint_results.csv
 ```
-concept-erasure-analysis/
-├── index.html                  ← GitHub Pages project webpage
-├── README.md
-├── requirements.txt
-├── blog.css                    ← Styling for the webpage
-├── experiments/
-│   ├── probe_ti_recovery.py    ← Experiment 1: Textual Inversion recovery
-│   ├── probe_compositional.py  ← Experiment 2: Compositional prompt evasion
-│   └── probe_neighbor_damage.py← Experiment 3: Semantic neighbor collateral damage
-└── results/                    ← Generated evaluation outputs
+
+To run the neighbor damage visual probe:
+```bash
+python experiments/probe_neighbor_damage.py \
+    --base_model CompVis/stable-diffusion-v1-4 \
+    --method speed \
+    --ckpt checkpoints/speed/few-concept/style/Van\ Gogh.pt \
+    --concept vangogh
 ```
 
 ---
 
 ## References
 
-- Gupta et al. (2026). *SPEED: Scalable, Precise, and Efficient Concept Erasure for Diffusion Models.* ICLR 2026.
+- Li et al. (2026). *SPEED: Scalable, Precise, and Efficient Concept Erasure for Diffusion Models.* ICLR 2026.
 - Gandikota et al. (2023). *Erasing Concepts from Diffusion Models.* ICCV 2023.
