@@ -1,0 +1,10 @@
+id,category,role,speed_5c,speed_10c,speed_20c,speed_40c,n_speed_5c,n_speed_10c,n_speed_20c,n_speed_40c,rising
+renoir,erased_check,erased at every N (sanity),0.35370,0.35401,0.36085,0.33175,4,4,4,4,False
+gauguin,canary,CANARY (retained, impressionist),0.08282,0.11888,0.11026,0.12841,4,4,4,4,False
+seurat,canary,CANARY (retained, impressionist),0.04396,0.11989,0.07569,0.13104,4,4,4,4,False
+pissarro,canary,CANARY (retained, impressionist),0.05200,0.12583,0.16544,0.25324,4,4,4,4,True
+impressionist,supertype,SUPERTYPE capability,0.03485,0.07041,0.04916,0.03551,4,4,4,4,False
+postimpr,supertype,SUPERTYPE capability,0.10565,0.07909,0.11010,0.14306,4,4,4,4,False
+pointillist,supertype,SUPERTYPE capability,0.05555,0.06760,0.10188,0.12068,4,4,4,4,True
+rembrandt,control_far,control (style-far),0.04964,0.09359,0.13225,0.11332,4,4,4,4,False
+hokusai,control_far,control (style-far),0.03632,0.04009,0.07364,0.08078,4,4,4,4,True
