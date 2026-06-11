@@ -1,20 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Experiment 3 — Neighbor Collateral & Rank Saturation</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="blog.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Concept Erasure Analysis</title>
+  <link rel="stylesheet" href="blog.css" />
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+  </script>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>Experiment 3 — Where the Null-Space Guarantee Breaks</h1>
-      <p class="subtitle">SPEED preserves neighbors with mathematical precision — until you erase a dense cluster of them at once. We locate the exact point where its guarantee leaks.</p>
-    </header>
+    
+
+<h1>SPEED: Scalable, Precise, and Efficient Concept Erasure<br>Project Analysis</h1>
+
+<h2 id="tldr">TL;DR</h2>
+<p>Large-scale text-to-image models are trained on internet-scale data and inevitably learn to generate harmful, copyrighted, or otherwise undesirable content. <strong>Concept erasure</strong> is the task of surgically removing specific visual concepts from a pretrained model's weights — without retraining from scratch and without post-hoc filters that can be bypassed.</p>
+<p>This project traces the lineage from the original ESD method (Gandikota et al., 2023) through to <strong>SPEED</strong> (Li et al., ICLR 2026), identifying SPEED as the current open-source frontier. The code, configuration scripts, visual results, and detailed analyses for our empirical probes are hosted on dedicated branches: <em>all-experiments</em> and <em>experiment-3</em>.</p>
+
+<h2 id="lineage">Research Lineage</h2>
+<p>ESD was not the first attempt to make generative models safer, nor the last. The field converged on weight-editing after finding dataset filtering too expensive and inference-time steering inadequate. The following diagram traces the lineage from foundations to the current frontier.</p>
+
+<div class="mermaid">
+graph TD
+  SD[Stable Diffusion<br/>Rombach et al. CVPR'22] --> ESD[ESD: Erasing Concepts<br/>Gandikota et al. ICCV'23]
+  SLD[Safe Latent Diffusion<br/>Schramowski et al. CVPR'23] --> ESD
+  SD --> Ablation[Concept Ablation<br/>Kumari et al. ICCV'23]
+  
+  %% Main branches
+  ESD --> UCE[Unified Concept Editing<br/>Gandikota et al. WACV'24]
+  UCE --> MACE[MACE<br/>Lu et al. CVPR'24]
+  UCE --> RECE[RECE<br/>Gong et al. ECCV'24]
+  
+  %% Our target
+  MACE --> SPEED[SPEED Frontier<br/>Li et al. ICLR'26]
+  RECE --> SPEED
+  
+  %% Other branches
+  MACE --> ETC[ETC: Thousands of Concepts<br/>Seo et al. CVPR'26]
+  SD --> AdvUnlearn[AdvUnlearn / Robustness<br/>Zhang et al. NeurIPS'24]
+  SD --> GLoCE[GLoCE / Localization<br/>Lee et al. CVPR'25]
+  
+  classDef frontier fill:#e1f5fe,stroke:#039be5,stroke-width:2px;
+  class SPEED frontier;
+</div>
+
+<p>From <strong>ESD</strong> (the first practical weight-editing method), the literature diverges into distinct branches:</p>
+<ul>
+  <li><strong>Efficiency & Closed-form (The Frontier)</strong>: UCE → RECE → <strong>SPEED</strong>. This branch aims for lightning-fast, training-free editing.</li>
+  <li><strong>Mass Erasure</strong>: MACE → DyME → ETC. Focuses on scaling up to hundreds or thousands of concepts using LoRA adapters.</li>
+  <li><strong>Robustness</strong>: AdvUnlearn, RACE. Focuses on adversarial training to resist prompt attacks.</li>
+  <li><strong>Localization</strong>: GLoCE, LACE. Focuses on spatial precision to avoid global collateral damage.</li>
+</ul>
+
+<h2 id="how">How SPEED Works</h2>
+<p>In a diffusion U-Net, the text prompt conditions the image through <strong>cross-attention</strong>: token embeddings are mapped through Key and Value projection matrices (W<sub>K</sub>, W<sub>V</sub>) that tell each region of the image what the text is asking for. SPEED edits exactly these matrices, in closed form.</p>
+<p>It computes a weight update that redirects a target concept's embedding toward a neutral one, then <strong>projects that update onto the null-space of a large retain set</strong> (R<sub>refine</sub>, ~1,700 artists) — the subspace of weight changes that, by construction, leave every retained concept unchanged. The target is erased; the retain set is provably preserved; and it all happens training-free in seconds.</p>
+<p>The catch, which SPEED's authors acknowledge but never demonstrate, is that this null-space has <strong>finite rank</strong>. As the protected set grows, the available subspace shrinks — potentially toward the trivial null-space {0}. They call this <em>rank saturation</em>, and our Experiment 3 locates where it actually begins to bite.</p>
+
+<h2 id="strengths">Strengths: What SPEED Does Well</h2>
+<p>As the frontier paper for efficient concept erasure, SPEED (Scalable, Precise, and Efficient Concept Erasure) improves upon MACE and UCE significantly:</p>
+<ul>
+  <li><strong>Extreme Efficiency:</strong> SPEED relies on <em>training-free null-space editing</em>. It iteratively projects out target concept directions via importance pruning and embedding constraints, scaling to hundreds of concepts in just ~5 seconds.</li>
+  <li><strong>Precision:</strong> By operating strictly in the null-space, it systematically minimizes collateral damage to non-target concepts (a major issue with earlier methods like ESD-u).</li>
+  <li><strong>Open Source & Accessible:</strong> Unlike many concurrent mass-erasure papers, SPEED provides publicly released checkpoints, enabling immediate empirical evaluation without requiring expensive fine-tuning.</li>
+</ul>
+
+<h2 id="experiments">Empirical Experiments</h2>
+<p>To stress-test SPEED and analyze its limitations, targeted empirical experiments are executed in separate branches of this repository:</p>
+<ul>
+  <li><strong>Experiment 1 (Textual Inversion Recovery Probe)</strong> and <strong>Experiment 2 (Compositional Prompt Evasion)</strong> are stored on the <code>all-experiments</code> branch.</li>
+  <li><strong>Experiment 3 (Neighbor Collateral Damage &amp; Rank Saturation)</strong> shows SPEED is robust to sparse multi-concept erasure, but locates a <em>selective</em> failure of its null-space guarantee under concentrated mass erasure — the rank-saturation limit. Stored on the <code>experiment-3</code> branch.</li>
+</ul>
+<p>Please refer to those branches to view the code, SLURM configs, generated images, and detailed analysis reports for each evaluation.</p>
+
+<h2 id="findings">Key Findings</h2>
+<p>Across our probes, SPEED proves to be a genuinely strong method with one precise, locatable limitation:</p>
+<ul>
+  <li><strong>It erases cleanly and preserves neighbors.</strong> Even when several mixed concepts are removed at once, un-targeted neighbors drift no more than stylistically unrelated control artists — the null-space guarantee holds.</li>
+  <li><strong>Its guarantee is bounded by rank saturation.</strong> Under concentrated mass erasure of a single dense semantic cluster (e.g. 40 impressionists), protection fails <em>selectively</em> for the one retained concept most entangled with the erased set, while stylistically distinct neighbors and the broader style capability survive.</li>
+</ul>
+<p>The takeaway: as long as erasure operates by projecting in cross-attention space, the most entangled neighbors will be the first to leak under heavy load — a direction future, disentanglement-based methods will need to address.</p>
+
+
+
+    <hr style="margin: 40px 0; border: 1px solid #ddd;">
+    <h2 style="text-align:center; font-size: 2.5em; margin-bottom: 20px;">Deep Dive: Empirical Limitations</h2>
 
     <main>
+      
 
       <!-- ===================== FRAMING ===================== -->
       <section class="card">
@@ -275,7 +351,17 @@
         </div>
       </section>
 
+    
     </main>
+
+    <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Li, O., Wang, Y., Hu, X., Jiang, H., Hao, Y., Feng, F. (2026). "SPEED: Scalable, Precise, and Efficient Concept Erasure for Diffusion Models." <em>ICLR 2026</em>.</p></li>
+<li id="fn2"><p>Gandikota, R., et al. (2023). "Erasing Concepts from Diffusion Models." <em>ICCV 2023</em>.</p></li>
+<li id="fn3"><p>Amara, I., et al. (2025). "Erasing More Than Intended? How Concept Erasure Degrades the Generation of Non-Target Concepts." <em>arXiv:2501.09833</em>.</p></li>
+</ol>
+</section>
   </div>
 </body>
 </html>
