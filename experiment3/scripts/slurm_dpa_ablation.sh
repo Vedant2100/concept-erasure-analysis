@@ -19,6 +19,25 @@ conda activate speed_env || conda activate mace_env
 
 cd $SLURM_SUBMIT_DIR
 
+# SPEED_repo is gitignored, so the --disable_dpa change may not have reached this
+# machine via git. Ensure the trainer supports it (idempotent: no-op if already there).
+python3 - <<'PYEOF'
+p = "SPEED_repo/train_erase_null.py"
+s = open(p).read()
+if "disable_dpa" not in s:
+    s = s.replace("            if args.aug_num > 0:\n",
+                  "            if args.aug_num > 0 and not args.disable_dpa:\n", 1)
+    s = s.replace(
+        "    parser.add_argument('--disable_filter', action='store_true', default=False)\n",
+        "    parser.add_argument('--disable_filter', action='store_true', default=False)\n"
+        "    parser.add_argument('--disable_dpa', action='store_true', default=False)\n", 1)
+    open(p, "w").write(s)
+    assert "disable_dpa" in open(p).read(), "PATCH FAILED — strings did not match"
+    print("Patched train_erase_null.py with --disable_dpa")
+else:
+    print("train_erase_null.py already supports --disable_dpa")
+PYEOF
+
 # ================================================================
 # Experiment 3.5 — DPA / Prior-Knowledge-Refinement ablation at N=40.
 #
