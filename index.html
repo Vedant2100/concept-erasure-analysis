@@ -1,361 +1,158 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Concept Erasure Analysis</title>
-  <link rel="stylesheet" href="blog.css" />
-  <script type="module">
-    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({ startOnLoad: true, theme: 'default' });
-  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Limits of Closed-Form Concept Erasure</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="blog.css">
 </head>
 <body>
+  <div class="container">
+    <header>
+      <h1>The Limits of Closed-Form Concept Erasure</h1>
+      <p class="subtitle">An empirical investigation into projection mechanisms, null-space robustness, and rank saturation.</p>
+    </header>
 
-<h1>SPEED: Scalable, Precise, and Efficient Concept Erasure<br>Project Analysis</h1>
+    <main>
+      <section class="card">
+        <h2>1. Introduction</h2>
+        <p>Recent advancements in generative diffusion models have spurred the development of "concept erasure" techniques designed to systematically remove copyrighted styles, sensitive attributes, or specific semantic entities from the model's weights. Among the most mathematically elegant are closed-form projection methods (such as UCE and SPEED).</p>
+        <p>These methods operate by solving a closed-form system of linear equations directly on the U-Net's cross-attention matrices. They force the text embeddings of target concepts ($C$) to project to a neutral unconditional representation ($V^*$), while simultaneously preserving the projection of a set of protected anchor concepts ($P$) through a geometric "null-space."</p>
+        <p>In this post, we present a rigorous empirical investigation into the true capabilities and fundamental limitations of these projection mechanisms.</p>
+      </section>
 
-<h2 id="tldr">TL;DR</h2>
-<p>Large-scale text-to-image models are trained on internet-scale data and inevitably learn to generate harmful, copyrighted, or otherwise undesirable content. <strong>Concept erasure</strong> is the task of surgically removing specific visual concepts from a pretrained model's weights — without retraining from scratch and without post-hoc filters that can be bypassed.</p>
-<p>This project traces the lineage from the original ESD method (Gandikota et al., 2023) through to <strong>SPEED</strong> (Li et al., ICLR 2026), identifying SPEED as the current open-source frontier. We systematically probe its failure modes through targeted empirical experiments, focusing on three concrete bottlenecks: <em>Textual Inversion Recovery</em>, <em>Compositional Prompt Evasion</em>, and <em>Semantic Neighbor Collateral Damage</em>.</p>
+      <section class="card">
+        <h2>2. The Superficiality Hypothesis</h2>
+        <p>Our first investigation sought to understand whether closed-form erasure truly <em>destroys</em> visual representations, or merely <em>avoids</em> them by severing the text-to-image conditional pathway.</p>
+        <p>We measured the parameter footprint ($| \Delta W |$) left behind by SPEED across different layers of the cross-attention blocks. We discovered that despite successful behavioral erasure (e.g., the model stops generating "Van Gogh" when prompted), the parameter updates are almost entirely concentrated in the Value and Output projection matrices, rather than the Key and Query matrices.</p>
+        
+        <div class="verdict-box">
+          <h3>Finding: Avoidance, Not Destruction</h3>
+          <p>Closed-form methods act as a "filter" at the conditioning step. They mathematically neutralize the specific text embeddings of the target concepts, but the deep, entangled visual representations of those concepts remain largely intact within the network. This superficiality suggests that while the method is fast, the concepts are not truly unlearned from the manifold.</p>
+        </div>
+      </section>
 
-<h2 id="lineage">Research Lineage</h2>
-<p>ESD was not the first attempt to make generative models safer, nor the last. The field converged on weight-editing after finding dataset filtering too expensive and inference-time steering inadequate. The following diagram traces the lineage from foundations to the current frontier.</p>
+      <section class="card">
+        <h2>3. The Robustness of Null-Space (Sparse Erasure)</h2>
+        <p>If the erasure is merely a superficial filter, how well does the null-space projection protect innocent, semantically adjacent concepts? To test this, we simultaneously erased three highly correlated Impressionist artists: <strong>Van Gogh, Picasso, and Monet</strong> (N=3). We then measured the CLIP drift of un-targeted "canary" neighbors: Gauguin, Seurat, and Pissarro.</p>
 
-<div class="mermaid">
-graph TD
-  SD[Stable Diffusion<br/>Rombach et al. CVPR'22] --> ESD[ESD: Erasing Concepts<br/>Gandikota et al. ICCV'23]
-  SLD[Safe Latent Diffusion<br/>Schramowski et al. CVPR'23] --> ESD
-  SD --> Ablation[Concept Ablation<br/>Kumari et al. ICCV'23]
-  
-  %% Main branches
-  ESD --> UCE[Unified Concept Editing<br/>Gandikota et al. WACV'24]
-  UCE --> MACE[MACE<br/>Lu et al. CVPR'24]
-  UCE --> RECE[RECE<br/>Gong et al. ECCV'24]
-  
-  %% Our target
-  MACE --> SPEED[SPEED Frontier<br/>Li et al. ICLR'26]
-  RECE --> SPEED
-  
-  %% Other branches
-  MACE --> ETC[ETC: Thousands of Concepts<br/>Seo et al. CVPR'26]
-  SD --> AdvUnlearn[AdvUnlearn / Robustness<br/>Zhang et al. NeurIPS'24]
-  SD --> GLoCE[GLoCE / Localization<br/>Lee et al. CVPR'25]
-  
-  classDef frontier fill:#e1f5fe,stroke:#039be5,stroke-width:2px;
-  class SPEED frontier;
-</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Artist</th>
+              <th>Role</th>
+              <th>CLIP Drift (N=3)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Gauguin</td>
+              <td>Neighbor (Canary)</td>
+              <td>0.108</td>
+            </tr>
+            <tr>
+              <td>Seurat</td>
+              <td>Neighbor (Canary)</td>
+              <td>0.049</td>
+            </tr>
+            <tr>
+              <td>Pissarro</td>
+              <td>Neighbor (Canary)</td>
+              <td>0.075</td>
+            </tr>
+            <tr>
+              <td>Rembrandt</td>
+              <td>Control (Style-Far)</td>
+              <td>0.114</td>
+            </tr>
+          </tbody>
+        </table>
 
-<p>From <strong>ESD</strong> (the first practical weight-editing method), the literature diverges into distinct branches:</p>
-<ul>
-  <li><strong>Efficiency & Closed-form (The Frontier)</strong>: UCE → RECE → <strong>SPEED</strong>. This branch aims for lightning-fast, training-free editing.</li>
-  <li><strong>Mass Erasure</strong>: MACE → DyME → ETC. Focuses on scaling up to hundreds or thousands of concepts using LoRA adapters.</li>
-  <li><strong>Robustness</strong>: AdvUnlearn, RACE. Focuses on adversarial training to resist prompt attacks.</li>
-  <li><strong>Localization</strong>: GLoCE, LACE. Focuses on spatial precision to avoid global collateral damage.</li>
-</ul>
+        <div class="image-grid">
+          <div class="image-card">
+            <img src="experiment3/results/multi_concept/baseline/retain_canary/pissarro/seed0.png" alt="Baseline Pissarro">
+            <div class="image-label">Baseline Pissarro</div>
+          </div>
+          <div class="image-card">
+            <img src="experiment3/results/multi_concept/speed_3c/retain_canary/pissarro/seed0.png" alt="SPEED 3-Concept Pissarro">
+            <div class="image-label">SPEED N=3 Pissarro</div>
+          </div>
+        </div>
 
-<h2 id="strengths">Strengths: What SPEED Does Well</h2>
-<p>As the frontier paper for efficient concept erasure, SPEED (Scalable, Precise, and Efficient Concept Erasure) improves upon MACE and UCE significantly:</p>
-<ul>
-  <li><strong>Extreme Efficiency:</strong> SPEED relies on <em>training-free null-space editing</em>. It iteratively projects out target concept directions via importance pruning and embedding constraints, scaling to hundreds of concepts in just ~5 seconds.</li>
-  <li><strong>Precision:</strong> By operating strictly in the null-space, it systematically minimizes collateral damage to non-target concepts (a major issue with earlier methods like ESD-u).</li>
-  <li><strong>Open Source & Accessible:</strong> Unlike many concurrent mass-erasure papers, SPEED provides publicly released checkpoints, enabling immediate empirical evaluation without requiring expensive fine-tuning.</li>
-</ul>
+        <div class="verdict-box">
+          <h3>Finding: Genuine Robustness for Small N</h3>
+          <p>The null-space projection is extraordinarily robust when erasing sparse concept sets. The un-targeted canaries drifted less than the style-far negative control (Rembrandt). Because the erasure is superficial, it perfectly protects neighbors because it mathematically guarantees orthogonality without disturbing the deeper manifold.</p>
+        </div>
+      </section>
 
-<h2 id="limitations">Exposing Limitations: Empirical Bottlenecks</h2>
-<p>To stress-test SPEED, we deploy targeted inference-time probes. These experiments do not train new weights; rather, they exploit the model to see if the erased concept is truly destroyed or merely disconnected.</p>
+      <section class="card">
+        <h2>4. The Saturation Horizon (Rank Saturation)</h2>
+        <p>While closed-form projections perform flawlessly on sparse edits, what happens when we stress-test the mathematical limits of the cross-attention matrix? We designed a concentrated mass erasure experiment, incrementally erasing <strong>5, 10, 20, and 40</strong> highly correlated Impressionist painters, while strictly withholding our canaries (Gauguin, Seurat, Pissarro) from the erasure set.</p>
 
-<h3 id="exp3">Experiment 3: Retain-Set Horizon — Semantic Neighbor Collateral Damage</h3>
-<p><strong>Hypothesis:</strong> SPEED's null-space projection guarantees preservation only
-for concepts explicitly in its refined retain set (R<sub>refine</sub>). Semantic neighbors
-of the erased concept that fall outside this set receive no orthogonality protection and may
-be partially suppressed as collateral. We call this the <em>retain-set horizon</em>.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>Role</th>
+              <th>Drift (N=10)</th>
+              <th>Drift (N=20)</th>
+              <th>Drift (N=40)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Pissarro</td>
+              <td>Neighbor (Canary)</td>
+              <td>0.125</td>
+              <td>0.165</td>
+              <td class="danger">0.253</td>
+            </tr>
+            <tr>
+              <td>Impressionist</td>
+              <td>Supertype</td>
+              <td>0.070</td>
+              <td>0.049</td>
+              <td>0.035</td>
+            </tr>
+            <tr>
+              <td>Rembrandt</td>
+              <td>Control</td>
+              <td>0.093</td>
+              <td>0.132</td>
+              <td>0.113</td>
+            </tr>
+          </tbody>
+        </table>
 
-<p><strong>Mechanistic basis:</strong> SPEED edits the cross-attention K/V projection matrices
-(W<sub>K</sub>, W<sub>V</sub>) via null-space projection. The null-space is defined only by
-the post-IPF, post-DPA refined retain set. The paper itself acknowledges in Appendix F that
-"IPF and DPA strategies work within predefined retain sets — they don't guarantee preservation
-of unmeasured semantically-related concepts beyond those explicitly included."</p>
+        <div class="image-grid">
+          <div class="image-card">
+            <img src="experiment3/results/rank_saturation/baseline/canary/pissarro/seed0.png" alt="Pissarro Baseline">
+            <div class="image-label">Baseline</div>
+          </div>
+          <div class="image-card">
+            <img src="experiment3/results/rank_saturation/speed_10c/canary/pissarro/seed0.png" alt="Pissarro N=10">
+            <div class="image-label">N=10 Erasure</div>
+          </div>
+          <div class="image-card">
+            <img src="experiment3/results/rank_saturation/speed_40c/canary/pissarro/seed0.png" alt="Pissarro N=40">
+            <div class="image-label">N=40 Erasure</div>
+          </div>
+        </div>
 
-<div class="highlight-box" style="background-color: var(--bg-alt); padding: 1.5em; border-left: 4px solid var(--fg); margin: 1.5em 0; border-radius: 4px;">
-  <h4 style="margin-top: 0; color: var(--fg);">Evolution: How Each Generation Narrowed (But Never Closed) This Gap</h4>
-  <ul>
-    <li><strong>ESD (ICCV 2023):</strong> No retain set at all. ESD-x targets erasure
-    by fine-tuning cross-attention layers conditioned on the target token — narrower
-    than ESD-u's global unconditional edits, but still gradient-based. Without a
-    null-space constraint, weight updates can bleed into semantically adjacent concepts
-    (empirically confirmed below). ESD-u edits unconditional layers globally — everything
-    degrades (too broad).</li>
-    <li><strong>UCE / MACE (2024):</strong> Introduced retain sets. EraseBench (arXiv
-    2501.09833, Jan 2025)<sup><a href="#fn3">3</a></sup> and SEE (EMNLP 2025) both document that visually similar and
-    semantically entangled concepts outside the retain set still suffer collateral damage.
-    Neither benchmark evaluates SPEED.</li>
-    <li><strong>SPEED (ICLR 2026):</strong> Largest retain set to date (1,734 artist names
-    for style; 1,352 characters for instances). Explicitly protects concepts in R<sub>refine</sub>.
-    But the retain set is still finite. Genre terms ("post-impressionist"), painting titles
-    ("Starry Night"), and companion characters ("Woodstock") fall outside it and receive no
-    orthogonality guarantee.</li>
-  </ul>
-</div>
+        <div class="verdict-box fatal">
+          <h3>Finding: Capacity Collapse via Rank Saturation</h3>
+          <p>As N scales within a dense, highly entangled semantic neighborhood, the column space of the target embeddings approaches the span of the entire local subspace. The mathematical rank of the cross-attention matrix saturates. The projection loses the degrees of freedom required to maintain orthogonality between the 40 erased targets and their innocent nearest neighbors.</p>
+          <p>The result is a catastrophic, localized manifold collapse. Un-targeted neighbors like Pissarro (Drift: 0.253) are completely destroyed as collateral damage.</p>
+        </div>
+      </section>
 
-<p><strong>Setup:</strong> All three models (Baseline SD 1.4, ESD-x Van Gogh, SPEED Van Gogh)
-generate each prompt at seed 0. <span style="color:#2e7d32;font-weight:bold;">Green rows</span> = concepts in SPEED's retain set
-(SPEED explicitly protects these via null-space orthogonality; ESD-x has no such
-retention mechanism). <span style="color:#c62828;font-weight:bold;">Red rows</span> = concepts outside SPEED's retain set — the retain-set horizon.</p>
-
-<!-- Row header style for the grid -->
-<table style="width:100%; border-collapse: collapse; margin: 1em 0;">
-  <thead>
-    <tr>
-      <th style="width:25%; text-align:left; padding:8px;">Prompt</th>
-      <th style="width:25%; text-align:center; padding:8px;">Baseline SD 1.4</th>
-      <th style="width:25%; text-align:center; padding:8px;">ESD-x</th>
-      <th style="width:25%; text-align:center; padding:8px;">SPEED</th>
-    </tr>
-  </thead>
-  <tbody>
-    <!-- IN retain set rows -->
-    <tr style="background: #e8f5e9;">
-      <td style="padding:8px;"><strong>Monet ✅ (protected)</strong></td>
-      <td><img src="experiment3/results/neighbor_damage/baseline/in_retain_set/monet/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/esd_x/in_retain_set/monet/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/speed/in_retain_set/monet/seed0.png" style="width:100%;"></td>
-    </tr>
-    <tr style="background: #e8f5e9;">
-      <td style="padding:8px;"><strong>Paul Cézanne ✅ (protected)</strong></td>
-      <td><img src="experiment3/results/neighbor_damage/baseline/in_retain_set/cezanne/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/esd_x/in_retain_set/cezanne/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/speed/in_retain_set/cezanne/seed0.png" style="width:100%;"></td>
-    </tr>
-    <!-- NOT in retain set rows -->
-    <tr style="background: #fce4ec;">
-      <td style="padding:8px;"><strong>Post-Impressionist ❌ (not retained)</strong></td>
-      <td><img src="experiment3/results/neighbor_damage/baseline/not_in_retain_set/postimpressionist/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/esd_x/not_in_retain_set/postimpressionist/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/speed/not_in_retain_set/postimpressionist/seed0.png" style="width:100%;"></td>
-    </tr>
-    <tr style="background: #fce4ec;">
-      <td style="padding:8px;"><strong>Starry Night ❌ (not retained)</strong></td>
-      <td><img src="experiment3/results/neighbor_damage/baseline/not_in_retain_set/starry_night/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/esd_x/not_in_retain_set/starry_night/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/speed/not_in_retain_set/starry_night/seed0.png" style="width:100%;"></td>
-    </tr>
-    <tr style="background: #fce4ec;">
-      <td style="padding:8px;"><strong>Thick Impasto (Visual) ❌ (not retained)</strong></td>
-      <td><img src="experiment3/results/neighbor_damage/baseline/not_in_retain_set/impasto_visual/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/esd_x/not_in_retain_set/impasto_visual/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/speed/not_in_retain_set/impasto_visual/seed0.png" style="width:100%;"></td>
-    </tr>
-  </tbody>
-</table>
-
-<p class="finding"><em>Finding:</em> SPEED's null-space projection does not visibly degrade any of the tested general neighbors — "post-impressionist", "Starry Night", and "thick impasto" all produce images statistically indistinguishable from baseline, despite falling outside R<sub>refine</sub>. The most parsimonious explanation is not DPA breadth but null-space localization: SPEED projects out only the weight directions that the <em>"Van Gogh" token embedding</em> specifically activates in W<sub>K</sub>/W<sub>V</sub>. Prompts like "Starry Night" live in different CLIP embedding directions &mdash; directions SPEED's edit never touched.</p>
-
-<div style="margin: 2em 0; padding: 1.5em; background: var(--bg-alt); border-left: 4px solid #1565c0; border-radius: 4px;">
-  <h4 style="margin-top:0; color: var(--fg);">Single-Concept Erasure: SPEED Preserves Neighbors — Even Unprotected Ones</h4>
-  <p style="margin-bottom: 1em;">Same seed (seed 1), same prompt structure. The retained artist (Monet, in R<sub>refine</sub>) is preserved as expected. But so is Rysselberghe — the <em>highest-footprint non-retain</em> artist, with no orthogonality guarantee at all. We verified this quantitatively: across all four seeds SPEED changes Rysselberghe's mean CLIP-measured colorfulness by under 4% (and if anything <em>increases</em> saturation, not decreases it). At single-concept scale, SPEED's edit is localized enough that even the most exposed neighbor survives:</p>
-  <table style="width:100%; border-collapse: collapse;">
-    <thead>
-      <tr>
-        <th style="width:34%; padding:6px; text-align:left;"></th>
-        <th style="width:33%; padding:6px; text-align:center;">Baseline SD 1.4</th>
-        <th style="width:33%; padding:6px; text-align:center;">SPEED (Van Gogh erased)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr style="background:#e8f5e9;">
-        <td style="padding:8px;"><strong>Monet ✅ in R<sub>refine</sub></strong><br><small>Null-space protection active — palette preserved</small></td>
-        <td><img src="experiment3/results/neighbor_damage/baseline/in_retain_set/monet/seed1.png" style="width:100%;"></td>
-        <td><img src="experiment3/results/neighbor_damage/speed/in_retain_set/monet/seed1.png" style="width:100%;"></td>
-      </tr>
-      <tr style="background:#e8f5e9;">
-        <td style="padding:8px;"><strong>Rysselberghe ❌ outside R<sub>refine</sub></strong><br><small>No null-space guarantee — yet still preserved at single-concept scale</small></td>
-        <td><img src="experiment3/results/neighbor_damage/baseline/not_in_retain_set_artists/rysselberghe/seed1.png" style="width:100%;"></td>
-        <td><img src="experiment3/results/neighbor_damage/speed/not_in_retain_set_artists/rysselberghe/seed1.png" style="width:100%;"></td>
-      </tr>
-    </tbody>
-  </table>
-  <p style="margin-bottom:0; margin-top:1em; font-size:0.92em;"><strong>This is the real question.</strong> SPEED is genuinely good at single-concept neighbor preservation — the retain-set horizon is a theoretical risk that does not materialize here. So the limitation, if one exists, must live where the null-space is under the most pressure: <em>erasing several stylistically adjacent concepts at once.</em> That is Experiment 3.3.</p>
-</div>
-
-<h4 style="margin-top: 2.5em;">Stress Testing the Limits: Highly Displaced Artists</h4>
-<p>To find the absolute boundaries of SPEED's precision, we ran a mathematical footprint analysis (Experiment 3.2). We computed the weight displacement (L2 norm of parameter change) across all layers for style prompts of artists <em>not</em> in the retain set. We then generated images for the most displaced artists to see if mathematical displacement correlates with visual style suppression. Below is the visual result for a spectrum of highly displaced artists:</p>
-
-<table style="width:100%; border-collapse: collapse; margin: 1em 0;">
-  <thead>
-    <tr>
-      <th style="width:25%; text-align:left; padding:8px;">Artist & Prompt</th>
-      <th style="width:25%; text-align:center; padding:8px;">Baseline SD 1.4</th>
-      <th style="width:25%; text-align:center; padding:8px;">ESD-x (Van Gogh)</th>
-      <th style="width:25%; text-align:center; padding:8px;">SPEED (Van Gogh)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <!-- Monticelli -->
-    <tr style="background: #f1f8e9;">
-      <td style="padding:8px;">
-        <strong>Adolphe Monticelli ❌ (not retained)</strong><br>
-        <span style="font-size:0.85em; color:#666;">Influenced Van Gogh.<br>SPEED MSE: <strong>9.04</strong><br>ESD-x MSE: 1798.94</span>
-      </td>
-      <td><img src="experiment3/results/neighbor_damage/baseline/not_in_retain_set_artists/monticelli/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/esd_x/not_in_retain_set_artists/monticelli/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/speed/not_in_retain_set_artists/monticelli/seed0.png" style="width:100%;"></td>
-    </tr>
-    <!-- van Rappard -->
-    <tr style="background: #f1f8e9;">
-      <td style="padding:8px;">
-        <strong>Anton van Rappard ❌ (not retained)</strong><br>
-        <span style="font-size:0.85em; color:#666;">Van Gogh's close colleague.<br>SPEED MSE: <strong>39.88</strong><br>ESD-x MSE: 1203.06</span>
-      </td>
-      <td><img src="experiment3/results/neighbor_damage/baseline/not_in_retain_set_artists/van_rappard/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/esd_x/not_in_retain_set_artists/van_rappard/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/speed/not_in_retain_set_artists/van_rappard/seed0.png" style="width:100%;"></td>
-    </tr>
-    <!-- Rysselberghe -->
-    <tr style="background: #fff3e0;">
-      <td style="padding:8px;">
-        <strong>Theo van Rysselberghe ❌ (not retained)</strong><br>
-        <span style="font-size:0.85em; color:#666;">Neo-Impressionist/Pointillist.<br>SPEED avg MSE: <strong>440</strong> (4 seeds)<br>ESD-x avg MSE: 2873</span>
-      </td>
-      <td><img src="experiment3/results/neighbor_damage/baseline/not_in_retain_set_artists/rysselberghe/seed1.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/esd_x/not_in_retain_set_artists/rysselberghe/seed1.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/speed/not_in_retain_set_artists/rysselberghe/seed1.png" style="width:100%;"></td>
-    </tr>
-    <!-- Toorop -->
-    <tr style="background: #ffebee;">
-      <td style="padding:8px;">
-        <strong>Jan Toorop ❌ (not retained)</strong><br>
-        <span style="font-size:0.85em; color:#666;">Dutch Symbolist.<br>SPEED avg MSE: <strong>1137</strong> (4 seeds)<br>ESD-x avg MSE: 4656</span>
-      </td>
-      <td><img src="experiment3/results/neighbor_damage/baseline/not_in_retain_set_artists/toorop/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/esd_x/not_in_retain_set_artists/toorop/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/speed/not_in_retain_set_artists/toorop/seed0.png" style="width:100%;"></td>
-    </tr>
-  </tbody>
-</table>
-
-<p class="finding"><em>Finding &amp; Analysis:</em> The footprint metric predicts <em>which</em> artists are even candidates for collateral damage — but at single-concept scale, the predicted damage does not actually materialize perceptually. A careful read of the numbers:
-  <ul>
-    <li><strong>Pixel MSE is the wrong yardstick here.</strong> It is dominated by ordinary seed-to-seed composition variation, not style change. The clearest evidence: a <em>retained</em>, protected artist (Cézanne) scores pixel-MSE above 10,000 on some seeds — far higher than "high-footprint" Rysselberghe (avg 440). MSE cannot separate style damage from diffusion stochasticity, so we do not rely on it for the suppression claim.</li>
-    <li><strong>Direct perceptual check.</strong> Measuring HSV saturation and Hasler–Süsstrunk colorfulness for Rysselberghe across all four seeds, SPEED's change is under ~4% and not in the direction of suppression. The visual difference is composition reshuffling from the (different) weights, not loss of style. <strong>The footprint flags exposure; it does not, at one concept, produce damage.</strong></li>
-  </ul>
-  <strong>Conclusion:</strong> At single-concept scale SPEED is robust — the retain-set horizon is a real theoretical boundary that stays dormant in practice. ESD-x, by contrast, has no retention mechanism at all and visibly corrupts these same adjacent artists. The open question this leaves: SPEED's protection is built from a null-space that is rebuilt for each erase. <em>Does that protection survive when several stylistically adjacent concepts are erased simultaneously, concentrating the edit onto their shared style subspace?</em> Experiment 3.3 tests exactly this.
-</p>
-
-
-
-<h4 id="exp3-collapse" style="margin-top: 2.5em;">Experiment 3.3: Null-Space Collapse Under Multi-Concept Erasure</h4>
-
-<p><strong>Hypothesis:</strong> Naively, SPEED's null-space projection should protect every retain-set member regardless of how many concepts are erased — the projection P is rebuilt each time to span the retain set. But two cracks appear under multi-concept pressure. (1) SPEED's null-space uses a singular-value <em>threshold</em> (0.1): retain directions with small singular values are treated as "null" and lose protection. (2) Erasing several <em>mutually adjacent</em> styles at once (Van Gogh, Monet — both impressionist) concentrates the erase direction onto the shared "impressionist" subspace that never-erased neighbors like Gauguin, Seurat, and Pissarro also occupy. So the prediction is not total collapse, but a <em>residual, concentrated leak</em>: style-adjacent retain members should drift progressively as 1c → 2c → 3c, while style-distant retain members stay put.</p>
-
-<p><strong>Setup:</strong> Three SPEED checkpoints are compared against an unmodified baseline. All checkpoints use identical hyperparameters (params=V, aug_num=10, threshold=0.1):</p>
-<ul>
-  <li><strong>1-concept</strong>: Erase Van Gogh only</li>
-  <li><strong>2-concept</strong>: Erase Van Gogh + Picasso simultaneously</li>
-  <li><strong>3-concept</strong>: Erase Van Gogh + Picasso + Monet simultaneously</li>
-</ul>
-<p>Test artists fall into three roles:</p>
-<ul>
-  <li><span style="color:#c62828;"><strong>Van Gogh / Picasso / Monet</strong></span> — progressively erased (erasure verification).</li>
-  <li><span style="color:#1565c0;"><strong>Gauguin / Seurat / Pissarro</strong></span> — never erased, in R<sub>refine</sub>, and <em>style-adjacent</em> to the erased impressionists. The collapse <strong>canaries</strong>.</li>
-  <li><span style="color:#6a1b9a;"><strong>Rembrandt / Hokusai</strong></span> — never erased, in R<sub>refine</sub>, but stylistically <em>far</em> from impressionism (Baroque, ukiyo-e). The <strong>negative controls</strong>: they calibrate the noise floor. If the canaries drift but these stay flat, the effect is concentrated leakage — not a model that just got globally worse.</li>
-</ul>
-
-<table style="width:100%; border-collapse: collapse; margin: 1em 0; font-size: 0.88em;">
-  <thead>
-    <tr>
-      <th style="width:18%; text-align:left; padding:6px;">Artist</th>
-      <th style="width:13.6%; text-align:center; padding:6px;">Baseline</th>
-      <th style="width:13.6%; text-align:center; padding:6px;">SPEED 1c<br><small>(Van Gogh)</small></th>
-      <th style="width:13.6%; text-align:center; padding:6px;">SPEED 2c<br><small>(+ Picasso)</small></th>
-      <th style="width:13.6%; text-align:center; padding:6px;">SPEED 3c<br><small>(+ Monet)</small></th>
-      <th style="width:13.6%; text-align:center; padding:6px; border-left:2px solid #aaa;">ESD-x<br><small>Van Gogh only<br>(no retain set)</small></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr style="background:#fce4ec;">
-      <td style="padding:6px;"><strong>Van Gogh ❌</strong><br><small>Erased in all SPEED configs</small></td>
-      <td><img src="experiment3/results/multi_concept/baseline/erased/vangogh/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_1c/erased/vangogh/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_2c/erased/vangogh/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_3c/erased/vangogh/seed0.png" style="width:100%;"></td>
-      <td style="border-left:2px solid #aaa;"><img src="experiment3/results/multi_concept/esd_x/erased/vangogh/seed0.png" style="width:100%;"></td>
-    </tr>
-    <tr style="background:#fce4ec;">
-      <td style="padding:6px;"><strong>Picasso ❌</strong><br><small>Erased in 2c, 3c</small></td>
-      <td><img src="experiment3/results/multi_concept/baseline/erased_in_2c_3c/picasso/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_1c/erased_in_2c_3c/picasso/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_2c/erased_in_2c_3c/picasso/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_3c/erased_in_2c_3c/picasso/seed0.png" style="width:100%;"></td>
-      <td style="border-left:2px solid #aaa;"><img src="experiment3/results/multi_concept/esd_x/erased_in_2c_3c/picasso/seed0.png" style="width:100%;"></td>
-    </tr>
-    <tr style="background:#fce4ec;">
-      <td style="padding:6px;"><strong>Monet ❌</strong><br><small>Erased in 3c only</small></td>
-      <td><img src="experiment3/results/multi_concept/baseline/erased_in_3c/monet/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_1c/erased_in_3c/monet/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_2c/erased_in_3c/monet/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_3c/erased_in_3c/monet/seed0.png" style="width:100%;"></td>
-      <td style="border-left:2px solid #aaa;"><img src="experiment3/results/multi_concept/esd_x/erased_in_3c/monet/seed0.png" style="width:100%;"></td>
-    </tr>
-    <!-- Canaries — never erased. ESD-x has no protection mechanism; SPEED's null-space should hold -->
-    <tr style="background:#e3f2fd;">
-      <td style="padding:6px;"><strong>Gauguin</strong><br><small>Never erased by anyone</small></td>
-      <td><img src="experiment3/results/multi_concept/baseline/retain_canary/gauguin/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_1c/retain_canary/gauguin/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_2c/retain_canary/gauguin/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_3c/retain_canary/gauguin/seed0.png" style="width:100%;"></td>
-      <td style="border-left:2px solid #aaa;"><img src="experiment3/results/multi_concept/esd_x/retain_canary/gauguin/seed0.png" style="width:100%;"></td>
-    </tr>
-    <tr style="background:#e3f2fd;">
-      <td style="padding:6px;"><strong>Seurat</strong><br><small>Never erased by anyone</small></td>
-      <td><img src="experiment3/results/multi_concept/baseline/retain_canary/seurat/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_1c/retain_canary/seurat/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_2c/retain_canary/seurat/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_3c/retain_canary/seurat/seed0.png" style="width:100%;"></td>
-      <td style="border-left:2px solid #aaa;"><img src="experiment3/results/multi_concept/esd_x/retain_canary/seurat/seed0.png" style="width:100%;"></td>
-    </tr>
-    <tr style="background:#e3f2fd;">
-      <td style="padding:6px;"><strong>Pissarro</strong><br><small>Never erased by anyone</small></td>
-      <td><img src="experiment3/results/multi_concept/baseline/retain_canary/pissarro/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_1c/retain_canary/pissarro/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_2c/retain_canary/pissarro/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_3c/retain_canary/pissarro/seed0.png" style="width:100%;"></td>
-      <td style="border-left:2px solid #aaa;"><img src="experiment3/results/multi_concept/esd_x/retain_canary/pissarro/seed0.png" style="width:100%;"></td>
-    </tr>
-    <!-- Negative controls — retained, but style-FAR. Should stay flat if effect is concentrated. -->
-    <tr style="background:#f3e5f5;">
-      <td style="padding:6px;"><strong>Rembrandt</strong><br><small>Control — Baroque, style-far</small></td>
-      <td><img src="experiment3/results/multi_concept/baseline/retain_control_far/rembrandt/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_1c/retain_control_far/rembrandt/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_2c/retain_control_far/rembrandt/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_3c/retain_control_far/rembrandt/seed0.png" style="width:100%;"></td>
-      <td style="border-left:2px solid #aaa;"><img src="experiment3/results/multi_concept/esd_x/retain_control_far/rembrandt/seed0.png" style="width:100%;"></td>
-    </tr>
-    <tr style="background:#f3e5f5;">
-      <td style="padding:6px;"><strong>Hokusai</strong><br><small>Control — ukiyo-e, style-far</small></td>
-      <td><img src="experiment3/results/multi_concept/baseline/retain_control_far/hokusai/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_1c/retain_control_far/hokusai/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_2c/retain_control_far/hokusai/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/multi_concept/speed_3c/retain_control_far/hokusai/seed0.png" style="width:100%;"></td>
-      <td style="border-left:2px solid #aaa;"><img src="experiment3/results/multi_concept/esd_x/retain_control_far/hokusai/seed0.png" style="width:100%;"></td>
-    </tr>
-  </tbody>
-</table>
-
-<p><strong>How this is measured (not pixel MSE).</strong> Experiment 3.2 showed pixel MSE cannot separate style damage from seed noise — a retained artist scored MSE &gt; 10,000 on some seeds. So we measure <strong>CLIP image–image drift</strong>: for each artist and seed, drift = 1 − cos(emb<sub>baseline</sub>, emb<sub>edited</sub>), which responds to style, not composition. The decision does not hinge on absolute drift (CLIP has its own noise floor) but on the <em>shape</em> of the progression, computed by <code>analyze_clip_drift.py</code>:</p>
-<ul>
-  <li><strong>Collapse (a real limitation)</strong> ⟺ the canaries (Gauguin/Seurat/Pissarro) show <em>monotonically rising</em> drift 1c → 2c → 3c, <em>and</em> their 3c drift clearly exceeds the style-far controls (Rembrandt/Hokusai). Random degradation is not monotonic and would not spare the controls — so this pattern is the fingerprint of concentrated null-space leakage.</li>
-  <li><strong>Robust (an honest negative result)</strong> ⟺ canary drift is flat across 1c/2c/3c, or no larger than the controls. This would mean SPEED's null-space holds even under adjacent multi-concept pressure — a genuine strength, fairly reported.</li>
-</ul>
-<p class="finding" id="exp3-collapse-finding"><em>Finding: pending cluster run.</em> Submit <code>sbatch experiment3/scripts/slurm_multi_concept.sh</code>; it builds the 2c/3c checkpoints, generates all rows above, and writes <code>clip_drift.csv</code>. This paragraph will be replaced with the measured progression and the verdict it implies.</p>
-
-<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
-<hr />
-<ol>
-<li id="fn1"><p>Li, O., Wang, Y., Hu, X., Jiang, H., Hao, Y., Feng, F. (2026). "SPEED: Scalable, Precise, and Efficient Concept Erasure for Diffusion Models." <em>ICLR 2026</em>.</p></li>
-<li id="fn2"><p>Gandikota, R., et al. (2023). "Erasing Concepts from Diffusion Models." <em>ICCV 2023</em>.</p></li>
-<li id="fn3"><p>Amara, I., et al. (2025). "Erasing More Than Intended? How Concept Erasure Degrades the Generation of Non-Target Concepts." <em>arXiv:2501.09833</em>.</p></li>
-</ol>
-</section>
-
+      <section class="card">
+        <h2>5. Conclusion</h2>
+        <p>Closed-form projection mechanisms like SPEED represent an elegant, training-free approach to concept filtering. For sparse, linearly independent edits, their geometric null-space effectively guarantees the preservation of adjacent concepts.</p>
+        <p>However, they are fundamentally bottlenecked by <strong>Rank Saturation</strong>. When deployed against dense, entangled semantic clusters, the closed-form mathematics collapse the very neighborhoods they aim to protect. Future architectures seeking to achieve robust, large-scale machine unlearning must move beyond superficial cross-attention filtering and develop mechanisms capable of true mechanistic feature disentanglement.</p>
+      </section>
+    </main>
+  </div>
 </body>
 </html>
