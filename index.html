@@ -117,6 +117,44 @@
         <p>One honest caveat: this is a single collapsing artist, so the geometric story is the best-supported explanation rather than a proven one. The clean confirmation would be to invert the experiment — erase 40 <em>pointillists</em> and predict that Seurat becomes the casualty while Pissarro survives.</p>
       </section>
 
+      <!-- ===================== ABLATION: THE REFINEMENT CONTRADICTION ===================== -->
+      <section class="card">
+        <h2>Ablation: The Refinement Contradiction</h2>
+        <p>If rank saturation caused Pissarro's collapse at N=40, it exposes a massive internal contradiction in SPEED's architecture. SPEED uses a feature called <strong>Prior Knowledge Refinement (DPA)</strong> which generates perturbed, "fake" retain concepts to artificially increase the coverage of the retain space. But adding vectors to the retain set <em>consumes the rank budget</em> and shrinks the null-space.</p>
+        <p>We hypothesized that DPA, designed to protect the prior, was actually accelerating the collapse under load. To test this, we repeated the N=40 erasure but turned SPEED's refinement machinery completely off (<code>aug_num=0</code>).</p>
+
+        <table>
+          <thead>
+            <tr><th>Concept</th><th>Role</th><th>Full Method (DPA On)</th><th>DPA Off</th><th>Zero Refinement</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Pissarro</strong></td><td>Canary (Leaker)</td><td class="danger">0.253</td><td>0.167</td><td class="highlight" style="color:var(--success);">0.141</td></tr>
+            <tr><td>Gauguin</td><td>Canary</td><td>0.128</td><td>0.109</td><td>0.102</td></tr>
+            <tr><td>Rembrandt</td><td>Control</td><td>0.113</td><td>0.187</td><td>0.084</td></tr>
+          </tbody>
+        </table>
+
+        <div class="image-grid">
+          <div class="image-card">
+            <img src="experiment3/results/rank_saturation/speed_40c/canary/pissarro/seed0.png" alt="Pissarro Full">
+            <div class="image-label">N=40 (Full Method) — Collapsed</div>
+          </div>
+          <div class="image-card">
+            <img src="experiment3/results/rank_saturation/speed_40c_nodpa/canary/pissarro/seed0.png" alt="Pissarro No DPA">
+            <div class="image-label">N=40 (No DPA) — Recovering</div>
+          </div>
+          <div class="image-card">
+            <img src="experiment3/results/rank_saturation/speed_40c_norefine/canary/pissarro/seed0.png" alt="Pissarro No Refinement">
+            <div class="image-label">N=40 (Zero Refinement) — Intact</div>
+          </div>
+        </div>
+
+        <div class="verdict-box">
+          <h3>SPEED sabotages its own null-space</h3>
+          <p>By turning <em>off</em> the safety feature, Pissarro's drift plummeted from a devastating 0.253 back down to 0.141 (barely above the noise floor). DPA artificially inflates the retain rank, starving the null-space of the exact degrees of freedom it desperately needs under dense entanglement. SPEED's preservation machinery actively accelerates its own capacity collapse.</p>
+        </div>
+      </section>
+
       <!-- ===================== METHODOLOGY / PITFALLS ===================== -->
       <section class="card">
         <h2>Methodology &amp; Pitfalls We Corrected</h2>
