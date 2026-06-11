@@ -26,9 +26,27 @@ TEST_PROMPTS = [
     {"id": "rysselberghe","prompt": "a painting in the style of Theo van Rysselberghe","category": "non_retain"},
 ]
 
+def is_black(image, thresh=10.0):
+    """Detect blank/near-black frames (mean luminance below thresh on 0-255)."""
+    px = list(image.convert("L").getdata())
+    return (sum(px) / len(px)) < thresh
+
+
 def load_pipeline(base_model, ckpt_path):
+    # Two root causes of the first run's 21 black frames, fixed here:
+    #  (1) NSFW safety checker blanks flagged outputs to solid black. It fires on
+    #      nude-heavy painters (Gauguin's Tahitian women, Picasso, Rembrandt) —
+    #      same seed -> same composition -> same trigger -> consistently black.
+    #  (2) fp16 can NaN the VAE decode, also yielding black.
+    # Disabling the safety checker + running fp32 removes both WITHOUT changing the
+    # seed, so the paired baseline-vs-edited comparison stays valid (the underlying
+    # latent was fine; the checker was just blanking it post-hoc). Disabling the
+    # NSFW filter is standard practice in the ESD/SPEED erasure codebases.
     pipe = StableDiffusionPipeline.from_pretrained(
-        base_model, torch_dtype=torch.float16
+        base_model,
+        torch_dtype=torch.float32,
+        safety_checker=None,
+        requires_safety_checker=False,
     ).to(DEVICE)
     if ckpt_path:
         if not os.path.exists(ckpt_path):
@@ -76,6 +94,13 @@ def main():
                 generator=gen,
                 guidance_scale=7.5,
             ).images[0]
+            if is_black(image):
+                # Should no longer happen with fp32 + safety checker off. If it
+                # ever does, record it loudly rather than silently shipping a
+                # black frame that would poison the CLIP-drift metric again.
+                print(f"    seed{seed}: WARNING — still black after fp32+no-safety-checker")
+                with open(os.path.join(args.out_dir, "corrupt_frames.txt"), "a") as cf:
+                    cf.write(f"{args.method}/{item['category']}/{item['id']}/seed{seed}.png\n")
             image.save(out_path)
             print(f"    seed{seed}: saved")
 
