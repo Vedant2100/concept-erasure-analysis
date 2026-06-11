@@ -15,12 +15,12 @@
   <div class="layout-wrapper">
     <nav class="toc-sidebar">
       <div class="toc-sticky">
-        <h3>Contents</h3>
+                <h3>Contents</h3>
         <ul>
           <li><a href="#tldr">TL;DR</a></li>
-          <li><a href="#lineage">Research Lineage</a></li>
-          <li><a href="#how">How SPEED Works</a></li>
-          <li><a href="#strengths">Strengths: What SPEED Does Well</a></li>
+          <li><a href="#lineage">1. Trace the Lineage & Find the Frontier</a></li>
+          <li><a href="#how">2. Target Paper: SPEED (Scalable, Precise, and Efficient Concept Erasure)</a></li>
+          <li><a href="#strengths">3. Articulate Strengths</a></li>
           <li><a href="#experiments">Empirical Experiments</a></li>
           <li><a href="#findings">Key Findings</a></li>
           <li><a href="#the-question">The Question</a></li>
@@ -44,7 +44,7 @@
 <p>Large-scale text-to-image models are trained on internet-scale data and inevitably learn to generate harmful, copyrighted, or otherwise undesirable content. <strong>Concept erasure</strong> is the task of surgically removing specific visual concepts from a pretrained model's weights — without retraining from scratch and without post-hoc filters that can be bypassed.</p>
 <p>This project traces the lineage from the original ESD method (Gandikota et al., 2023) through to <strong>SPEED</strong> (Li et al., ICLR 2026), identifying SPEED as the current open-source frontier. The code, configuration scripts, visual results, and detailed analyses for our empirical probes are hosted on dedicated branches: <em>all-experiments</em> and <em>experiment-3</em>.</p>
 
-<h2 id="lineage">Research Lineage</h2>
+<h2 id="lineage">1. Trace the Lineage & Find the Frontier</h2>
 <p>ESD was not the first attempt to make generative models safer, nor the last. The field converged on weight-editing after finding dataset filtering too expensive and inference-time steering inadequate. The following diagram traces the lineage from foundations to the current frontier.</p>
 
 <div class="mermaid">
@@ -79,12 +79,12 @@ graph TD
   <li><strong>Localization</strong>: GLoCE, LACE. Focuses on spatial precision to avoid global collateral damage.</li>
 </ul>
 
-<h2 id="how">How SPEED Works</h2>
+<h2 id="how">2. Target Paper: SPEED (Scalable, Precise, and Efficient Concept Erasure)</h2>
 <p>In a diffusion U-Net, the text prompt conditions the image through <strong>cross-attention</strong>: token embeddings are mapped through Key and Value projection matrices (W<sub>K</sub>, W<sub>V</sub>) that tell each region of the image what the text is asking for. SPEED edits exactly these matrices, in closed form.</p>
 <p>It computes a weight update that redirects a target concept's embedding toward a neutral one, then <strong>projects that update onto the null-space of a large retain set</strong> (R<sub>refine</sub>, ~1,700 artists) — the subspace of weight changes that, by construction, leave every retained concept unchanged. The target is erased; the retain set is provably preserved; and it all happens training-free in seconds.</p>
 <p>The catch, which SPEED's authors acknowledge but never demonstrate, is that this null-space has <strong>finite rank</strong>. As the protected set grows, the available subspace shrinks — potentially toward the trivial null-space {0}. They call this <em>rank saturation</em>, and our Experiment 3 locates where it actually begins to bite.</p>
 
-<h2 id="strengths">Strengths: What SPEED Does Well</h2>
+<h2 id="strengths">3. Articulate Strengths</h2>
 <p>As the frontier paper for efficient concept erasure, SPEED (Scalable, Precise, and Efficient Concept Erasure) improves upon MACE and UCE significantly:</p>
 <ul>
   <li><strong>Extreme Efficiency:</strong> SPEED relies on <em>training-free null-space editing</em>. It iteratively projects out target concept directions via importance pruning and embedding constraints, scaling to hundreds of concepts in just ~5 seconds.</li>
@@ -111,7 +111,7 @@ graph TD
 
 
     <hr style="margin: 40px 0; border: 1px solid #ddd;">
-    <h2 id="deep-dive-empirical-limitations" style="text-align:center; font-size: 2.5em; margin-bottom: 20px;">Deep Dive: Empirical Limitations</h2>
+    <h2 id="deep-dive-empirical-limitations" style="text-align:center; font-size: 2.5em; margin-bottom: 20px;">4. Expose Limitations Through Experiments</h2>
 
     <main>
       
