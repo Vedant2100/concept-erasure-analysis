@@ -1,9 +1,0 @@
-Place experiment output images here after running experiments/exp1_compositional.py
-
-Expected files (per concept, e.g. "car"):
-  car_T1_exact_baseline.jpg
-  car_T1_exact_mace.jpg
-  car_T2_synonym_baseline.jpg
-  car_T2_synonym_mace.jpg
-  ... etc.
-  car_prompts.json
