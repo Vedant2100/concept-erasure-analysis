@@ -1,4 +1,4 @@
-# Erasing Concepts from Diffusion Models — Semantic Neighbor Damage
+# Erasing Concepts from Diffusion Models — Project Analysis
 
 **Course:** EE243  
 **Student:** Vedant  
@@ -8,42 +8,28 @@
 
 ---
 
-## Experiment 3: Semantic Neighbor Collateral Damage (The "Blast Radius" Test)
+## Overview
 
-This branch hosts the codebase and visual results specifically for **Experiment 3** (Semantic Neighbor Collateral Damage).
+This repository hosts a research analysis tracing the lineage from ESD (Gandikota et al., 2023) to SPEED (Li et al., ICLR 2026), evaluating training-free concept erasure in text-to-image diffusion models.
 
-We investigate the **retain-set horizon** of SPEED's null-space projection:
-* **The Goal:** Test if SPEED's null-space projection edits bleed into semantic neighbors (similar artists) that fall outside the explicit protected list (retain set).
-* **Key Discovery:** It is not a binary damage-vs-no-damage landscape, but a spectrum. Artists with high mathematical footprints (displacement) under SPEED's edit suffer noticeable visual style suppression (e.g., Theo van Rysselberghe and Jan Toorop) even when not in the retain set, while low-similarity adjacent artists (Monticelli, van Rappard) remain perfectly preserved.
+To maintain a clean master branch, all experimental code, scripts, SLURM configs, logs, and generated visual results are isolated onto dedicated development branches.
 
 ---
 
-## Branch Structure
+## Branch Mapping
 
-* `experiment3/scripts/`
-  * `footprint_analysis.py` — Calculates mathematical footprint / weight displacement for unprotected style concepts.
-  * `probe_neighbor_damage.py` — Evaluates neighbor visual damage by generating images from baseline, SPEED, and ESD-x.
-  * `neighbor_prompts.json` — Prompt library containing target artists.
-  * `setup_speed.sh` / `setup_esd_neighbor.sh` — Downloads weights.
-  * `slurm_probe_neighbor.sh` — Executes the neighbor damage probe on cluster.
-* `experiment3/results/neighbor_damage/` — PNG outputs for baseline, SPEED, and ESD-x across target artists.
+* **`main`**: The clean homepage (`index.html` and `blog.css`), documenting only the research lineage diagram, strengths, and TL;DR. Contains no experimental scripts, assets, or results.
+* **`all-experiments`**: Contains the complete project workspace, scripts, and results for all three experiments:
+  1. **Textual Inversion Recovery Probe** — Evaluates if style/instance erasures can be "re-learned" with few-shot optimization.
+  2. **Compositional Prompt Evasion Probe** — Evaluates whether synonym or detailed composition bypasses concept erasures.
+  3. **Semantic Neighbor Collateral Damage Probe** — Evaluates visual style suppression in semantically adjacent artists outside the retain set.
+* **`experiment-3`**: Dedicated branch focusing strictly on **Experiment 3** (Semantic Neighbor Collateral Damage), containing the mathematical footprint analysis and neighbor damage visual probes.
 
-To run the footprint analysis:
+To run scripts or view output images, checkout the respective experiment branch:
 ```bash
-python experiment3/scripts/footprint_analysis.py \
-    --speed_ckpt checkpoints/speed/few-concept/style/Van\ Gogh.pt \
-    --base_model CompVis/stable-diffusion-v1-4 \
-    --retain_set SPEED_repo/data/style.csv \
-    --out footprint_results.csv
-```
-
-To run the neighbor damage visual probe:
-```bash
-python experiment3/scripts/probe_neighbor_damage.py \
-    --base_model CompVis/stable-diffusion-v1-4 \
-    --method speed \
-    --ckpt checkpoints/speed/few-concept/style/Van\ Gogh.pt \
-    --concept vangogh
+git checkout all-experiments
+# or
+git checkout experiment-3
 ```
 
 ---
