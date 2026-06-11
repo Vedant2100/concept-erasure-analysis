@@ -104,7 +104,8 @@ graph TD
   <p><strong>Our Finding:</strong> Our Textual Inversion (TI) experiment directly attacks this assumption.</p>
   <ul>
     <li>We found that SPEED's null-space projection permanently destroys the visual features of instance concepts (e.g., <strong>Snoopy remains at 0% recovery</strong> even after 1,000 TI steps).</li>
-    <li>However, for distributed style concepts, the erasure is purely lexical. <strong>Van Gogh recovered to 100% within just 50 TI steps</strong>.</li>
+    <li>However, for distributed style concepts, the erasure is purely lexical. <strong>Van Gogh recovered to 100% within just 50 TI steps</strong> under SPEED.</li>
+    <li>For <strong>ESD-x</strong>, the Textual Inversion optimization landscape was found to be permanently damaged. The training loss diverged to NaN within 50 steps, resulting in completely collapsed (black) image outputs. While ESD successfully prevents TI recovery, it does so through catastrophic degradation of the local latent space rather than precise semantic targeting.</li>
   </ul>
   <p style="margin-bottom: 0;"><strong>Analysis:</strong> SPEED claims precise erasure for Van Gogh in their paper (Table 1) based purely on zero-shot CLIP scores. However, our probe proves that SPEED only severs the text-to-image mapping for the specific token "Van Gogh". The actual visual knowledge of the style is fully intact in the U-Net and trivially recoverable by a malicious (or curious) user.</p>
 </div>
@@ -131,7 +132,21 @@ graph TD
   </div>
 </div>
 
-<p><em>Observation:</em> Our experiments show that while querying SPEED with "Snoopy" successfully yields a generic dog (erased), coercing the model with detailed compositional text easily reconstructs the target. This proves that concept erasure methods fundamentally struggle to dismantle <strong>distributed attribute combinations</strong>, leaving the core visual priors perfectly intact and accessible.</p>
+<h4 style="margin-top: 2em;">ESD-x (Van Gogh)</h4>
+<div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1em;">
+  <div>
+    <strong>Prompt: "a painting in the style of Van Gogh"</strong>
+    <img src="results/comp_vangogh/esd_direct_seed0.png" alt="Van Gogh Direct" style="width:100%; border-radius:4px; margin-top:8px;">
+    <div class="figure-caption">Direct Concept (Blocked by ESD-x)</div>
+  </div>
+  <div>
+    <strong>Prompt: "a painting with thick impasto brushstrokes and swirling night skies over a village"</strong>
+    <img src="results/comp_vangogh/esd_compositional_seed0.png" alt="Van Gogh Compositional" style="width:100%; border-radius:4px; margin-top:8px;">
+    <div class="figure-caption">Compositional Evasion (Bypasses Erasure)</div>
+  </div>
+</div>
+
+<p><em>Observation:</em> Our experiments show that whether querying SPEED with "Snoopy" or ESD-x with "Van Gogh", the models successfully yield generic outputs for direct prompts. However, coercing the models with detailed compositional text easily reconstructs the targets. This proves that concept erasure methods fundamentally struggle to dismantle <strong>distributed attribute combinations</strong>, leaving the core visual priors perfectly intact and accessible.</p>
 
 <h3 id="exp3">Experiment 3: Retain-Set Horizon — Semantic Neighbor Collateral Damage</h3>
 <p><strong>Hypothesis:</strong> SPEED's null-space projection guarantees preservation only
