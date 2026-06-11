@@ -20,22 +20,38 @@ conda activate speed_env || conda activate mace_env
 cd $SLURM_SUBMIT_DIR
 
 # Verify required checkpoints exist
-if [ ! -f "checkpoints/speed/few-concept/style/Van Gogh.pt" ]; then
-    echo "ERROR: SPEED Van Gogh checkpoint missing. Run setup_speed.sh first."
-    exit 1
-fi
 if [ ! -f "checkpoints/esd/diffusers-VanGogh-ESDx1-UNET.pt" ]; then
     echo "ERROR: ESD-x checkpoint missing. Run setup_esd_neighbor.sh first."
     exit 1
 fi
 
+mkdir -p checkpoints/speed/multi/1concept
 mkdir -p checkpoints/speed/multi/2concept
 mkdir -p checkpoints/speed/multi/3concept
 
 # ================================================================
-# Step 1: Generate multi-concept SPEED checkpoints
-# SPEED is training-free — each takes ~60 seconds
+# Step 1: Generate ALL THREE SPEED checkpoints with IDENTICAL settings.
+# SPEED is training-free — each takes ~60 seconds.
+#
+# CRITICAL: we build the 1-concept checkpoint here rather than reusing the
+# released few-concept/style/Van Gogh.pt. All three (1c/2c/3c) must come from the
+# same script, retain set (style.csv), and hyperparameters (V, aug_num=10,
+# threshold=1e-1) so the ONLY variable across columns is the number of erased
+# concepts. Reusing the released checkpoint would confound concept-count with
+# checkpoint provenance and invalidate the 1c->2c->3c trend.
 # ================================================================
+
+echo "=== Building 1-concept checkpoint: Van Gogh ==="
+cd SPEED_repo
+python train_erase_null.py \
+    --baseline SPEED \
+    --target_concepts "Van Gogh" \
+    --anchor_concepts "art" \
+    --retain_path "data/style.csv" --heads "concept" \
+    --save_path "../checkpoints/speed/multi/1concept" \
+    --file_name "weight" \
+    --params V --aug_num 10 --threshold 1e-1
+cd ..
 
 echo "=== Building 2-concept checkpoint: Van Gogh + Picasso ==="
 cd SPEED_repo
@@ -73,7 +89,7 @@ python experiment3/scripts/probe_multi_concept.py \
 echo "=== Generating: SPEED 1-concept (Van Gogh only) ==="
 python experiment3/scripts/probe_multi_concept.py \
     --method speed_1c \
-    --ckpt "checkpoints/speed/few-concept/style/Van Gogh.pt" \
+    --ckpt "checkpoints/speed/multi/1concept/weight.pt" \
     --out_dir experiment3/results/multi_concept
 
 echo "=== Generating: SPEED 2-concept (Van Gogh + Picasso) ==="
