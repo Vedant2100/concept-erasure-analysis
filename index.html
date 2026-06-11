@@ -232,8 +232,71 @@ retention mechanism). <span style="color:#c62828;font-weight:bold;">Red rows</sp
   </tbody>
 </table>
 
-<p class="finding"><em>Finding:</em> SPEED's null-space projection does not visibly degrade any of the tested neighbors — "post-impressionist", "Starry Night", and "thick impasto" all produce images statistically indistinguishable from baseline, despite falling outside R<sub>refine</sub>. The most parsimonious explanation is not DPA breadth but null-space localization: SPEED projects out only the weight directions that the <em>"Van Gogh" token embedding</em> specifically activates in W<sub>K</sub>/W<sub>V</sub>. Prompts like "Starry Night" live in different CLIP embedding directions &mdash; directions SPEED's edit never touched. The retain-set horizon is a real theoretical gap (no orthogonality guarantee for concepts outside R<sub>refine</sub>), but the prompts tested here do not fall into it empirically, because their CLIP embeddings have low overlap with the erased token's direction.</p>
-<p>ESD-x shows measurable collateral degradation to neighbors including Cézanne and Starry Night. This is not a failure of something ESD-x was designed to do &mdash; it has no retention mechanism. The bleed is a direct consequence of gradient descent updating cross-attention weights globally: any concept whose CLIP embedding partially overlaps with the Van Gogh direction gets caught in the gradient update. <strong>This contrast is the real finding of Experiment 3:</strong> the architectural shift from gradient-based fine-tuning (ESD) to null-space projection (SPEED) is what enables isolated erasure. ESD-x illustrates the problem that motivated SPEED's design, not a new limitation of SPEED.</p>
+<p class="finding"><em>Finding:</em> SPEED's null-space projection does not visibly degrade any of the tested general neighbors — "post-impressionist", "Starry Night", and "thick impasto" all produce images statistically indistinguishable from baseline, despite falling outside R<sub>refine</sub>. The most parsimonious explanation is not DPA breadth but null-space localization: SPEED projects out only the weight directions that the <em>"Van Gogh" token embedding</em> specifically activates in W<sub>K</sub>/W<sub>V</sub>. Prompts like "Starry Night" live in different CLIP embedding directions &mdash; directions SPEED's edit never touched.</p>
+
+<h4 style="margin-top: 2.5em;">Stress Testing the Limits: Highly Displaced Artists</h4>
+<p>To find the absolute boundaries of SPEED's precision, we ran a mathematical footprint analysis (Experiment 3.2). We computed the weight displacement (L2 norm of parameter change) across all layers for style prompts of artists <em>not</em> in the retain set. We then generated images for the most displaced artists to see if mathematical displacement correlates with visual style corruption. Below is the visual result for a spectrum of these highly displaced artists (seed 0):</p>
+
+<table style="width:100%; border-collapse: collapse; margin: 1em 0;">
+  <thead>
+    <tr>
+      <th style="width:25%; text-align:left; padding:8px;">Artist & Prompt</th>
+      <th style="width:25%; text-align:center; padding:8px;">Baseline SD 1.4</th>
+      <th style="width:25%; text-align:center; padding:8px;">ESD-x (Van Gogh)</th>
+      <th style="width:25%; text-align:center; padding:8px;">SPEED (Van Gogh)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Monticelli -->
+    <tr style="background: #f1f8e9;">
+      <td style="padding:8px;">
+        <strong>Adolphe Monticelli ❌ (not retained)</strong><br>
+        <span style="font-size:0.85em; color:#666;">Influenced Van Gogh.<br>SPEED MSE: <strong>9.04</strong><br>ESD-x MSE: 1798.94</span>
+      </td>
+      <td><img src="results/neighbor_damage/baseline/not_in_retain_set_artists/monticelli/seed0.png" style="width:100%;"></td>
+      <td><img src="results/neighbor_damage/esd_x/not_in_retain_set_artists/monticelli/seed0.png" style="width:100%;"></td>
+      <td><img src="results/neighbor_damage/speed/not_in_retain_set_artists/monticelli/seed0.png" style="width:100%;"></td>
+    </tr>
+    <!-- van Rappard -->
+    <tr style="background: #f1f8e9;">
+      <td style="padding:8px;">
+        <strong>Anton van Rappard ❌ (not retained)</strong><br>
+        <span style="font-size:0.85em; color:#666;">Van Gogh's close colleague.<br>SPEED MSE: <strong>39.88</strong><br>ESD-x MSE: 1203.06</span>
+      </td>
+      <td><img src="results/neighbor_damage/baseline/not_in_retain_set_artists/van_rappard/seed0.png" style="width:100%;"></td>
+      <td><img src="results/neighbor_damage/esd_x/not_in_retain_set_artists/van_rappard/seed0.png" style="width:100%;"></td>
+      <td><img src="results/neighbor_damage/speed/not_in_retain_set_artists/van_rappard/seed0.png" style="width:100%;"></td>
+    </tr>
+    <!-- Rysselberghe -->
+    <tr style="background: #fff3e0;">
+      <td style="padding:8px;">
+        <strong>Theo van Rysselberghe ❌ (not retained)</strong><br>
+        <span style="font-size:0.85em; color:#666;">Neo-Impressionist/Pointillist.<br>SPEED MSE: <strong>439.78</strong><br>ESD-x MSE: 2872.93</span>
+      </td>
+      <td><img src="results/neighbor_damage/baseline/not_in_retain_set_artists/rysselberghe/seed0.png" style="width:100%;"></td>
+      <td><img src="results/neighbor_damage/esd_x/not_in_retain_set_artists/rysselberghe/seed0.png" style="width:100%;"></td>
+      <td><img src="results/neighbor_damage/speed/not_in_retain_set_artists/rysselberghe/seed0.png" style="width:100%;"></td>
+    </tr>
+    <!-- Toorop -->
+    <tr style="background: #ffebee;">
+      <td style="padding:8px;">
+        <strong>Jan Toorop ❌ (not retained)</strong><br>
+        <span style="font-size:0.85em; color:#666;">Dutch Symbolist.<br>SPEED MSE: <strong>1137.07</strong><br>ESD-x MSE: 4655.98</span>
+      </td>
+      <td><img src="results/neighbor_damage/baseline/not_in_retain_set_artists/toorop/seed0.png" style="width:100%;"></td>
+      <td><img src="results/neighbor_damage/esd_x/not_in_retain_set_artists/toorop/seed0.png" style="width:100%;"></td>
+      <td><img src="results/neighbor_damage/speed/not_in_retain_set_artists/toorop/seed0.png" style="width:100%;"></td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="finding"><em>Finding & Analysis:</em> Our stress test reveals a clear correlation between mathematical weight displacement (footprint) and visual collateral damage. While general neighbors like "post-impressionist" and "Starry Night" remain unscathed, artists outside the retain set with high mathematical footprints suffer noticeable style shifts:
+  <ul>
+    <li><strong>Low Displacement (Monticelli, Breitner, van Rappard):</strong> Despite receiving no explicit null-space protection, their generated styles remain virtually identical to the baseline (SPEED MSE under 40). SPEED's null-space projection is localized enough to spare them, while ESD-x causes catastrophic style erosion (ESD-x MSE over 1200).</li>
+    <li><strong>Medium to High Displacement (Theo van Rysselberghe, Jan Toorop):</strong> At the absolute boundaries of the edit (highest footprint values), we observe a distinct style drift under SPEED. For <strong>Jan Toorop</strong>, the SPEED MSE reaches <strong>1137.07</strong>, indicating visible distortion (color shift, brushstroke and pattern changes) compared to the baseline.</li>
+  </ul>
+  <strong>Conclusion:</strong> The "retain-set horizon" is indeed a real limitation of SPEED. Null-space projection prevents collateral damage to the general landscape, but it cannot fully protect highly similar semantic neighbors that are left out of the retain set. When a neighbor's representation heavily overlaps with the target concept in the cross-attention layers, SPEED's training-free projection inevitably leaks, leading to style distortion. However, SPEED still represents a massive improvement over ESD-x, which operates like a sledgehammer—completely destroying all neighboring styles with MSEs between 1200 and 4600.
+</p>
 
 <h2 id="video">Video Walkthrough</h2>
 <p>A complete demonstration of the codebase, Textual Inversion pipeline, and results walkthrough.</p>
