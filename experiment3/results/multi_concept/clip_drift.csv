@@ -1,10 +1,10 @@
-artist,category,role,speed_1c,speed_2c,speed_3c,esd_x,speed_monotonic_rising
-vangogh,erased,erased target (VG, all configs),0.37397,0.34809,0.34816,0.39390,False
-picasso,erased_in_2c_3c,erased target (2c, 3c),0.11397,0.28219,0.28117,0.24234,False
-monet,erased_in_3c,erased target (3c only),0.14080,0.14933,0.32212,0.23275,True
-gauguin,retain_canary,RETAIN canary (style-adjacent),0.00614,0.01424,0.26746,0.30486,True
-seurat,retain_canary,RETAIN canary (style-adjacent),0.03830,0.04760,0.05652,0.29938,True
-pissarro,retain_canary,RETAIN canary (style-adjacent),0.02661,0.05355,0.07059,0.26949,True
-rembrandt,retain_control_far,RETAIN control (style-far),0.14723,0.19201,0.23082,0.31396,True
-hokusai,retain_control_far,RETAIN control (style-far),0.01660,0.03202,0.07531,0.11999,True
-rysselberghe,non_retain,non-retain bridge,0.05944,0.06844,0.27263,0.23786,True
+artist,category,role,speed_1c,speed_2c,speed_3c,esd_x,n_speed_1c,n_speed_2c,n_speed_3c,n_esd_x,speed_monotonic_rising
+vangogh,erased,erased target (VG, all configs),0.34678,0.32555,0.32771,0.38770,4,4,4,4,False
+picasso,erased_in_2c_3c,erased target (2c, 3c),0.00912,0.13366,0.14058,0.11452,4,4,4,4,True
+monet,erased_in_3c,erased target (3c only),0.02424,0.03681,0.31766,0.22713,4,4,4,4,True
+gauguin,retain_canary,RETAIN canary (style-adjacent),0.01825,0.07747,0.10880,0.22480,4,4,4,4,True
+seurat,retain_canary,RETAIN canary (style-adjacent),0.03538,0.04408,0.04933,0.28967,4,4,4,4,True
+pissarro,retain_canary,RETAIN canary (style-adjacent),0.02891,0.05846,0.07551,0.28403,4,4,4,4,True
+rembrandt,retain_control_far,RETAIN control (style-far),0.03245,0.06597,0.11416,0.19899,4,4,4,4,True
+hokusai,retain_control_far,RETAIN control (style-far),0.02964,0.04031,0.06331,0.14314,4,4,4,4,True
+rysselberghe,non_retain,non-retain bridge,0.05817,0.06967,0.16408,0.23877,4,4,4,4,True
