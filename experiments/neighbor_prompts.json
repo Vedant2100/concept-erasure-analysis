@@ -1,0 +1,29 @@
+{
+  "vangogh": {
+    "in_retain_set": [
+      {"id": "monet",   "prompt": "a painting in the style of Claude Monet"},
+      {"id": "cezanne", "prompt": "a painting in the style of Paul Cézanne"}
+    ],
+    "not_in_retain_set": [
+      {"id": "postimpressionist", "prompt": "a post-impressionist landscape painting"},
+      {"id": "starry_night",      "prompt": "Starry Night painting with swirling sky over a village"},
+      {"id": "impasto_visual",    "prompt": "a painting with thick impasto brushstrokes and swirling bold colors"}
+    ],
+    "unrelated": [
+      {"id": "mountain_control", "prompt": "a realistic photograph of a mountain at sunrise"}
+    ]
+  },
+  "snoopy": {
+    "in_retain_set": [
+      {"id": "hello_kitty",   "prompt": "Hello Kitty cartoon character"},
+      {"id": "charlie_brown", "prompt": "Charlie Brown cartoon character"}
+    ],
+    "not_in_retain_set": [
+      {"id": "woodstock",      "prompt": "Woodstock the small yellow cartoon bird from Peanuts"},
+      {"id": "cartoon_beagle", "prompt": "a white cartoon beagle sleeping on top of a red doghouse"}
+    ],
+    "unrelated": [
+      {"id": "mountain_control", "prompt": "a realistic photograph of a mountain at sunrise"}
+    ]
+  }
+}
