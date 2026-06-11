@@ -117,6 +117,26 @@
         <p>One honest caveat: this is a single collapsing artist, so the geometric story is the best-supported explanation rather than a proven one. The clean confirmation would be to invert the experiment — erase 40 <em>pointillists</em> and predict that Seurat becomes the casualty while Pissarro survives.</p>
       </section>
 
+      <!-- ===================== METHODOLOGY / PITFALLS ===================== -->
+      <section class="card">
+        <h2>Methodology &amp; Pitfalls We Corrected</h2>
+        <p>Getting to a trustworthy number here was harder than it looks. Three measurement traps each produced a convincing-but-wrong result before we caught them — and every safeguard in the pipeline above exists because of one of them.</p>
+
+        <h3>1. Pixel MSE could not tell damage from noise</h3>
+        <p>Our first instinct was to measure neighbor damage with pixel-space MSE between baseline and erased images. It failed badly: a <em>retained, protected</em> artist (Cézanne) scored MSE above <strong>10,000</strong> on some seeds, while a supposedly "damaged" neighbor scored ~440. MSE is dominated by ordinary seed-to-seed composition variation, not style change — so it cannot distinguish real erasure damage from diffusion stochasticity. That is why every number in this report uses <strong>CLIP image-to-image drift</strong>, which responds to style rather than pixel layout.</p>
+
+        <h3>2. The NSFW safety checker faked a collapse</h3>
+        <p>An early concentrated-erasure run showed a dramatic "Gauguin collapses to 0.267 drift" signal — and it was entirely an artifact. Stable Diffusion's NSFW safety checker blanks flagged generations to <em>solid black</em>, and it fires on nude-heavy painters like Gauguin (his Tahitian series). A black frame compared against a normal painting maxes out CLIP distance, manufacturing a fake collapse. We fixed it at the source: generation now runs in <code>fp32</code> with the safety checker disabled, and the analyzer explicitly excludes any black frame and reports how many valid seeds each number rests on. The "zero corrupt frames" note on the results above is the receipt for this fix.</p>
+
+        <h3>3. A neighbor "suppression" claim that reversed under measurement</h3>
+        <p>An initial single-concept framing claimed SPEED visibly suppressed a neighbor's color saturation. Measuring it directly told the opposite story — saturation actually rose slightly. It was confirmation bias reading damage into noise. Discarding that false start is what pushed us toward the controlled, multi-seed, control-calibrated design used here.</p>
+
+        <div class="verdict-box">
+          <h3>Why this matters</h3>
+          <p>Each pitfall would have produced a <em>more dramatic</em> headline than the real finding. The selective Pissarro leak survived all three corrections — which is precisely why we trust it. The controls, the seed averaging, the CLIP metric, and the black-frame exclusion are not decoration; they are the difference between a real limitation and an artifact.</p>
+        </div>
+      </section>
+
     </main>
   </div>
 </body>
