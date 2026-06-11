@@ -229,13 +229,7 @@ preserved). Red headers = concepts outside the retain set (the retain-set horizo
   </tbody>
 </table>
 
-<p class="finding"><em>Finding:</em> SPEED preserves Monet and Cézanne (both in R<sub>refine</sub>) with
-high fidelity, confirming the null-space mechanism works as designed for retained concepts.
-However, prompts that reference Van Gogh's style <em>without using his name</em> — genre
-terms, painting titles, and pure visual descriptors — show degraded generation under SPEED,
-while ESD-x leaves these largely unaffected. This is the retain-set horizon in practice:
-SPEED's precision guarantee does not extend to the semantic neighborhood of the erased
-concept when that neighborhood lies beyond the retain set's coverage.</p>
+<p class="finding"><em>Finding:</em> Contrary to the theoretical prediction, SPEED's null-space edit does not visibly degrade generation of semantically adjacent concepts ("post-impressionist", "Starry Night style") even though these fall outside R<sub>refine</sub>. A likely explanation is that SPEED's DPA augmentation introduces directed perturbations that implicitly protect nearby embedding directions, effectively broadening the null-space coverage beyond the explicitly listed concepts. This is actually a stronger precision result than the paper claims &mdash; but it does suggest that the DPA hyperparameters (not the paper's stated retain set) are the true determinant of the retain-set horizon's location. By contrast, <strong>ESD-x</strong> fundamentally lacks any spatial containment mechanism; its unconstrained gradient updates bleed heavily into semantic neighbors, catastrophically warping unlisted concepts like "Starry Night" into abstract noise.</p>
 
 <h2 id="video">Video Walkthrough</h2>
 <p>A complete demonstration of the codebase, Textual Inversion pipeline, and results walkthrough.</p>
