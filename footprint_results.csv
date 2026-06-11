@@ -1,0 +1,33 @@
+label,prompt,in_retain_set,footprint,relative_footprint
+Starry Night desc,Starry Night painting with swirling sky over a village,False,403.262615,0.453202
+Daubigny,a painting in the style of Charles-François Daubigny,True,357.815093,0.402126
+Dutch Golden Age,a Dutch Golden Age landscape painting,False,302.62478,0.340101
+Toorop,a painting in the style of Jan Toorop,False,297.365416,0.334191
+expressionist,an expressionist painting with bold colors,False,284.177644,0.31937
+Guillaumin,a painting in the style of Armand Guillaumin,True,278.389599,0.312865
+Seurat,a painting in the style of Georges Seurat,True,275.457558,0.30957
+van Rappard,a painting in the style of Anton van Rappard,False,247.320708,0.277949
+Toulouse-Lautrec,a painting in the style of Henri de Toulouse-Lautrec,True,236.602934,0.265903
+Cross,a painting in the style of Henri-Edmond Cross,True,233.948383,0.26292
+plein air,a plein air landscape in oil paint,False,233.034789,0.261893
+Rysselberghe,a painting in the style of Theo van Rysselberghe,False,218.832052,0.245932
+Pissarro,a painting in the style of Camille Pissarro,True,199.684236,0.224413
+Maximilien Luce,a painting in the style of Maximilien Luce,True,191.991182,0.215767
+Cézanne,a painting in the style of Paul Cézanne,True,191.80774,0.215561
+impasto,a painting with thick impasto brushstrokes and swirling bold colors,False,188.906759,0.212301
+Jongkind,a painting in the style of Johan Barthold Jongkind,False,184.637074,0.207502
+post-impressionist,a post-impressionist landscape painting,False,181.996582,0.204535
+Monticelli,a painting in the style of Adolphe Monticelli,False,181.057903,0.20348
+Gauguin,a painting in the style of Paul Gauguin,True,176.385173,0.198228
+pointillist,a pointillist painting made of small dots,False,166.726484,0.187374
+mountain photo,a realistic photograph of a mountain at sunrise,False,164.529389,0.184904
+Monet,a painting in the style of Claude Monet,True,164.060196,0.184377
+Anton Mauve,a painting in the style of Anton Mauve,True,142.363079,0.159993
+portrait photo,a photorealistic portrait of a person,False,137.315418,0.15432
+Breitner,a painting in the style of George Hendrik Breitner,False,135.775666,0.15259
+Angrand,a painting in the style of Charles Angrand,True,132.596662,0.149017
+Corot,a painting in the style of Camille Corot,True,128.490063,0.144402
+Courbet,a painting in the style of Gustave Courbet,True,126.917125,0.142634
+Émile Bernard,a painting in the style of Émile Bernard,True,126.370944,0.142021
+fauvism,a Fauvist painting with vivid flat color,False,109.487312,0.123046
+anime,an anime character illustration,False,105.680397,0.118768

@@ -1,0 +1,188 @@
+
+EnvironmentNameNotFound: Could not find conda environment: speed_env
+You can list all discoverable environments with `conda info --envs`.
+
+
+=== Van Gogh: Baseline ===
+Loading pipeline: method=baseline
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:02,  2.56it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:02,  2.27it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:01<00:00,  5.57it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  7.28it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.62it/s]
+  [in_retain_set] monet: a painting in the style of Claude Monet
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [in_retain_set] cezanne: a painting in the style of Paul Cézanne
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [not_in_retain_set] postimpressionist: a post-impressionist landscape painting
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [not_in_retain_set] starry_night: Starry Night painting with swirling sky over a village
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [not_in_retain_set] impasto_visual: a painting with thick impasto brushstrokes and swirling bold colors
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [not_in_retain_set_artists] monticelli: a painting in the style of Adolphe Monticelli
+  [not_in_retain_set_artists] van_rappard: a painting in the style of Anton van Rappard
+  [not_in_retain_set_artists] breitner: a painting in the style of George Hendrik Breitner
+  [not_in_retain_set_artists] rysselberghe: a painting in the style of Theo van Rysselberghe
+  [not_in_retain_set_artists] toorop: a painting in the style of Jan Toorop
+  [not_in_retain_set_artists] jongkind: a painting in the style of Johan Barthold Jongkind
+  [unrelated] mountain_control: a realistic photograph of a mountain at sunrise
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+Done. Results saved to results/neighbor_damage/baseline/
+=== Van Gogh: ESD-x ===
+Loading pipeline: method=esd_x
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:02,  2.56it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:01,  3.48it/s]Loading pipeline components...:  43%|████▎     | 3/7 [00:01<00:01,  2.62it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  7.41it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.55it/s]
+Potential NSFW content was detected in one or more images. A black image will be returned instead. Try again with a different prompt and/or seed.
+  Applying ESD-x UNet weights from checkpoints/esd/diffusers-VanGogh-ESDx1-UNET.pt ...
+  [in_retain_set] monet: a painting in the style of Claude Monet
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [in_retain_set] cezanne: a painting in the style of Paul Cézanne
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [not_in_retain_set] postimpressionist: a post-impressionist landscape painting
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [not_in_retain_set] starry_night: Starry Night painting with swirling sky over a village
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [not_in_retain_set] impasto_visual: a painting with thick impasto brushstrokes and swirling bold colors
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [not_in_retain_set_artists] monticelli: a painting in the style of Adolphe Monticelli
+  [not_in_retain_set_artists] van_rappard: a painting in the style of Anton van Rappard
+  [not_in_retain_set_artists] breitner: a painting in the style of George Hendrik Breitner
+  [not_in_retain_set_artists] rysselberghe: a painting in the style of Theo van Rysselberghe
+  [not_in_retain_set_artists] toorop: a painting in the style of Jan Toorop
+  [not_in_retain_set_artists] jongkind: a painting in the style of Johan Barthold Jongkind
+  [unrelated] mountain_control: a realistic photograph of a mountain at sunrise
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+Done. Results saved to results/neighbor_damage/esd_x/
+=== Van Gogh: SPEED ===
+Loading pipeline: method=speed
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:01,  3.72it/s]Loading pipeline components...:  57%|█████▋    | 4/7 [00:00<00:00,  6.32it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:01<00:00,  3.90it/s]Loading pipeline components...:  86%|████████▌ | 6/7 [00:01<00:00,  4.11it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  4.99it/s]
+  Applying SPEED weights from checkpoints/speed/few-concept/style/Van Gogh.pt ...
+  [in_retain_set] monet: a painting in the style of Claude Monet
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [in_retain_set] cezanne: a painting in the style of Paul Cézanne
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [not_in_retain_set] postimpressionist: a post-impressionist landscape painting
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [not_in_retain_set] starry_night: Starry Night painting with swirling sky over a village
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [not_in_retain_set] impasto_visual: a painting with thick impasto brushstrokes and swirling bold colors
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [not_in_retain_set_artists] monticelli: a painting in the style of Adolphe Monticelli
+  [not_in_retain_set_artists] van_rappard: a painting in the style of Anton van Rappard
+  [not_in_retain_set_artists] breitner: a painting in the style of George Hendrik Breitner
+  [not_in_retain_set_artists] rysselberghe: a painting in the style of Theo van Rysselberghe
+  [not_in_retain_set_artists] toorop: a painting in the style of Jan Toorop
+  [not_in_retain_set_artists] jongkind: a painting in the style of Johan Barthold Jongkind
+  [unrelated] mountain_control: a realistic photograph of a mountain at sunrise
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+Done. Results saved to results/neighbor_damage/speed/
+=== Snoopy: Baseline ===
+Loading pipeline: method=baseline
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:00,  8.55it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:01,  3.08it/s]Loading pipeline components...:  43%|████▎     | 3/7 [00:01<00:01,  2.58it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:01<00:00,  4.36it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.29it/s]
+  [in_retain_set] hello_kitty: Hello Kitty cartoon character
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [in_retain_set] charlie_brown: Charlie Brown cartoon character
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [not_in_retain_set] woodstock: Woodstock the small yellow cartoon bird from Peanuts
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [not_in_retain_set] cartoon_beagle: a white cartoon beagle sleeping on top of a red doghouse
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [unrelated] mountain_control: a realistic photograph of a mountain at sunrise
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+Done. Results saved to results/neighbor_damage/baseline/
+=== Snoopy: SPEED ===
+Loading pipeline: method=speed
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:01,  3.48it/s]Loading pipeline components...:  86%|████████▌ | 6/7 [00:01<00:00,  5.64it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.44it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.23it/s]
+  Applying SPEED weights from checkpoints/speed/few-concept/instance/Snoopy.pt ...
+  [in_retain_set] hello_kitty: Hello Kitty cartoon character
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [in_retain_set] charlie_brown: Charlie Brown cartoon character
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [not_in_retain_set] woodstock: Woodstock the small yellow cartoon bird from Peanuts
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [not_in_retain_set] cartoon_beagle: a white cartoon beagle sleeping on top of a red doghouse
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+  [unrelated] mountain_control: a realistic photograph of a mountain at sunrise
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+Done. Results saved to results/neighbor_damage/speed/
+All neighbor damage probes complete.

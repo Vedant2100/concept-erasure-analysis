@@ -1,0 +1,72 @@
+
+EnvironmentNameNotFound: Could not find conda environment: speed_env
+You can list all discoverable environments with `conda info --envs`.
+
+
+=== Van Gogh: Baseline ===
+Loading pipeline: method=baseline
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:03,  1.97it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:01,  2.94it/s]Loading pipeline components...:  43%|████▎     | 3/7 [00:01<00:01,  2.93it/s]Loading pipeline components...:  86%|████████▌ | 6/7 [00:01<00:00,  7.24it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.67it/s]
+Potential NSFW content was detected in one or more images. A black image will be returned instead. Try again with a different prompt and/or seed.
+Potential NSFW content was detected in one or more images. A black image will be returned instead. Try again with a different prompt and/or seed.
+  [in_retain_set] monet: a painting in the style of Claude Monet
+  [in_retain_set] cezanne: a painting in the style of Paul Cézanne
+  [not_in_retain_set] postimpressionist: a post-impressionist landscape painting
+  [not_in_retain_set] starry_night: Starry Night painting with swirling sky over a village
+  [not_in_retain_set] impasto_visual: a painting with thick impasto brushstrokes and swirling bold colors
+  [unrelated] mountain_control: a realistic photograph of a mountain at sunrise
+Done. Results saved to results/neighbor_damage/baseline/
+=== Van Gogh: ESD-x ===
+Loading pipeline: method=esd_x
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:00, 16.03it/s]Loading pipeline components...:  57%|█████▋    | 4/7 [00:00<00:00,  5.45it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:00<00:00,  5.08it/s]Loading pipeline components...:  86%|████████▌ | 6/7 [00:01<00:00,  4.12it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.59it/s]
+Potential NSFW content was detected in one or more images. A black image will be returned instead. Try again with a different prompt and/or seed.
+Potential NSFW content was detected in one or more images. A black image will be returned instead. Try again with a different prompt and/or seed.
+  Applying ESD-x UNet weights from checkpoints/esd/diffusers-VanGogh-ESDx1-UNET.pt ...
+  [in_retain_set] monet: a painting in the style of Claude Monet
+  [in_retain_set] cezanne: a painting in the style of Paul Cézanne
+  [not_in_retain_set] postimpressionist: a post-impressionist landscape painting
+  [not_in_retain_set] starry_night: Starry Night painting with swirling sky over a village
+  [not_in_retain_set] impasto_visual: a painting with thick impasto brushstrokes and swirling bold colors
+  [unrelated] mountain_control: a realistic photograph of a mountain at sunrise
+Done. Results saved to results/neighbor_damage/esd_x/
+=== Van Gogh: SPEED ===
+Loading pipeline: method=speed
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:00, 19.61it/s]Loading pipeline components...:  57%|█████▋    | 4/7 [00:00<00:00,  7.65it/s]Loading pipeline components...:  86%|████████▌ | 6/7 [00:01<00:00,  4.29it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  4.98it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.44it/s]
+Potential NSFW content was detected in one or more images. A black image will be returned instead. Try again with a different prompt and/or seed.
+  Applying SPEED weights from checkpoints/speed/few-concept/style/Van Gogh.pt ...
+  [in_retain_set] monet: a painting in the style of Claude Monet
+  [in_retain_set] cezanne: a painting in the style of Paul Cézanne
+  [not_in_retain_set] postimpressionist: a post-impressionist landscape painting
+  [not_in_retain_set] starry_night: Starry Night painting with swirling sky over a village
+  [not_in_retain_set] impasto_visual: a painting with thick impasto brushstrokes and swirling bold colors
+  [unrelated] mountain_control: a realistic photograph of a mountain at sunrise
+Done. Results saved to results/neighbor_damage/speed/
+=== Snoopy: Baseline ===
+Loading pipeline: method=baseline
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:01,  3.88it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:01,  2.52it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:00<00:00,  6.66it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  6.21it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.54it/s]
+Potential NSFW content was detected in one or more images. A black image will be returned instead. Try again with a different prompt and/or seed.
+  [in_retain_set] hello_kitty: Hello Kitty cartoon character
+  [in_retain_set] charlie_brown: Charlie Brown cartoon character
+  [not_in_retain_set] woodstock: Woodstock the small yellow cartoon bird from Peanuts
+  [not_in_retain_set] cartoon_beagle: a white cartoon beagle sleeping on top of a red doghouse
+  [unrelated] mountain_control: a realistic photograph of a mountain at sunrise
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+Done. Results saved to results/neighbor_damage/baseline/
+=== Snoopy: SPEED ===
+Loading pipeline: method=speed
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:00,  8.03it/s]Loading pipeline components...:  43%|████▎     | 3/7 [00:00<00:00,  5.08it/s]Loading pipeline components...:  57%|█████▋    | 4/7 [00:00<00:00,  4.92it/s]Loading pipeline components...:  86%|████████▌ | 6/7 [00:01<00:00,  4.40it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.44it/s]
+Potential NSFW content was detected in one or more images. A black image will be returned instead. Try again with a different prompt and/or seed.
+  Applying SPEED weights from checkpoints/speed/few-concept/instance/Snoopy.pt ...
+  [in_retain_set] hello_kitty: Hello Kitty cartoon character
+  [in_retain_set] charlie_brown: Charlie Brown cartoon character
+  [not_in_retain_set] woodstock: Woodstock the small yellow cartoon bird from Peanuts
+  [not_in_retain_set] cartoon_beagle: a white cartoon beagle sleeping on top of a red doghouse
+  [unrelated] mountain_control: a realistic photograph of a mountain at sunrise
+    seed0: already exists, skipping
+    seed1: already exists, skipping
+    seed2: already exists, skipping
+    seed3: already exists, skipping
+Done. Results saved to results/neighbor_damage/speed/
+All neighbor damage probes complete.
