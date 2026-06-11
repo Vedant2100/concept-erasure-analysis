@@ -15,22 +15,25 @@
   <div class="layout-wrapper">
     <nav class="toc-sidebar">
       <div class="toc-sticky">
-                        <h3>Contents</h3>
+                                <h3>Contents</h3>
         <ul>
           <li><a href="#tldr">TL;DR</a></li>
-          <li><a href="#lineage">1. Trace the Lineage & Find the Frontier</a></li>
-          <li><a href="#how">2. Target Paper: SPEED</a></li>
-          <li><a href="#strengths">3. Articulate Strengths</a></li>
-          <li><a href="#experiments">4. Expose Limitations Through Experiments</a>
+          <li><a href="#lineage">1. Research Lineage & The Frontier</a></li>
+          <li><a href="#how">2. Target Paper: SPEED (Scalable, Precise, and Efficient Concept Erasure)</a></li>
+          <li><a href="#strengths">3. Algorithmic Strengths</a></li>
+          <li><a href="#deep-dive-empirical-limitations">4. Empirical Limitations</a>
             <ul style="margin-top: 0.5rem; padding-left: 1rem; border-left: 2px solid var(--border-color); margin-left: 0.5rem;">
-              <li><a href="#findings">Key Findings Summary</a></li>
               <li><a href="#the-question">The Question</a></li>
               <li><a href="#probe-1-sparse-multi-concept-erasure-speed-holds">Probe 1: Sparse Multi-Concept</a></li>
-              <li><a href="#probe-2-concentrated-mass-erasure-the-limit-appears">Probe 2: Concentrated Mass Erasure</a></li>
+              <li><a href="#probe-2">Limitation 1: Rank Saturation Collapse</a></li>
+              <li><a href="#why-only-one-neighbor-failed">Why Only One Neighbor Failed</a></li>
               <li><a href="#ablation-the-refinement-contradiction">Ablation: Refinement Contradiction</a></li>
-              <li><a href="#limitation-2-the-evasion-vulnerability-lexical-overfitting">Limitation 2: Evasion Vulnerability</a></li>
+              <li><a href="#robustness-fidelity-vs-identity">Robustness: Fidelity vs. Identity</a></li>
+              <li><a href="#limitation-2">Limitation 2: Evasion Vulnerability</a></li>
               <li><a href="#methodology-amp-pitfalls-we-corrected">Methodology & Pitfalls</a></li>
             </ul>
+          </li>
+        </ul>
           </li>
         </ul>
       </div>
@@ -45,7 +48,7 @@
 <p>Large-scale text-to-image models are trained on internet-scale data and inevitably learn to generate harmful, copyrighted, or otherwise undesirable content. <strong>Concept erasure</strong> is the task of surgically removing specific visual concepts from a pretrained model's weights — without retraining from scratch and without post-hoc filters that can be bypassed.</p>
 <p>This project traces the lineage from the original ESD method (Gandikota et al., 2023) through to <strong>SPEED</strong> (Li et al., ICLR 2026), identifying SPEED as the current open-source frontier. The code, configuration scripts, visual results, and detailed analyses for our empirical probes are hosted on dedicated branches: <em>all-experiments</em> and <em>experiment-3</em>.</p>
 
-<h2 id="lineage">1. Trace the Lineage & Find the Frontier</h2>
+<h2 id="lineage">1. Research Lineage & The Frontier</h2>
 <p>ESD was not the first attempt to make generative models safer, nor the last. The field converged on weight-editing after finding dataset filtering too expensive and inference-time steering inadequate. The following diagram traces the lineage from foundations to the current frontier.</p>
 
 <div class="mermaid">
@@ -85,7 +88,7 @@ graph TD
 <p>It computes a weight update that redirects a target concept's embedding toward a neutral one, then <strong>projects that update onto the null-space of a large retain set</strong> (R<sub>refine</sub>, ~1,700 artists) — the subspace of weight changes that, by construction, leave every retained concept unchanged. The target is erased; the retain set is provably preserved; and it all happens training-free in seconds.</p>
 <p>The catch, which SPEED's authors acknowledge but never demonstrate, is that this null-space has <strong>finite rank</strong>. As the protected set grows, the available subspace shrinks — potentially toward the trivial null-space {0}. They call this <em>rank saturation</em>, and our Experiment 3 locates where it actually begins to bite.</p>
 
-<h2 id="strengths">3. Articulate Strengths</h2>
+<h2 id="strengths">3. Algorithmic Strengths</h2>
 <p>As the frontier paper for efficient concept erasure, SPEED (Scalable, Precise, and Efficient Concept Erasure) improves upon MACE and UCE significantly:</p>
 <ul>
   <li><strong>Extreme Efficiency:</strong> SPEED relies on <em>training-free null-space editing</em>. It iteratively projects out target concept directions via importance pruning and embedding constraints, scaling to hundreds of concepts in just ~5 seconds.</li>
@@ -112,7 +115,7 @@ graph TD
 
 
     <hr style="margin: 40px 0; border: 1px solid #ddd;">
-    <h2 id="deep-dive-empirical-limitations" style="text-align:center; font-size: 2.5em; margin-bottom: 20px;">4. Expose Limitations Through Experiments</h2>
+    <h2 id="deep-dive-empirical-limitations" style="text-align:center; font-size: 2.5em; margin-bottom: 20px;">4. Empirical Limitations</h2>
 
     <main>
       
@@ -162,7 +165,7 @@ graph TD
 
       <!-- ===================== PROBE 2: CONCENTRATED ===================== -->
       <section class="card">
-        <h2 id="probe-2-concentrated-mass-erasure-the-limit-appears">Probe 2 — Concentrated Mass Erasure (The Limit Appears)</h2>
+        <h2 id="probe-2">Limitation 1: Rank Saturation Collapse (Probe 2)</h2>
         <p>So we concentrated the pressure. Instead of three mixed painters, we erased a growing, tightly-correlated cluster of <strong>impressionists</strong> — 5, then 10, then 20, then 40 — while strictly holding our three canaries (Gauguin, Seurat, Pissarro) out of every erasure set. Each list is nested inside the next, so the only thing changing is <em>how many same-movement concepts we pile on</em>. This is precisely the rank-saturation regime SPEED admits to but never tests.</p>
 
         <p>CLIP drift vs. baseline, 4 seeds per cell (zero corrupt frames). The erased-artist row (Renoir) confirms erasure actually fires; the style-far controls calibrate the noise floor.</p>
@@ -270,7 +273,7 @@ graph TD
 
       <!-- ===================== LIMITATION 2: EVASION VIA PARAPHRASING ===================== -->
       <section class="card">
-        <h2 id="limitation-2-the-evasion-vulnerability-lexical-overfitting">Limitation 2: The Evasion Vulnerability (Lexical Overfitting)</h2>
+        <h2 id="limitation-2">Limitation 2: Evasion Vulnerability (Lexical Overfitting)</h2>
         <p>A true safety or concept-erasure mechanism must be robust against evasion. SPEED's paper evaluates robustness against <em>nudity</em> prompts using adversarial attacks, but crucially leaves its <strong>style erasure</strong> un-evaluated against simple paraphrasing.</p>
         <p>We discovered that SPEED's null-space projection is mathematically precise but <strong>lexically overfit</strong>. It ties the erasure strictly to the text embeddings of the exact target tokens (e.g., "Van Gogh"). If a user describes the style without using the exact name, the erasure is trivially bypassed.</p>
         
