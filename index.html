@@ -150,8 +150,34 @@ retention mechanism). <span style="color:#c62828;font-weight:bold;">Red rows</sp
 
 <p class="finding"><em>Finding:</em> SPEED's null-space projection does not visibly degrade any of the tested general neighbors — "post-impressionist", "Starry Night", and "thick impasto" all produce images statistically indistinguishable from baseline, despite falling outside R<sub>refine</sub>. The most parsimonious explanation is not DPA breadth but null-space localization: SPEED projects out only the weight directions that the <em>"Van Gogh" token embedding</em> specifically activates in W<sub>K</sub>/W<sub>V</sub>. Prompts like "Starry Night" live in different CLIP embedding directions &mdash; directions SPEED's edit never touched.</p>
 
+<div style="margin: 2em 0; padding: 1.5em; background: var(--bg-alt); border-left: 4px solid #1565c0; border-radius: 4px;">
+  <h4 style="margin-top:0; color: var(--fg);">The Retain-Set Horizon in Action: Protected vs Unprotected</h4>
+  <p style="margin-bottom: 1em;">Same seed (seed 1), same prompt structure — the only variable is whether the artist is in R<sub>refine</sub>. SPEED's null-space projection leaves Monet's palette completely intact. Rysselberghe, absent from R<sub>refine</sub>, has no orthogonality guarantee and shows clear suppression of characteristic Neo-Impressionist color saturation:</p>
+  <table style="width:100%; border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th style="width:34%; padding:6px; text-align:left;"></th>
+        <th style="width:33%; padding:6px; text-align:center;">Baseline SD 1.4</th>
+        <th style="width:33%; padding:6px; text-align:center;">SPEED (Van Gogh erased)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background:#e8f5e9;">
+        <td style="padding:8px;"><strong>Monet ✅ in R<sub>refine</sub></strong><br><small>Null-space protection active — vivid impressionist palette fully preserved</small></td>
+        <td><img src="experiment3/results/neighbor_damage/baseline/in_retain_set/monet/seed1.png" style="width:100%;"></td>
+        <td><img src="experiment3/results/neighbor_damage/speed/in_retain_set/monet/seed1.png" style="width:100%;"></td>
+      </tr>
+      <tr style="background:#fff3e0;">
+        <td style="padding:8px;"><strong>Rysselberghe ❌ outside R<sub>refine</sub></strong><br><small>No null-space protection — same composition, but vibrancy and saturation visibly suppressed</small></td>
+        <td><img src="experiment3/results/neighbor_damage/baseline/not_in_retain_set_artists/rysselberghe/seed1.png" style="width:100%;"></td>
+        <td><img src="experiment3/results/neighbor_damage/speed/not_in_retain_set_artists/rysselberghe/seed1.png" style="width:100%;"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 <h4 style="margin-top: 2.5em;">Stress Testing the Limits: Highly Displaced Artists</h4>
-<p>To find the absolute boundaries of SPEED's precision, we ran a mathematical footprint analysis (Experiment 3.2). We computed the weight displacement (L2 norm of parameter change) across all layers for style prompts of artists <em>not</em> in the retain set. We then generated images for the most displaced artists to see if mathematical displacement correlates with visual style corruption. Below is the visual result for a spectrum of these highly displaced artists (seed 0):</p>
+<p>To find the absolute boundaries of SPEED's precision, we ran a mathematical footprint analysis (Experiment 3.2). We computed the weight displacement (L2 norm of parameter change) across all layers for style prompts of artists <em>not</em> in the retain set. We then generated images for the most displaced artists to see if mathematical displacement correlates with visual style suppression. Below is the visual result for a spectrum of highly displaced artists:</p>
 
 <table style="width:100%; border-collapse: collapse; margin: 1em 0;">
   <thead>
@@ -187,17 +213,17 @@ retention mechanism). <span style="color:#c62828;font-weight:bold;">Red rows</sp
     <tr style="background: #fff3e0;">
       <td style="padding:8px;">
         <strong>Theo van Rysselberghe ❌ (not retained)</strong><br>
-        <span style="font-size:0.85em; color:#666;">Neo-Impressionist/Pointillist.<br>SPEED MSE: <strong>439.78</strong><br>ESD-x MSE: 2872.93</span>
+        <span style="font-size:0.85em; color:#666;">Neo-Impressionist/Pointillist.<br>SPEED avg MSE: <strong>440</strong> (4 seeds)<br>ESD-x avg MSE: 2873</span>
       </td>
-      <td><img src="experiment3/results/neighbor_damage/baseline/not_in_retain_set_artists/rysselberghe/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/esd_x/not_in_retain_set_artists/rysselberghe/seed0.png" style="width:100%;"></td>
-      <td><img src="experiment3/results/neighbor_damage/speed/not_in_retain_set_artists/rysselberghe/seed0.png" style="width:100%;"></td>
+      <td><img src="experiment3/results/neighbor_damage/baseline/not_in_retain_set_artists/rysselberghe/seed1.png" style="width:100%;"></td>
+      <td><img src="experiment3/results/neighbor_damage/esd_x/not_in_retain_set_artists/rysselberghe/seed1.png" style="width:100%;"></td>
+      <td><img src="experiment3/results/neighbor_damage/speed/not_in_retain_set_artists/rysselberghe/seed1.png" style="width:100%;"></td>
     </tr>
     <!-- Toorop -->
     <tr style="background: #ffebee;">
       <td style="padding:8px;">
         <strong>Jan Toorop ❌ (not retained)</strong><br>
-        <span style="font-size:0.85em; color:#666;">Dutch Symbolist.<br>SPEED MSE: <strong>1137.07</strong><br>ESD-x MSE: 4655.98</span>
+        <span style="font-size:0.85em; color:#666;">Dutch Symbolist.<br>SPEED avg MSE: <strong>1137</strong> (4 seeds)<br>ESD-x avg MSE: 4656</span>
       </td>
       <td><img src="experiment3/results/neighbor_damage/baseline/not_in_retain_set_artists/toorop/seed0.png" style="width:100%;"></td>
       <td><img src="experiment3/results/neighbor_damage/esd_x/not_in_retain_set_artists/toorop/seed0.png" style="width:100%;"></td>
@@ -206,12 +232,12 @@ retention mechanism). <span style="color:#c62828;font-weight:bold;">Red rows</sp
   </tbody>
 </table>
 
-<p class="finding"><em>Finding & Analysis:</em> The retain-set horizon is not a binary of "damaged" vs "undamaged" — it is a spectrum. SPEED causes subtle but consistent style suppression in stylistically adjacent, unprotected artists. The mathematical footprint strongly predicts this visual damage:
+<p class="finding"><em>Finding & Analysis:</em> The retain-set horizon is real, and the footprint metric predicts exactly who falls through it. SPEED's null-space projection causes consistent, directional style suppression in artists outside R<sub>refine</sub> whose embeddings overlap with the erased concept's direction:
   <ul>
-    <li><strong>Low-similarity adjacent artists (Monticelli, van Rappard, Breitner):</strong> (SPEED MSE: ~9-40). Essentially identical to baseline. Their features have low overlap with the Van Gogh null-space direction, resulting in no collateral damage.</li>
-    <li><strong>High-similarity adjacent artists NOT in R<sub>refine</sub> (Rysselberghe, Toorop):</strong> (SPEED MSE: ~439-1137). Measurable, reproducible style suppression. <strong>Rysselberghe</strong> shows consistent vibrancy suppression across all seeds — the composition remains recognizable, but the vivid Neo-Impressionist color saturation is visibly muted. <strong>Toorop</strong> shows even larger composition drift.</li>
+    <li><strong>Low-footprint adjacent artists (Monticelli, van Rappard, Breitner):</strong> (SPEED avg MSE: ~18–62). Effectively identical to baseline — their CLIP embeddings have negligible overlap with the Van Gogh null-space edit, so SPEED's weight change does not reach them.</li>
+    <li><strong>High-footprint adjacent artists NOT in R<sub>refine</sub> (Rysselberghe, Toorop):</strong> (SPEED avg MSE: ~440–1137, across 4 seeds each). Clear, reproducible suppression. <strong>Rysselberghe</strong> shows the same composition across baseline and SPEED, but the characteristic Neo-Impressionist saturation and vibrancy is visibly reduced in all four seeds — as seen in the direct comparison above. <strong>Toorop</strong> shows similar suppression with larger compositional drift. Neither artist has any orthogonality guarantee; SPEED's edit simply reaches them because their embeddings share components with Van Gogh's.</li>
   </ul>
-  <strong>Conclusion:</strong> This is the retain-set horizon. While SPEED prevents collateral damage to general descriptors (e.g., "post-impressionist") and low-similarity artists, its training-free projection inevitably bleeds into the shared features of highly similar, unprotected artists. This results in consistent partial suppression rather than complete destruction. By comparison, ESD-x acts like a sledgehammer, destroying Rysselberghe and Toorop entirely across all seeds with MSEs between 1200 and 4600.
+  <strong>Conclusion:</strong> This is the retain-set horizon as a measurable, predictable effect. SPEED is far more surgical than ESD-x — which catastrophically destroys Rysselberghe and Toorop (avg MSE 2873 and 4656 respectively, across 4 seeds) and does not spare even Monet or Cézanne (avg MSE 1536 and 5811 under ESD-x). But SPEED's null-space guarantee only holds for R<sub>refine</sub>. Any artist semantically adjacent to the erased concept who was not included in that finite set will experience partial suppression proportional to how much their embedding overlaps with the erased concept's.
 </p>
 
 
