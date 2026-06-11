@@ -44,11 +44,10 @@ def run_probe(args):
         all_prompts = json.load(f)
 
     concept_prompts = all_prompts[args.concept]
-    all_items = (
-        [(p["id"], p["prompt"], "in_retain_set")    for p in concept_prompts["in_retain_set"]]
-        + [(p["id"], p["prompt"], "not_in_retain_set") for p in concept_prompts["not_in_retain_set"]]
-        + [(p["id"], p["prompt"], "unrelated")         for p in concept_prompts["unrelated"]]
-    )
+    all_items = []
+    for category in ("in_retain_set", "not_in_retain_set", "not_in_retain_set_artists", "unrelated"):
+        if category in concept_prompts:
+            all_items += [(p["id"], p["prompt"], category) for p in concept_prompts[category]]
 
     pipe = load_pipeline(args)
 

@@ -9,6 +9,14 @@
       {"id": "starry_night",      "prompt": "Starry Night painting with swirling sky over a village"},
       {"id": "impasto_visual",    "prompt": "a painting with thick impasto brushstrokes and swirling bold colors"}
     ],
+    "not_in_retain_set_artists": [
+      {"id": "monticelli",    "prompt": "a painting in the style of Adolphe Monticelli"},
+      {"id": "van_rappard",   "prompt": "a painting in the style of Anton van Rappard"},
+      {"id": "breitner",      "prompt": "a painting in the style of George Hendrik Breitner"},
+      {"id": "rysselberghe",  "prompt": "a painting in the style of Theo van Rysselberghe"},
+      {"id": "toorop",        "prompt": "a painting in the style of Jan Toorop"},
+      {"id": "jongkind",      "prompt": "a painting in the style of Johan Barthold Jongkind"}
+    ],
     "unrelated": [
       {"id": "mountain_control", "prompt": "a realistic photograph of a mountain at sunrise"}
     ]
