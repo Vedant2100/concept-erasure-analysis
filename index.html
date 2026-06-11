@@ -16,7 +16,7 @@
 
 <h2 id="tldr">TL;DR</h2>
 <p>Large-scale text-to-image models are trained on internet-scale data and inevitably learn to generate harmful, copyrighted, or otherwise undesirable content. <strong>Concept erasure</strong> is the task of surgically removing specific visual concepts from a pretrained model's weights — without retraining from scratch and without post-hoc filters that can be bypassed.</p>
-<p>This project traces the lineage from the original ESD method (Gandikota et al., 2023) through to <strong>SPEED</strong> (Gupta et al., ICLR 2026), identifying SPEED as the current open-source frontier. We systematically probe its failure modes through targeted empirical experiments, focusing on two concrete bottlenecks: <em>Textual Inversion Recovery</em> and <em>Compositional Prompt Evasion</em>.</p>
+<p>This project traces the lineage from the original ESD method (Gandikota et al., 2023) through to <strong>SPEED</strong> (Li et al., ICLR 2026), identifying SPEED as the current open-source frontier. We systematically probe its failure modes through targeted empirical experiments, focusing on three concrete bottlenecks: <em>Textual Inversion Recovery</em>, <em>Compositional Prompt Evasion</em>, and <em>Semantic Neighbor Collateral Damage</em>.</p>
 
 <h2 id="lineage">Research Lineage</h2>
 <p>ESD was not the first attempt to make generative models safer, nor the last. The field converged on weight-editing after finding dataset filtering too expensive and inference-time steering inadequate. The following diagram traces the lineage from foundations to the current frontier.</p>
@@ -33,7 +33,7 @@ graph TD
   UCE --> RECE[RECE<br/>Gong et al. ECCV'24]
   
   %% Our target
-  MACE --> SPEED[SPEED Frontier<br/>Gupta et al. ICLR'26]
+  MACE --> SPEED[SPEED Frontier<br/>Li et al. ICLR'26]
   RECE --> SPEED
   
   %% Other branches
@@ -163,9 +163,11 @@ of unmeasured semantically-related concepts beyond those explicitly included."</
 <div class="highlight-box" style="background-color: var(--bg-alt); padding: 1.5em; border-left: 4px solid var(--fg); margin: 1.5em 0; border-radius: 4px;">
   <h4 style="margin-top: 0; color: var(--fg);">Evolution: How Each Generation Narrowed (But Never Closed) This Gap</h4>
   <ul>
-    <li><strong>ESD (ICCV 2023):</strong> No retain set. ESD-x targets only the
-    "Van Gogh" token's cross-attention effects — semantically unrelated neighbors are
-    untouched (too narrow). ESD-u edits unconditional layers globally — everything
+    <li><strong>ESD (ICCV 2023):</strong> No retain set at all. ESD-x targets erasure
+    by fine-tuning cross-attention layers conditioned on the target token — narrower
+    than ESD-u's global unconditional edits, but still gradient-based. Without a
+    null-space constraint, weight updates can bleed into semantically adjacent concepts
+    (empirically confirmed below). ESD-u edits unconditional layers globally — everything
     degrades (too broad).</li>
     <li><strong>UCE / MACE (2024):</strong> Introduced retain sets. EraseBench (arXiv
     2501.09833, Jan 2025)<sup><a href="#fn3">3</a></sup> and SEE (EMNLP 2025) both document that visually similar and
@@ -180,8 +182,9 @@ of unmeasured semantically-related concepts beyond those explicitly included."</
 </div>
 
 <p><strong>Setup:</strong> All three models (Baseline SD 1.4, ESD-x Van Gogh, SPEED Van Gogh)
-generate each prompt at seed 0. Green headers = concepts in SPEED's retain set (should be
-preserved). Red headers = concepts outside the retain set (the retain-set horizon).</p>
+generate each prompt at seed 0. <span style="color:#2e7d32;font-weight:bold;">Green rows</span> = concepts in SPEED's retain set
+(SPEED explicitly protects these via null-space orthogonality; ESD-x has no such
+retention mechanism). <span style="color:#c62828;font-weight:bold;">Red rows</span> = concepts outside SPEED's retain set — the retain-set horizon.</p>
 
 <!-- Row header style for the grid -->
 <table style="width:100%; border-collapse: collapse; margin: 1em 0;">
@@ -243,7 +246,7 @@ preserved). Red headers = concepts outside the retain set (the retain-set horizo
 <ol>
 <li id="fn1"><p>Li, O., Wang, Y., Hu, X., Jiang, H., Hao, Y., Feng, F. (2026). "SPEED: Scalable, Precise, and Efficient Concept Erasure for Diffusion Models." <em>ICLR 2026</em>.</p></li>
 <li id="fn2"><p>Gandikota, R., et al. (2023). "Erasing Concepts from Diffusion Models." <em>ICCV 2023</em>.</p></li>
-<li id="fn3"><p>Wang, Z., et al. (2025). "EraseBench: A Benchmark for Concept Erasure in Diffusion Models." <em>arXiv:2501.09833</em>.</p></li>
+<li id="fn3"><p>Amara, I., et al. (2025). "Erasing More Than Intended? How Concept Erasure Degrades the Generation of Non-Target Concepts." <em>arXiv:2501.09833</em>.</p></li>
 </ol>
 </section>
 
