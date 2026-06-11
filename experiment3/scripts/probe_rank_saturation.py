@@ -46,7 +46,9 @@ TEST_PROMPTS = [
     {"id": "hokusai",       "prompt": "a painting in the style of Hokusai",          "category": "control_far"},
 ]
 
-METHOD_CHOICES = ["baseline", "speed_5c", "speed_10c", "speed_20c", "speed_40c"]
+METHOD_CHOICES = ["baseline", "speed_5c", "speed_10c", "speed_20c", "speed_40c",
+                  # DPA / refinement ablation variants (Experiment 3.5), all at N=40
+                  "speed_40c_nodpa", "speed_40c_norefine"]
 
 
 def is_black(image, thresh=10.0):
