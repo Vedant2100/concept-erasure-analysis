@@ -11,7 +11,31 @@
   </script>
 </head>
 <body>
-  <div class="container">
+  
+  <div class="layout-wrapper">
+    <nav class="toc-sidebar">
+      <div class="toc-sticky">
+        <h3>Contents</h3>
+        <ul>
+          <li><a href="#tldr">TL;DR</a></li>
+          <li><a href="#lineage">Research Lineage</a></li>
+          <li><a href="#how">How SPEED Works</a></li>
+          <li><a href="#strengths">Strengths: What SPEED Does Well</a></li>
+          <li><a href="#experiments">Empirical Experiments</a></li>
+          <li><a href="#findings">Key Findings</a></li>
+          <li><a href="#the-question">The Question</a></li>
+          <li><a href="#probe-1-sparse-multi-concept-erasure-speed-holds">Probe 1 — Sparse Multi-Concept Erasure (SPEED Holds)</a></li>
+          <li><a href="#probe-2-concentrated-mass-erasure-the-limit-appears">Probe 2 — Concentrated Mass Erasure (The Limit Appears)</a></li>
+          <li><a href="#why-only-one-neighbor-failed">Why Only One Neighbor Failed</a></li>
+          <li><a href="#ablation-the-refinement-contradiction">Ablation: The Refinement Contradiction</a></li>
+          <li><a href="#robustness-fidelity-vs-identity">Robustness: Fidelity vs. Identity</a></li>
+          <li><a href="#limitation-2-the-evasion-vulnerability-lexical-overfitting">Limitation 2: The Evasion Vulnerability (Lexical Overfitting)</a></li>
+          <li><a href="#methodology-amp-pitfalls-we-corrected">Methodology &amp; Pitfalls We Corrected</a></li>
+        </ul>
+      </div>
+    </nav>
+    <div class="main-content">
+
     
 
 <h1>SPEED: Scalable, Precise, and Efficient Concept Erasure<br>Project Analysis</h1>
@@ -87,14 +111,14 @@ graph TD
 
 
     <hr style="margin: 40px 0; border: 1px solid #ddd;">
-    <h2 style="text-align:center; font-size: 2.5em; margin-bottom: 20px;">Deep Dive: Empirical Limitations</h2>
+    <h2 id="deep-dive-empirical-limitations" style="text-align:center; font-size: 2.5em; margin-bottom: 20px;">Deep Dive: Empirical Limitations</h2>
 
     <main>
       
 
       <!-- ===================== FRAMING ===================== -->
       <section class="card">
-        <h2>The Question</h2>
+        <h2 id="the-question">The Question</h2>
         <p>SPEED's core promise is a <strong>null-space guarantee</strong>: weight edits are projected into a subspace that, by construction, leaves a large retain set of ~1,700 artists untouched. Erase Van Gogh and Monet still looks like Monet. The guarantee is real — but it is only as strong as the regime it is tested in.</p>
         <p>SPEED's own evaluation erases either many <em>diverse</em> concepts (100 different celebrities) or single painters in isolation. We probe the harder, less-tested direction: erasing concepts densely <em>entangled</em> with the very neighbors we want to protect. That is exactly where SPEED's own admitted <strong>rank-saturation</strong> dilemma — "as the retain set grows, the null space narrows toward {0}" — should begin to bite.</p>
         <p><strong>How we measure damage.</strong> For each test we generate the same prompt at the same seeds before and after erasure, and compute <strong>CLIP image-to-image drift</strong> = 1 − cos(emb<sub>baseline</sub>, emb<sub>edited</sub>). CLIP responds to style, so this captures real stylistic change rather than the pixel-level noise ordinary metrics confuse for damage. Every number below is averaged over 4 seeds, and we always include <strong>style-far control artists</strong> (Rembrandt, Hokusai) — retained but stylistically distant — to calibrate how much drift is just "a bigger edit perturbs everything a little."</p>
@@ -102,7 +126,7 @@ graph TD
 
       <!-- ===================== PROBE 1: SPARSE ===================== -->
       <section class="card">
-        <h2>Probe 1 — Sparse Multi-Concept Erasure (SPEED Holds)</h2>
+        <h2 id="probe-1-sparse-multi-concept-erasure-speed-holds">Probe 1 — Sparse Multi-Concept Erasure (SPEED Holds)</h2>
         <p>First, the easy case. We erased three painters at once — <strong>Van Gogh, Picasso, and Monet</strong> — and watched three un-targeted impressionist neighbors held out of the edit: Gauguin, Seurat, and Pissarro. If the null-space leaked under multi-concept pressure, these "canaries" would drift away from their original style.</p>
 
         <table>
@@ -137,7 +161,7 @@ graph TD
 
       <!-- ===================== PROBE 2: CONCENTRATED ===================== -->
       <section class="card">
-        <h2>Probe 2 — Concentrated Mass Erasure (The Limit Appears)</h2>
+        <h2 id="probe-2-concentrated-mass-erasure-the-limit-appears">Probe 2 — Concentrated Mass Erasure (The Limit Appears)</h2>
         <p>So we concentrated the pressure. Instead of three mixed painters, we erased a growing, tightly-correlated cluster of <strong>impressionists</strong> — 5, then 10, then 20, then 40 — while strictly holding our three canaries (Gauguin, Seurat, Pissarro) out of every erasure set. Each list is nested inside the next, so the only thing changing is <em>how many same-movement concepts we pile on</em>. This is precisely the rank-saturation regime SPEED admits to but never tests.</p>
 
         <p>CLIP drift vs. baseline, 4 seeds per cell (zero corrupt frames). The erased-artist row (Renoir) confirms erasure actually fires; the style-far controls calibrate the noise floor.</p>
@@ -187,7 +211,7 @@ graph TD
 
       <!-- ===================== WHY ONE ===================== -->
       <section class="card">
-        <h2>Why Only One Neighbor Failed</h2>
+        <h2 id="why-only-one-neighbor-failed">Why Only One Neighbor Failed</h2>
         <p>The failure is geometric, not random. SPEED pushes its edit along the <em>shared direction</em> of everything in the erased set, while keeping that edit orthogonal to retained concepts. When you erase 40 impressionists, that shared direction collapses onto one thing — soft, plein-air impressionist landscape — because that is what most of those 40 painters are.</p>
         <p>Place each held-out neighbor relative to that direction. <strong>Pissarro is that direction</strong>: the most prototypical impressionist of the three, near-indistinguishable from the Monets and Sisleys being erased — so when the null-space runs low on degrees of freedom, he is the one concept it cannot keep orthogonal. <strong>Gauguin</strong> (flat cloisonnist planes) and <strong>Seurat</strong> (rigid pointillist dots) sit <em>off</em> that axis; their distinctive techniques give the projection room to protect them. It is also why only Pissarro's drift <em>grows with N</em> — every additional impressionist reinforces the exact direction he lives on.</p>
         <p>One honest caveat: this is a single collapsing artist, so the geometric story is the best-supported explanation rather than a proven one. The clean confirmation would be to invert the experiment — erase 40 <em>pointillists</em> and predict that Seurat becomes the casualty while Pissarro survives.</p>
@@ -195,7 +219,7 @@ graph TD
 
       <!-- ===================== ABLATION: THE REFINEMENT CONTRADICTION ===================== -->
       <section class="card">
-        <h2>Ablation: The Refinement Contradiction</h2>
+        <h2 id="ablation-the-refinement-contradiction">Ablation: The Refinement Contradiction</h2>
         <p>If rank saturation caused Pissarro's collapse at N=40, it exposes a massive internal contradiction in SPEED's architecture. SPEED uses a feature called <strong>Prior Knowledge Refinement (DPA)</strong> which generates perturbed, "fake" retain concepts to artificially increase the coverage of the retain space. But adding vectors to the retain set <em>consumes the rank budget</em> and shrinks the null-space.</p>
         <p>We hypothesized that DPA, designed to protect the prior, was actually accelerating the collapse under load. To test this, we repeated the N=40 erasure but turned SPEED's refinement machinery completely off (<code>aug_num=0</code>).</p>
 
@@ -233,7 +257,7 @@ graph TD
 
       <!-- ===================== ROBUSTNESS: FIDELITY VS IDENTITY ===================== -->
       <section class="card">
-        <h2>Robustness: Fidelity vs. Identity</h2>
+        <h2 id="robustness-fidelity-vs-identity">Robustness: Fidelity vs. Identity</h2>
         <p>A common vulnerability in concept erasure is creating a "semantic illusion"—fooling the text encoder (CLIP) into recognizing a retained concept, while quietly trashing the pixel-level image quality with artifacts, blur, and structural breakage. To test if SPEED's preservation of neighbors was an illusion, we re-scanned the multi-concept erasure images.</p>
         <p>Instead of CLIP, we computed <strong>LPIPS</strong> (Learned Perceptual Image Patch Similarity) against the baseline, which explicitly catches perceptual degradation that semantic metrics ignore. If SPEED was cheating, canary LPIPS would spike above the control baseline.</p>
         
@@ -245,7 +269,7 @@ graph TD
 
       <!-- ===================== LIMITATION 2: EVASION VIA PARAPHRASING ===================== -->
       <section class="card">
-        <h2>Limitation 2: The Evasion Vulnerability (Lexical Overfitting)</h2>
+        <h2 id="limitation-2-the-evasion-vulnerability-lexical-overfitting">Limitation 2: The Evasion Vulnerability (Lexical Overfitting)</h2>
         <p>A true safety or concept-erasure mechanism must be robust against evasion. SPEED's paper evaluates robustness against <em>nudity</em> prompts using adversarial attacks, but crucially leaves its <strong>style erasure</strong> un-evaluated against simple paraphrasing.</p>
         <p>We discovered that SPEED's null-space projection is mathematically precise but <strong>lexically overfit</strong>. It ties the erasure strictly to the text embeddings of the exact target tokens (e.g., "Van Gogh"). If a user describes the style without using the exact name, the erasure is trivially bypassed.</p>
         
@@ -333,7 +357,7 @@ graph TD
 
       <!-- ===================== METHODOLOGY / PITFALLS ===================== -->
       <section class="card">
-        <h2>Methodology &amp; Pitfalls We Corrected</h2>
+        <h2 id="methodology-amp-pitfalls-we-corrected">Methodology &amp; Pitfalls We Corrected</h2>
         <p>Getting to a trustworthy number here was harder than it looks. Three measurement traps each produced a convincing-but-wrong result before we caught them — and every safeguard in the pipeline above exists because of one of them.</p>
 
         <h3>1. Pixel MSE could not tell damage from noise</h3>
@@ -362,6 +386,7 @@ graph TD
 <li id="fn3"><p>Amara, I., et al. (2025). "Erasing More Than Intended? How Concept Erasure Degrades the Generation of Non-Target Concepts." <em>arXiv:2501.09833</em>.</p></li>
 </ol>
 </section>
+  </div>
   </div>
 </body>
 </html>

@@ -20,10 +20,68 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-.container {
-  max-width: 850px;
+/* Layout Wrapper */
+.layout-wrapper {
+  display: flex;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 4rem 2rem;
+  padding: 2rem;
+  gap: 3rem;
+  align-items: flex-start;
+}
+
+/* Sidebar TOC */
+.toc-sidebar {
+  flex: 0 0 250px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.toc-sticky {
+  position: sticky;
+  top: 2rem;
+  background: var(--bg-secondary);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+}
+
+.toc-sticky h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  color: #111827;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.toc-sticky ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toc-sticky li {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.toc-sticky a {
+  text-decoration: none;
+  color: var(--text-secondary);
+  transition: color 0.2s;
+  display: block;
+}
+
+.toc-sticky a:hover {
+  color: var(--accent);
+}
+
+/* Main Content Area */
+.main-content {
+  flex: 1;
+  min-width: 0;
+  max-width: 850px;
 }
 
 header {
