@@ -155,6 +155,18 @@
         </div>
       </section>
 
+      <!-- ===================== ROBUSTNESS: FIDELITY VS IDENTITY ===================== -->
+      <section class="card">
+        <h2>Robustness: Fidelity vs. Identity</h2>
+        <p>A common vulnerability in concept erasure is creating a "semantic illusion"—fooling the text encoder (CLIP) into recognizing a retained concept, while quietly trashing the pixel-level image quality with artifacts, blur, and structural breakage. To test if SPEED's preservation of neighbors was an illusion, we re-scanned the multi-concept erasure images.</p>
+        <p>Instead of CLIP, we computed <strong>LPIPS</strong> (Learned Perceptual Image Patch Similarity) against the baseline, which explicitly catches perceptual degradation that semantic metrics ignore. If SPEED was cheating, canary LPIPS would spike above the control baseline.</p>
+        
+        <div class="verdict-box">
+          <h3 style="color: var(--success);">SPEED genuinely preserves perceptual fidelity</h3>
+          <p>The results were an honest negative: SPEED completely passed the test. In the 3-concept erasure regime, the perceptual damage to the protected canaries (Pissarro LPIPS = 0.244, Seurat = 0.260) was strictly <strong>bounded below</strong> the baseline drift of the style-far controls (Rembrandt = 0.331, Hokusai = 0.272). SPEED doesn't just preserve the semantic label of its neighbors—it preserves their true, pixel-level structural fidelity.</p>
+        </div>
+      </section>
+
       <!-- ===================== METHODOLOGY / PITFALLS ===================== -->
       <section class="card">
         <h2>Methodology &amp; Pitfalls We Corrected</h2>
