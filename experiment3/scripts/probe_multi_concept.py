@@ -28,7 +28,7 @@ def load_pipeline(base_model, ckpt_path):
             raise FileNotFoundError(f"Checkpoint not found: {ckpt_path}")
         state_dict = torch.load(ckpt_path, map_location="cpu")
         pipe.unet.load_state_dict(state_dict, strict=False)
-        print(f"  Loaded SPEED checkpoint: {ckpt_path}")
+        print(f"  Loaded checkpoint: {ckpt_path}")
     else:
         print("  Running baseline (no checkpoint)")
     pipe.set_progress_bar_config(disable=True)
@@ -39,16 +39,16 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--base_model", default="CompVis/stable-diffusion-v1-4")
     parser.add_argument("--method", required=True,
-                        choices=["baseline", "speed_1c", "speed_2c", "speed_3c"],
+                        choices=["baseline", "speed_1c", "speed_2c", "speed_3c", "esd_x"],
                         help="Which model config to run")
     parser.add_argument("--ckpt", default=None,
-                        help="Path to SPEED .pt checkpoint (not needed for baseline)")
+                        help="Path to .pt checkpoint (SPEED or ESD-x UNet weights; not needed for baseline)")
     parser.add_argument("--out_dir", default="experiment3/results/multi_concept",
                         help="Output root; images go to out_dir/method/category/id/seedN.png")
     parser.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2, 3])
     args = parser.parse_args()
 
-    if args.method != "baseline" and not args.ckpt:
+    if args.method not in ("baseline",) and not args.ckpt:
         parser.error(f"--ckpt is required for method={args.method}")
 
     pipe = load_pipeline(args.base_model, args.ckpt)
