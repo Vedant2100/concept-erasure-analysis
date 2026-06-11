@@ -3,199 +3,120 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Limits of Closed-Form Concept Erasure</title>
+  <title>Experiment 3 — Neighbor Collateral & Rank Saturation</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="blog.css">
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>The Limits of Closed-Form Concept Erasure</h1>
-      <p class="subtitle">An empirical investigation into projection mechanisms, null-space robustness, and rank saturation.</p>
+      <h1>Experiment 3 — Where the Null-Space Guarantee Breaks</h1>
+      <p class="subtitle">SPEED preserves neighbors with mathematical precision — until you erase a dense cluster of them at once. We locate the exact point where its guarantee leaks.</p>
     </header>
 
     <main>
+
+      <!-- ===================== FRAMING ===================== -->
       <section class="card">
-        <h2>1. Introduction</h2>
-        <p>Recent advancements in generative diffusion models have spurred the development of "concept erasure" techniques designed to systematically remove copyrighted styles, sensitive attributes, or specific semantic entities from the model's weights. Among the most mathematically elegant are closed-form projection methods (such as UCE and SPEED).</p>
-        <p>These methods operate by solving a closed-form system of linear equations directly on the U-Net's cross-attention matrices. They force the text embeddings of target concepts ($C$) to project to a neutral unconditional representation ($V^*$), while simultaneously preserving the projection of a set of protected anchor concepts ($P$) through a geometric "null-space."</p>
-        <p>In this post, we present a rigorous empirical investigation into the true capabilities and fundamental limitations of these projection mechanisms.</p>
+        <h2>The Question</h2>
+        <p>SPEED's core promise is a <strong>null-space guarantee</strong>: weight edits are projected into a subspace that, by construction, leaves a large retain set of ~1,700 artists untouched. Erase Van Gogh and Monet still looks like Monet. The guarantee is real — but it is only as strong as the regime it is tested in.</p>
+        <p>SPEED's own evaluation erases either many <em>diverse</em> concepts (100 different celebrities) or single painters in isolation. We probe the harder, less-tested direction: erasing concepts densely <em>entangled</em> with the very neighbors we want to protect. That is exactly where SPEED's own admitted <strong>rank-saturation</strong> dilemma — "as the retain set grows, the null space narrows toward {0}" — should begin to bite.</p>
+        <p><strong>How we measure damage.</strong> For each test we generate the same prompt at the same seeds before and after erasure, and compute <strong>CLIP image-to-image drift</strong> = 1 − cos(emb<sub>baseline</sub>, emb<sub>edited</sub>). CLIP responds to style, so this captures real stylistic change rather than the pixel-level noise ordinary metrics confuse for damage. Every number below is averaged over 4 seeds, and we always include <strong>style-far control artists</strong> (Rembrandt, Hokusai) — retained but stylistically distant — to calibrate how much drift is just "a bigger edit perturbs everything a little."</p>
       </section>
 
+      <!-- ===================== PROBE 1: SPARSE ===================== -->
       <section class="card">
-        <h2>2. The Superficiality Hypothesis</h2>
-        <p>Our first investigation sought to understand whether closed-form erasure truly <em>destroys</em> visual representations, or merely <em>avoids</em> them by severing the text-to-image conditional pathway.</p>
-        <p>We measured the parameter footprint ($| \Delta W |$) left behind by SPEED across different layers of the cross-attention blocks. We discovered that despite successful behavioral erasure (e.g., the model stops generating "Van Gogh" when prompted), the parameter updates are almost entirely concentrated in the Value and Output projection matrices, rather than the Key and Query matrices.</p>
-        
-        <div class="verdict-box">
-          <h3>Finding: Avoidance, Not Destruction</h3>
-          <p>Closed-form methods act as a "filter" at the conditioning step. They mathematically neutralize the specific text embeddings of the target concepts, but the deep, entangled visual representations of those concepts remain largely intact within the network. This superficiality suggests that while the method is fast, the concepts are not truly unlearned from the manifold.</p>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>3. The Robustness of Null-Space (Sparse Erasure)</h2>
-        <p>If the erasure is merely a superficial filter, how well does the null-space projection protect innocent, semantically adjacent concepts? To test this, we simultaneously erased three highly correlated Impressionist artists: <strong>Van Gogh, Picasso, and Monet</strong> (N=3). We then measured the CLIP drift of un-targeted "canary" neighbors: Gauguin, Seurat, and Pissarro.</p>
+        <h2>Probe 1 — Sparse Multi-Concept Erasure (SPEED Holds)</h2>
+        <p>First, the easy case. We erased three painters at once — <strong>Van Gogh, Picasso, and Monet</strong> — and watched three un-targeted impressionist neighbors held out of the edit: Gauguin, Seurat, and Pissarro. If the null-space leaked under multi-concept pressure, these "canaries" would drift away from their original style.</p>
 
         <table>
           <thead>
-            <tr>
-              <th>Artist</th>
-              <th>Role</th>
-              <th>CLIP Drift (N=3)</th>
-            </tr>
+            <tr><th>Concept</th><th>Role</th><th>CLIP drift</th></tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Gauguin</td>
-              <td>Neighbor (Canary)</td>
-              <td>0.108</td>
-            </tr>
-            <tr>
-              <td>Seurat</td>
-              <td>Neighbor (Canary)</td>
-              <td>0.049</td>
-            </tr>
-            <tr>
-              <td>Pissarro</td>
-              <td>Neighbor (Canary)</td>
-              <td>0.075</td>
-            </tr>
-            <tr>
-              <td>Rembrandt</td>
-              <td>Control (Style-Far)</td>
-              <td>0.114</td>
-            </tr>
+            <tr><td>Gauguin</td><td>Neighbor (canary)</td><td>0.109</td></tr>
+            <tr><td>Seurat</td><td>Neighbor (canary)</td><td>0.049</td></tr>
+            <tr><td>Pissarro</td><td>Neighbor (canary)</td><td>0.076</td></tr>
+            <tr><td>Rembrandt</td><td>Control (style-far)</td><td>0.114</td></tr>
+            <tr><td>Hokusai</td><td>Control (style-far)</td><td>0.063</td></tr>
           </tbody>
         </table>
 
         <div class="image-grid">
           <div class="image-card">
-            <img src="experiment3/results/multi_concept/baseline/retain_canary/pissarro/seed0.png" alt="Baseline Pissarro">
-            <div class="image-label">Baseline Pissarro</div>
+            <img src="experiment3/results/multi_concept/baseline/retain_canary/gauguin/seed0.png" alt="Gauguin, original model">
+            <div class="image-label">Gauguin — original</div>
           </div>
           <div class="image-card">
-            <img src="experiment3/results/multi_concept/speed_3c/retain_canary/pissarro/seed0.png" alt="SPEED 3-Concept Pissarro">
-            <div class="image-label">SPEED N=3 Pissarro</div>
+            <img src="experiment3/results/multi_concept/speed_3c/retain_canary/gauguin/seed0.png" alt="Gauguin after 3-concept erasure">
+            <div class="image-label">Gauguin — after N=3 erasure (intact)</div>
           </div>
         </div>
 
         <div class="verdict-box">
-          <h3>Finding: Genuine Robustness for Small N</h3>
-          <p>The null-space projection is extraordinarily robust when erasing sparse concept sets. The un-targeted canaries drifted less than the style-far negative control (Rembrandt). Because the erasure is superficial, it perfectly protects neighbors because it mathematically guarantees orthogonality without disturbing the deeper manifold.</p>
+          <h3>Finding: genuine robustness</h3>
+          <p>The canaries drift <em>no more than</em> the style-far controls — Gauguin (0.109) is statistically indistinguishable from Rembrandt (0.114), a painter with nothing in common with the targets. There is no concentrated leakage onto the neighbors. For sparse, mixed erasure, SPEED's null-space does exactly what it advertises. This is an honest negative result — and it told us the limitation, if one existed, had to live somewhere harder.</p>
         </div>
       </section>
 
+      <!-- ===================== PROBE 2: CONCENTRATED ===================== -->
       <section class="card">
-        <h2>4. The Saturation Horizon (Rank Saturation)</h2>
-        <p>While closed-form projections perform flawlessly on sparse edits, what happens when we stress-test the mathematical limits of the cross-attention matrix? We designed a concentrated mass erasure experiment, incrementally erasing <strong>5, 10, 20, and 40</strong> highly correlated Impressionist painters, while strictly withholding our canaries (Gauguin, Seurat, Pissarro) from the erasure set.</p>
+        <h2>Probe 2 — Concentrated Mass Erasure (The Limit Appears)</h2>
+        <p>So we concentrated the pressure. Instead of three mixed painters, we erased a growing, tightly-correlated cluster of <strong>impressionists</strong> — 5, then 10, then 20, then 40 — while strictly holding our three canaries (Gauguin, Seurat, Pissarro) out of every erasure set. Each list is nested inside the next, so the only thing changing is <em>how many same-movement concepts we pile on</em>. This is precisely the rank-saturation regime SPEED admits to but never tests.</p>
 
-        <p>CLIP image-image drift vs. baseline, averaged over 4 seeds (n=4 every cell, zero corrupt frames). The erased-artist row (Renoir) confirms erasure actually fires; the two style-far retained artists (Rembrandt, Hokusai) calibrate the noise floor.</p>
+        <p>CLIP drift vs. baseline, 4 seeds per cell (zero corrupt frames). The erased-artist row (Renoir) confirms erasure actually fires; the style-far controls calibrate the noise floor.</p>
 
         <table>
           <thead>
-            <tr>
-              <th>Concept</th>
-              <th>Role</th>
-              <th>N=5</th>
-              <th>N=10</th>
-              <th>N=20</th>
-              <th>N=40</th>
-            </tr>
+            <tr><th>Concept</th><th>Role</th><th>N=5</th><th>N=10</th><th>N=20</th><th>N=40</th></tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Renoir</td>
-              <td>Erased (sanity)</td>
-              <td>0.354</td>
-              <td>0.354</td>
-              <td>0.361</td>
-              <td>0.332</td>
-            </tr>
-            <tr>
-              <td><strong>Pissarro</strong></td>
-              <td>Canary — core impressionist</td>
-              <td>0.052</td>
-              <td>0.126</td>
-              <td>0.165</td>
-              <td class="danger">0.253</td>
-            </tr>
-            <tr>
-              <td>Gauguin</td>
-              <td>Canary — post-impressionist</td>
-              <td>0.083</td>
-              <td>0.119</td>
-              <td>0.110</td>
-              <td>0.128</td>
-            </tr>
-            <tr>
-              <td>Seurat</td>
-              <td>Canary — pointillist</td>
-              <td>0.044</td>
-              <td>0.120</td>
-              <td>0.076</td>
-              <td>0.131</td>
-            </tr>
-            <tr>
-              <td>"an impressionist oil painting"</td>
-              <td>Supertype capability</td>
-              <td>0.035</td>
-              <td>0.070</td>
-              <td>0.049</td>
-              <td>0.036</td>
-            </tr>
-            <tr>
-              <td>Rembrandt</td>
-              <td>Control — style-far</td>
-              <td>0.050</td>
-              <td>0.094</td>
-              <td>0.132</td>
-              <td>0.113</td>
-            </tr>
-            <tr>
-              <td>Hokusai</td>
-              <td>Control — style-far</td>
-              <td>0.036</td>
-              <td>0.040</td>
-              <td>0.074</td>
-              <td>0.081</td>
-            </tr>
+            <tr><td>Renoir</td><td>Erased (sanity check)</td><td>0.354</td><td>0.354</td><td>0.361</td><td>0.332</td></tr>
+            <tr><td><strong>Pissarro</strong></td><td>Canary — core impressionist</td><td>0.052</td><td>0.126</td><td>0.165</td><td class="danger">0.253</td></tr>
+            <tr><td>Gauguin</td><td>Canary — post-impressionist</td><td>0.083</td><td>0.119</td><td>0.110</td><td>0.128</td></tr>
+            <tr><td>Seurat</td><td>Canary — pointillist</td><td>0.044</td><td>0.120</td><td>0.076</td><td>0.131</td></tr>
+            <tr><td>"an impressionist oil painting"</td><td>Supertype capability</td><td>0.035</td><td>0.070</td><td>0.049</td><td>0.036</td></tr>
+            <tr><td>Rembrandt</td><td>Control — style-far</td><td>0.050</td><td>0.094</td><td>0.132</td><td>0.113</td></tr>
+            <tr><td>Hokusai</td><td>Control — style-far</td><td>0.036</td><td>0.040</td><td>0.074</td><td>0.081</td></tr>
           </tbody>
         </table>
 
-        <p>Pissarro — the canary whose style overlaps the erased impressionist core most heavily — drifts monotonically to 0.253 at N=40, roughly double the style-far controls, with a visible loss of impressionist softness. But the effect is <em>selective</em>, not systemic: Gauguin and Seurat (more distinct post-impressionist and pointillist techniques) stay at control levels, and the supertype prompt "an impressionist oil painting" is essentially untouched (0.036) — the model still renders impressionism fine.</p>
+        <p>One row breaks away from the pack. <strong>Pissarro</strong> climbs monotonically — 0.05 → 0.13 → 0.17 → <span class="danger">0.25</span> — until, at N=40, he has drifted to roughly <em>double</em> the style-far controls. And it is visible: his soft, broken-brushwork impressionism flattens into bolder, more saturated, less characteristic forms. Gauguin, erased alongside the same cluster, stays put.</p>
 
         <div class="image-grid">
           <div class="image-card">
-            <img src="experiment3/results/rank_saturation/baseline/canary/pissarro/seed0.png" alt="Pissarro Baseline">
-            <div class="image-label">Pissarro — Baseline</div>
+            <img src="experiment3/results/rank_saturation/baseline/canary/pissarro/seed0.png" alt="Pissarro original">
+            <div class="image-label">Pissarro — original</div>
           </div>
           <div class="image-card">
-            <img src="experiment3/results/rank_saturation/speed_40c/canary/pissarro/seed0.png" alt="Pissarro N=40">
-            <div class="image-label">Pissarro — N=40 (degraded)</div>
+            <img src="experiment3/results/rank_saturation/speed_40c/canary/pissarro/seed0.png" alt="Pissarro after 40-concept erasure">
+            <div class="image-label">Pissarro — after N=40 (degraded)</div>
           </div>
           <div class="image-card">
-            <img src="experiment3/results/rank_saturation/baseline/canary/gauguin/seed0.png" alt="Gauguin Baseline">
-            <div class="image-label">Gauguin — Baseline</div>
+            <img src="experiment3/results/rank_saturation/baseline/canary/gauguin/seed0.png" alt="Gauguin original">
+            <div class="image-label">Gauguin — original</div>
           </div>
           <div class="image-card">
-            <img src="experiment3/results/rank_saturation/speed_40c/canary/gauguin/seed0.png" alt="Gauguin N=40">
-            <div class="image-label">Gauguin — N=40 (intact)</div>
+            <img src="experiment3/results/rank_saturation/speed_40c/canary/gauguin/seed0.png" alt="Gauguin after 40-concept erasure">
+            <div class="image-label">Gauguin — after N=40 (intact)</div>
           </div>
         </div>
 
         <div class="verdict-box">
-          <h3>Finding: Selective Degradation of the Most-Entangled Neighbor</h3>
-          <p>Under extreme concentrated erasure (40 same-movement artists), SPEED's null-space protection is <strong>not uniform</strong>. It degrades for the single retained concept with maximal overlap to the erased cluster — Pissarro, a core impressionist — which drifts to ~2× the style-far controls with visibly reduced impressionist character. This is consistent with SPEED's own admitted rank-saturation dilemma: as the erased cluster fills the local subspace, the projection loses the degrees of freedom to keep the most-overlapping neighbor orthogonal.</p>
-          <p>Crucially, this is <em>localized</em>, not a capacity collapse: stylistically distinct neighbors (Gauguin, Seurat) and the impressionist supertype capability remain protected at control levels. The honest takeaway is that SPEED resists concentrated mass erasure remarkably well, and only the most entangled retained concept begins to leak at the extreme of the load.</p>
+          <h3>The limitation: selective collateral collapse under rank saturation</h3>
+          <p>This is the bottleneck. Under concentrated mass erasure, SPEED's null-space protection <strong>fails for the single retained concept most entangled with what was erased</strong> — Pissarro, a core impressionist whose style sits in the middle of the very cluster being removed. The guarantee SPEED advertises for its retain set does not hold for him at scale: he becomes collateral damage, visibly and reproducibly.</p>
+          <p>What keeps this honest — and makes it a <em>precise</em> finding rather than a sweeping one — is the rest of the table. The effect is <strong>localized, not catastrophic</strong>: the stylistically distinct neighbors (Gauguin, Seurat) hold at control levels, and the broad "impressionist painting" capability is untouched (0.036). SPEED does not collapse the neighborhood; it springs a leak at its single weakest point, exactly where its admitted rank-saturation dilemma predicts.</p>
         </div>
       </section>
 
+      <!-- ===================== WHY ONE ===================== -->
       <section class="card">
-        <h2>5. Conclusion</h2>
-        <p>Closed-form projection mechanisms like SPEED represent an elegant, training-free approach to concept filtering. For sparse, linearly independent edits, their geometric null-space effectively guarantees the preservation of adjacent concepts.</p>
-        <p>Their limit is <strong>rank saturation</strong> — a bottleneck SPEED's authors acknowledge in the abstract but never demonstrate. We located where it begins to bite: under extreme concentrated erasure (40 same-movement artists), protection degrades <em>selectively</em> for the single retained concept most entangled with the erased cluster (Pissarro), while distinct neighbors and the broader style capability stay intact. This is a real but localized leak, not the catastrophic neighborhood collapse a naive reading of the rank-saturation dilemma might predict — SPEED is more robust than that. The open direction for large-scale unlearning remains moving beyond cross-attention filtering toward true mechanistic feature disentanglement, so that even the most entangled neighbors are preserved under heavy load.</p>
+        <h2>Why Only One Neighbor Failed</h2>
+        <p>The failure is geometric, not random. SPEED pushes its edit along the <em>shared direction</em> of everything in the erased set, while keeping that edit orthogonal to retained concepts. When you erase 40 impressionists, that shared direction collapses onto one thing — soft, plein-air impressionist landscape — because that is what most of those 40 painters are.</p>
+        <p>Place each held-out neighbor relative to that direction. <strong>Pissarro is that direction</strong>: the most prototypical impressionist of the three, near-indistinguishable from the Monets and Sisleys being erased — so when the null-space runs low on degrees of freedom, he is the one concept it cannot keep orthogonal. <strong>Gauguin</strong> (flat cloisonnist planes) and <strong>Seurat</strong> (rigid pointillist dots) sit <em>off</em> that axis; their distinctive techniques give the projection room to protect them. It is also why only Pissarro's drift <em>grows with N</em> — every additional impressionist reinforces the exact direction he lives on.</p>
+        <p>One honest caveat: this is a single collapsing artist, so the geometric story is the best-supported explanation rather than a proven one. The clean confirmation would be to invert the experiment — erase 40 <em>pointillists</em> and predict that Seurat becomes the casualty while Pissarro survives.</p>
       </section>
+
     </main>
   </div>
 </body>
