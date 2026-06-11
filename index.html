@@ -3,138 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Experiment 3 — Neighbor Collateral & Rank Saturation</title>
+  <title>Experiment 4 — Identity Preserved, Fidelity Degraded?</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="blog.css">
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>Experiment 3 — Where the Null-Space Guarantee Breaks</h1>
-      <p class="subtitle">SPEED preserves neighbors with mathematical precision — until you erase a dense cluster of them at once. We locate the exact point where its guarantee leaks.</p>
+      <h1>Experiment 4 — Does SPEED Keep a Neighbor's <em>Identity</em> While Wrecking its <em>Fidelity</em>?</h1>
+      <p class="subtitle">Semantic-preservation metrics (CLIP) are blind to image quality. We test whether SPEED's retained neighbors stay recognizable but visually degrade — a failure axis its own metrics cannot see.</p>
     </header>
 
     <main>
 
       <!-- ===================== FRAMING ===================== -->
       <section class="card">
-        <h2>The Question</h2>
-        <p>SPEED's core promise is a <strong>null-space guarantee</strong>: weight edits are projected into a subspace that, by construction, leaves a large retain set of ~1,700 artists untouched. Erase Van Gogh and Monet still looks like Monet. The guarantee is real — but it is only as strong as the regime it is tested in.</p>
-        <p>SPEED's own evaluation erases either many <em>diverse</em> concepts (100 different celebrities) or single painters in isolation. We probe the harder, less-tested direction: erasing concepts densely <em>entangled</em> with the very neighbors we want to protect. That is exactly where SPEED's own admitted <strong>rank-saturation</strong> dilemma — "as the retain set grows, the null space narrows toward {0}" — should begin to bite.</p>
-        <p><strong>How we measure damage.</strong> For each test we generate the same prompt at the same seeds before and after erasure, and compute <strong>CLIP image-to-image drift</strong> = 1 − cos(emb<sub>baseline</sub>, emb<sub>edited</sub>). CLIP responds to style, so this captures real stylistic change rather than the pixel-level noise ordinary metrics confuse for damage. Every number below is averaged over 4 seeds, and we always include <strong>style-far control artists</strong> (Rembrandt, Hokusai) — retained but stylistically distant — to calibrate how much drift is just "a bigger edit perturbs everything a little."</p>
+        <h2>The Blind Spot</h2>
+        <p>SPEED's central claim is <strong>precision</strong>: it preserves non-target concepts. But "preserved" is judged — in SPEED's paper and in our own earlier experiments — by metrics that read <em>semantic identity</em>: CLIP similarity and classifier scores. These answer one question: <em>does the image still read as the same concept?</em></p>
+        <p>They are largely blind to a second, independent question: <em>is the image still any good?</em> A retained concept can stay perfectly recognizable to CLIP while its rendering degrades — texture breakdown, blur, structural artifacts, loss of fine detail. The erasure benchmarks <strong>EraseBench</strong> and <strong>EMMA</strong> treat <em>image-quality degradation</em> as a <strong>distinct failure axis</strong> from semantic preservation, precisely because a concept can survive semantically while eroding visually. SPEED explicitly markets high fidelity (it reports FID as a headline metric), so this is in-scope — and untested for the regime we probe.</p>
+        <p>This matters directly for our own prior result. We concluded SPEED was <em>robust</em> at sparse multi-concept erasure because the retained neighbors showed low <strong>CLIP drift</strong>. But low CLIP drift only rules out <em>semantic</em> damage. It says nothing about fidelity. This experiment asks what that robustness claim missed.</p>
       </section>
 
-      <!-- ===================== PROBE 1: SPARSE ===================== -->
+      <!-- ===================== METHOD ===================== -->
       <section class="card">
-        <h2>Probe 1 — Sparse Multi-Concept Erasure (SPEED Holds)</h2>
-        <p>First, the easy case. We erased three painters at once — <strong>Van Gogh, Picasso, and Monet</strong> — and watched three un-targeted impressionist neighbors held out of the edit: Gauguin, Seurat, and Pissarro. If the null-space leaked under multi-concept pressure, these "canaries" would drift away from their original style.</p>
+        <h2>How We Measure Identity vs. Fidelity</h2>
+        <p>For each retained artist we compare the <strong>baseline</strong> generation against the <strong>SPEED-edited</strong> generation at the <em>same seed</em> (so the shared initial noise holds composition roughly fixed), on two complementary metrics:</p>
+        <ul>
+          <li><strong>CLIP image–image drift</strong> = 1 &minus; cos(emb<sub>baseline</sub>, emb<sub>edited</sub>) &mdash; <em>semantic</em> change. Low ⇒ the concept still reads as itself.</li>
+          <li><strong>LPIPS</strong>(baseline, edited) &mdash; <em>perceptual / fidelity</em> distance. This is the metric CLIP cannot see: it responds to texture, sharpness, and structural artifacts.</li>
+        </ul>
+        <p>The finding lives in the <strong>contrast</strong>, not the absolute LPIPS. We include the same <strong>style-far controls</strong> (Rembrandt, Hokusai — retained but stylistically distant) used throughout the project to calibrate the noise floor, and the single-concept <strong>ESD</strong> erasure as the no-retain-mechanism reference (expected to wreck both metrics). The probe runs purely on images we already generated — <em>no new diffusion runs</em> — with black/corrupt frames excluded and the valid-seed count reported per cell.</p>
+      </section>
+
+      <!-- ===================== EXPERIMENT (PENDING) ===================== -->
+      <section class="card">
+        <h2>The Test</h2>
+        <p>Retained canaries (Gauguin, Seurat, Pissarro) vs. style-far controls (Rembrandt, Hokusai), across single- to triple-concept SPEED erasure and ESD. Each cell: CLIP drift (identity) and LPIPS (fidelity), averaged over 4 seeds.</p>
 
         <table>
           <thead>
-            <tr><th>Concept</th><th>Role</th><th>CLIP drift</th></tr>
+            <tr>
+              <th>Artist</th>
+              <th>Role</th>
+              <th>SPEED 1c<br><small>CLIP / LPIPS</small></th>
+              <th>SPEED 3c<br><small>CLIP / LPIPS</small></th>
+              <th>ESD<br><small>CLIP / LPIPS</small></th>
+            </tr>
           </thead>
           <tbody>
-            <tr><td>Gauguin</td><td>Neighbor (canary)</td><td>0.109</td></tr>
-            <tr><td>Seurat</td><td>Neighbor (canary)</td><td>0.049</td></tr>
-            <tr><td>Pissarro</td><td>Neighbor (canary)</td><td>0.076</td></tr>
-            <tr><td>Rembrandt</td><td>Control (style-far)</td><td>0.114</td></tr>
-            <tr><td>Hokusai</td><td>Control (style-far)</td><td>0.063</td></tr>
+            <tr><td>Gauguin</td><td>Canary</td><td>pending</td><td>pending</td><td>pending</td></tr>
+            <tr><td>Seurat</td><td>Canary</td><td>pending</td><td>pending</td><td>pending</td></tr>
+            <tr><td>Pissarro</td><td>Canary</td><td>pending</td><td>pending</td><td>pending</td></tr>
+            <tr><td>Rembrandt</td><td>Control (far)</td><td>pending</td><td>pending</td><td>pending</td></tr>
+            <tr><td>Hokusai</td><td>Control (far)</td><td>pending</td><td>pending</td><td>pending</td></tr>
           </tbody>
         </table>
 
-        <div class="image-grid">
-          <div class="image-card">
-            <img src="experiment3/results/multi_concept/baseline/retain_canary/gauguin/seed0.png" alt="Gauguin, original model">
-            <div class="image-label">Gauguin — original</div>
-          </div>
-          <div class="image-card">
-            <img src="experiment3/results/multi_concept/speed_3c/retain_canary/gauguin/seed0.png" alt="Gauguin after 3-concept erasure">
-            <div class="image-label">Gauguin — after N=3 erasure (intact)</div>
-          </div>
-        </div>
-
         <div class="verdict-box">
-          <h3>Finding: genuine robustness</h3>
-          <p>The canaries drift <em>no more than</em> the style-far controls — Gauguin (0.109) is statistically indistinguishable from Rembrandt (0.114), a painter with nothing in common with the targets. There is no concentrated leakage onto the neighbors. For sparse, mixed erasure, SPEED's null-space does exactly what it advertises. This is an honest negative result — and it told us the limitation, if one existed, had to live somewhere harder.</p>
-        </div>
-      </section>
-
-      <!-- ===================== PROBE 2: CONCENTRATED ===================== -->
-      <section class="card">
-        <h2>Probe 2 — Concentrated Mass Erasure (The Limit Appears)</h2>
-        <p>So we concentrated the pressure. Instead of three mixed painters, we erased a growing, tightly-correlated cluster of <strong>impressionists</strong> — 5, then 10, then 20, then 40 — while strictly holding our three canaries (Gauguin, Seurat, Pissarro) out of every erasure set. Each list is nested inside the next, so the only thing changing is <em>how many same-movement concepts we pile on</em>. This is precisely the rank-saturation regime SPEED admits to but never tests.</p>
-
-        <p>CLIP drift vs. baseline, 4 seeds per cell (zero corrupt frames). The erased-artist row (Renoir) confirms erasure actually fires; the style-far controls calibrate the noise floor.</p>
-
-        <table>
-          <thead>
-            <tr><th>Concept</th><th>Role</th><th>N=5</th><th>N=10</th><th>N=20</th><th>N=40</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Renoir</td><td>Erased (sanity check)</td><td>0.354</td><td>0.354</td><td>0.361</td><td>0.332</td></tr>
-            <tr><td><strong>Pissarro</strong></td><td>Canary — core impressionist</td><td>0.052</td><td>0.126</td><td>0.165</td><td class="danger">0.253</td></tr>
-            <tr><td>Gauguin</td><td>Canary — post-impressionist</td><td>0.083</td><td>0.119</td><td>0.110</td><td>0.128</td></tr>
-            <tr><td>Seurat</td><td>Canary — pointillist</td><td>0.044</td><td>0.120</td><td>0.076</td><td>0.131</td></tr>
-            <tr><td>"an impressionist oil painting"</td><td>Supertype capability</td><td>0.035</td><td>0.070</td><td>0.049</td><td>0.036</td></tr>
-            <tr><td>Rembrandt</td><td>Control — style-far</td><td>0.050</td><td>0.094</td><td>0.132</td><td>0.113</td></tr>
-            <tr><td>Hokusai</td><td>Control — style-far</td><td>0.036</td><td>0.040</td><td>0.074</td><td>0.081</td></tr>
-          </tbody>
-        </table>
-
-        <p>One row breaks away from the pack. <strong>Pissarro</strong> climbs monotonically — 0.05 → 0.13 → 0.17 → <span class="danger">0.25</span> — until, at N=40, he has drifted to roughly <em>double</em> the style-far controls. And it is visible: his soft, broken-brushwork impressionism flattens into bolder, more saturated, less characteristic forms. Gauguin, erased alongside the same cluster, stays put.</p>
-
-        <div class="image-grid">
-          <div class="image-card">
-            <img src="experiment3/results/rank_saturation/baseline/canary/pissarro/seed0.png" alt="Pissarro original">
-            <div class="image-label">Pissarro — original</div>
-          </div>
-          <div class="image-card">
-            <img src="experiment3/results/rank_saturation/speed_40c/canary/pissarro/seed0.png" alt="Pissarro after 40-concept erasure">
-            <div class="image-label">Pissarro — after N=40 (degraded)</div>
-          </div>
-          <div class="image-card">
-            <img src="experiment3/results/rank_saturation/baseline/canary/gauguin/seed0.png" alt="Gauguin original">
-            <div class="image-label">Gauguin — original</div>
-          </div>
-          <div class="image-card">
-            <img src="experiment3/results/rank_saturation/speed_40c/canary/gauguin/seed0.png" alt="Gauguin after 40-concept erasure">
-            <div class="image-label">Gauguin — after N=40 (intact)</div>
-          </div>
+          <h3>Verdict criteria (pre-registered)</h3>
+          <p><strong>Fidelity degradation (the limitation)</strong> ⟺ the canaries keep <em>low CLIP drift</em> (identity preserved, comparable to the controls) <strong>but show LPIPS clearly above the style-far controls</strong> — i.e. perceptual damage concentrated on the semantically-preserved neighbors, which SPEED's own semantic metrics cannot detect.</p>
+          <p><strong>Robust (honest negative / bounding result)</strong> ⟺ canary LPIPS is no higher than the controls' — SPEED preserves identity <em>and</em> fidelity, and the CLIP-robustness shown earlier extends to perceptual quality. Either outcome is reportable.</p>
+          <p><em>Caveat:</em> same-seed pairing holds composition roughly fixed, but LPIPS still captures some layout change — so the claim rests on the canary-vs-control <em>contrast</em>, not the absolute LPIPS value.</p>
         </div>
 
-        <div class="verdict-box">
-          <h3>The limitation: selective collateral collapse under rank saturation</h3>
-          <p>This is the bottleneck. Under concentrated mass erasure, SPEED's null-space protection <strong>fails for the single retained concept most entangled with what was erased</strong> — Pissarro, a core impressionist whose style sits in the middle of the very cluster being removed. The guarantee SPEED advertises for its retain set does not hold for him at scale: he becomes collateral damage, visibly and reproducibly.</p>
-          <p>What keeps this honest — and makes it a <em>precise</em> finding rather than a sweeping one — is the rest of the table. The effect is <strong>localized, not catastrophic</strong>: the stylistically distinct neighbors (Gauguin, Seurat) hold at control levels, and the broad "impressionist painting" capability is untouched (0.036). SPEED does not collapse the neighborhood; it springs a leak at its single weakest point, exactly where its admitted rank-saturation dilemma predicts.</p>
-        </div>
-      </section>
-
-      <!-- ===================== WHY ONE ===================== -->
-      <section class="card">
-        <h2>Why Only One Neighbor Failed</h2>
-        <p>The failure is geometric, not random. SPEED pushes its edit along the <em>shared direction</em> of everything in the erased set, while keeping that edit orthogonal to retained concepts. When you erase 40 impressionists, that shared direction collapses onto one thing — soft, plein-air impressionist landscape — because that is what most of those 40 painters are.</p>
-        <p>Place each held-out neighbor relative to that direction. <strong>Pissarro is that direction</strong>: the most prototypical impressionist of the three, near-indistinguishable from the Monets and Sisleys being erased — so when the null-space runs low on degrees of freedom, he is the one concept it cannot keep orthogonal. <strong>Gauguin</strong> (flat cloisonnist planes) and <strong>Seurat</strong> (rigid pointillist dots) sit <em>off</em> that axis; their distinctive techniques give the projection room to protect them. It is also why only Pissarro's drift <em>grows with N</em> — every additional impressionist reinforces the exact direction he lives on.</p>
-        <p>One honest caveat: this is a single collapsing artist, so the geometric story is the best-supported explanation rather than a proven one. The clean confirmation would be to invert the experiment — erase 40 <em>pointillists</em> and predict that Seurat becomes the casualty while Pissarro survives.</p>
-      </section>
-
-      <!-- ===================== METHODOLOGY / PITFALLS ===================== -->
-      <section class="card">
-        <h2>Methodology &amp; Pitfalls We Corrected</h2>
-        <p>Getting to a trustworthy number here was harder than it looks. Three measurement traps each produced a convincing-but-wrong result before we caught them — and every safeguard in the pipeline above exists because of one of them.</p>
-
-        <h3>1. Pixel MSE could not tell damage from noise</h3>
-        <p>Our first instinct was to measure neighbor damage with pixel-space MSE between baseline and erased images. It failed badly: a <em>retained, protected</em> artist (Cézanne) scored MSE above <strong>10,000</strong> on some seeds, while a supposedly "damaged" neighbor scored ~440. MSE is dominated by ordinary seed-to-seed composition variation, not style change — so it cannot distinguish real erasure damage from diffusion stochasticity. That is why every number in this report uses <strong>CLIP image-to-image drift</strong>, which responds to style rather than pixel layout.</p>
-
-        <h3>2. The NSFW safety checker faked a collapse</h3>
-        <p>An early concentrated-erasure run showed a dramatic "Gauguin collapses to 0.267 drift" signal — and it was entirely an artifact. Stable Diffusion's NSFW safety checker blanks flagged generations to <em>solid black</em>, and it fires on nude-heavy painters like Gauguin (his Tahitian series). A black frame compared against a normal painting maxes out CLIP distance, manufacturing a fake collapse. We fixed it at the source: generation now runs in <code>fp32</code> with the safety checker disabled, and the analyzer explicitly excludes any black frame and reports how many valid seeds each number rests on. The "zero corrupt frames" note on the results above is the receipt for this fix.</p>
-
-        <h3>3. A neighbor "suppression" claim that reversed under measurement</h3>
-        <p>An initial single-concept framing claimed SPEED visibly suppressed a neighbor's color saturation. Measuring it directly told the opposite story — saturation actually rose slightly. It was confirmation bias reading damage into noise. Discarding that false start is what pushed us toward the controlled, multi-seed, control-calibrated design used here.</p>
-
-        <div class="verdict-box">
-          <h3>Why this matters</h3>
-          <p>Each pitfall would have produced a <em>more dramatic</em> headline than the real finding. The selective Pissarro leak survived all three corrections — which is precisely why we trust it. The controls, the seed averaging, the CLIP metric, and the black-frame exclusion are not decoration; they are the difference between a real limitation and an artifact.</p>
-        </div>
+        <p class="finding"><em>Finding: pending.</em> Run <code>sbatch experiment3/scripts/slurm_fidelity.sh</code> (pure re-analysis of existing <code>multi_concept</code> images; writes <code>experiment3/results/fidelity/fidelity.csv</code>). This section will be replaced with the measured CLIP/LPIPS table and the verdict it implies.</p>
       </section>
 
     </main>
