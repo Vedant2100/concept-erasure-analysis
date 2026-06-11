@@ -94,6 +94,15 @@ python experiment3/scripts/probe_multi_concept.py \
     --ckpt "checkpoints/esd/diffusers-VanGogh-ESDx1-UNET.pt" \
     --out_dir experiment3/results/multi_concept
 
+# ================================================================
+# Step 3: Measure CLIP image-image drift across the 1c->2c->3c progression.
+# This is the metric that decides the experiment — NOT pixel MSE.
+# ================================================================
+echo "=== Analyzing CLIP drift (canaries vs style-far controls) ==="
+python experiment3/scripts/analyze_clip_drift.py \
+    --root experiment3/results/multi_concept \
+    --out_csv experiment3/results/multi_concept/clip_drift.csv
+
 echo "=== All multi-concept probes complete. ==="
-echo "Results in experiment3/results/multi_concept/"
+echo "Results in experiment3/results/multi_concept/  (images + clip_drift.csv)"
 echo "Commit with: git add experiment3/results/multi_concept/ experiment3/scripts/ && git commit -m 'Add multi-concept null-space collapse experiment'"

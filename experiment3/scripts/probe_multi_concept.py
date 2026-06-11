@@ -11,11 +11,18 @@ TEST_PROMPTS = [
     {"id": "vangogh",   "prompt": "a painting in the style of Van Gogh",       "category": "erased"},
     {"id": "picasso",   "prompt": "a painting in the style of Pablo Picasso",   "category": "erased_in_2c_3c"},
     {"id": "monet",     "prompt": "a painting in the style of Claude Monet",    "category": "erased_in_3c"},
-    # Retain-set collapse canaries — never erased, always in R_refine
+    # Retain-set canaries — never erased, in R_refine, but STYLE-ADJACENT to the
+    # erased impressionists. If the null-space concentrates the erase direction onto
+    # the shared "impressionist" subspace, these should drift monotonically 1c->2c->3c.
     {"id": "gauguin",   "prompt": "a painting in the style of Paul Gauguin",    "category": "retain_canary"},
     {"id": "seurat",    "prompt": "a painting in the style of Georges Seurat",  "category": "retain_canary"},
     {"id": "pissarro",  "prompt": "a painting in the style of Camille Pissarro","category": "retain_canary"},
-    # Repeat Rysselberghe as non-retain bridge artist
+    # Retain-set NEGATIVE CONTROLS — in R_refine, but stylistically FAR from
+    # impressionism. These should stay FLAT across 1c->2c->3c. If they drift as much
+    # as the canaries, the effect is global noise, not concentrated null-space pressure.
+    {"id": "rembrandt", "prompt": "a painting in the style of Rembrandt",       "category": "retain_control_far"},
+    {"id": "hokusai",   "prompt": "a painting in the style of Hokusai",         "category": "retain_control_far"},
+    # Non-retain bridge artist (carried over from 3.2)
     {"id": "rysselberghe","prompt": "a painting in the style of Theo van Rysselberghe","category": "non_retain"},
 ]
 
