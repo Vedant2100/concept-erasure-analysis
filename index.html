@@ -90,67 +90,111 @@
         <h2>4. The Saturation Horizon (Rank Saturation)</h2>
         <p>While closed-form projections perform flawlessly on sparse edits, what happens when we stress-test the mathematical limits of the cross-attention matrix? We designed a concentrated mass erasure experiment, incrementally erasing <strong>5, 10, 20, and 40</strong> highly correlated Impressionist painters, while strictly withholding our canaries (Gauguin, Seurat, Pissarro) from the erasure set.</p>
 
+        <p>CLIP image-image drift vs. baseline, averaged over 4 seeds (n=4 every cell, zero corrupt frames). The erased-artist row (Renoir) confirms erasure actually fires; the two style-far retained artists (Rembrandt, Hokusai) calibrate the noise floor.</p>
+
         <table>
           <thead>
             <tr>
               <th>Concept</th>
               <th>Role</th>
-              <th>Drift (N=10)</th>
-              <th>Drift (N=20)</th>
-              <th>Drift (N=40)</th>
+              <th>N=5</th>
+              <th>N=10</th>
+              <th>N=20</th>
+              <th>N=40</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Pissarro</td>
-              <td>Neighbor (Canary)</td>
-              <td>0.125</td>
+              <td>Renoir</td>
+              <td>Erased (sanity)</td>
+              <td>0.354</td>
+              <td>0.354</td>
+              <td>0.361</td>
+              <td>0.332</td>
+            </tr>
+            <tr>
+              <td><strong>Pissarro</strong></td>
+              <td>Canary — core impressionist</td>
+              <td>0.052</td>
+              <td>0.126</td>
               <td>0.165</td>
               <td class="danger">0.253</td>
             </tr>
             <tr>
-              <td>Impressionist</td>
-              <td>Supertype</td>
+              <td>Gauguin</td>
+              <td>Canary — post-impressionist</td>
+              <td>0.083</td>
+              <td>0.119</td>
+              <td>0.110</td>
+              <td>0.128</td>
+            </tr>
+            <tr>
+              <td>Seurat</td>
+              <td>Canary — pointillist</td>
+              <td>0.044</td>
+              <td>0.120</td>
+              <td>0.076</td>
+              <td>0.131</td>
+            </tr>
+            <tr>
+              <td>"an impressionist oil painting"</td>
+              <td>Supertype capability</td>
+              <td>0.035</td>
               <td>0.070</td>
               <td>0.049</td>
-              <td>0.035</td>
+              <td>0.036</td>
             </tr>
             <tr>
               <td>Rembrandt</td>
-              <td>Control</td>
-              <td>0.093</td>
+              <td>Control — style-far</td>
+              <td>0.050</td>
+              <td>0.094</td>
               <td>0.132</td>
               <td>0.113</td>
+            </tr>
+            <tr>
+              <td>Hokusai</td>
+              <td>Control — style-far</td>
+              <td>0.036</td>
+              <td>0.040</td>
+              <td>0.074</td>
+              <td>0.081</td>
             </tr>
           </tbody>
         </table>
 
+        <p>Pissarro — the canary whose style overlaps the erased impressionist core most heavily — drifts monotonically to 0.253 at N=40, roughly double the style-far controls, with a visible loss of impressionist softness. But the effect is <em>selective</em>, not systemic: Gauguin and Seurat (more distinct post-impressionist and pointillist techniques) stay at control levels, and the supertype prompt "an impressionist oil painting" is essentially untouched (0.036) — the model still renders impressionism fine.</p>
+
         <div class="image-grid">
           <div class="image-card">
             <img src="experiment3/results/rank_saturation/baseline/canary/pissarro/seed0.png" alt="Pissarro Baseline">
-            <div class="image-label">Baseline</div>
-          </div>
-          <div class="image-card">
-            <img src="experiment3/results/rank_saturation/speed_10c/canary/pissarro/seed0.png" alt="Pissarro N=10">
-            <div class="image-label">N=10 Erasure</div>
+            <div class="image-label">Pissarro — Baseline</div>
           </div>
           <div class="image-card">
             <img src="experiment3/results/rank_saturation/speed_40c/canary/pissarro/seed0.png" alt="Pissarro N=40">
-            <div class="image-label">N=40 Erasure</div>
+            <div class="image-label">Pissarro — N=40 (degraded)</div>
+          </div>
+          <div class="image-card">
+            <img src="experiment3/results/rank_saturation/baseline/canary/gauguin/seed0.png" alt="Gauguin Baseline">
+            <div class="image-label">Gauguin — Baseline</div>
+          </div>
+          <div class="image-card">
+            <img src="experiment3/results/rank_saturation/speed_40c/canary/gauguin/seed0.png" alt="Gauguin N=40">
+            <div class="image-label">Gauguin — N=40 (intact)</div>
           </div>
         </div>
 
-        <div class="verdict-box fatal">
-          <h3>Finding: Capacity Collapse via Rank Saturation</h3>
-          <p>As N scales within a dense, highly entangled semantic neighborhood, the column space of the target embeddings approaches the span of the entire local subspace. The mathematical rank of the cross-attention matrix saturates. The projection loses the degrees of freedom required to maintain orthogonality between the 40 erased targets and their innocent nearest neighbors.</p>
-          <p>The result is a catastrophic, localized manifold collapse. Un-targeted neighbors like Pissarro (Drift: 0.253) are completely destroyed as collateral damage.</p>
+        <div class="verdict-box">
+          <h3>Finding: Selective Degradation of the Most-Entangled Neighbor</h3>
+          <p>Under extreme concentrated erasure (40 same-movement artists), SPEED's null-space protection is <strong>not uniform</strong>. It degrades for the single retained concept with maximal overlap to the erased cluster — Pissarro, a core impressionist — which drifts to ~2× the style-far controls with visibly reduced impressionist character. This is consistent with SPEED's own admitted rank-saturation dilemma: as the erased cluster fills the local subspace, the projection loses the degrees of freedom to keep the most-overlapping neighbor orthogonal.</p>
+          <p>Crucially, this is <em>localized</em>, not a capacity collapse: stylistically distinct neighbors (Gauguin, Seurat) and the impressionist supertype capability remain protected at control levels. The honest takeaway is that SPEED resists concentrated mass erasure remarkably well, and only the most entangled retained concept begins to leak at the extreme of the load.</p>
         </div>
       </section>
 
       <section class="card">
         <h2>5. Conclusion</h2>
         <p>Closed-form projection mechanisms like SPEED represent an elegant, training-free approach to concept filtering. For sparse, linearly independent edits, their geometric null-space effectively guarantees the preservation of adjacent concepts.</p>
-        <p>However, they are fundamentally bottlenecked by <strong>Rank Saturation</strong>. When deployed against dense, entangled semantic clusters, the closed-form mathematics collapse the very neighborhoods they aim to protect. Future architectures seeking to achieve robust, large-scale machine unlearning must move beyond superficial cross-attention filtering and develop mechanisms capable of true mechanistic feature disentanglement.</p>
+        <p>Their limit is <strong>rank saturation</strong> — a bottleneck SPEED's authors acknowledge in the abstract but never demonstrate. We located where it begins to bite: under extreme concentrated erasure (40 same-movement artists), protection degrades <em>selectively</em> for the single retained concept most entangled with the erased cluster (Pissarro), while distinct neighbors and the broader style capability stay intact. This is a real but localized leak, not the catastrophic neighborhood collapse a naive reading of the rank-saturation dilemma might predict — SPEED is more robust than that. The open direction for large-scale unlearning remains moving beyond cross-attention filtering toward true mechanistic feature disentanglement, so that even the most entangled neighbors are preserved under heavy load.</p>
       </section>
     </main>
   </div>
