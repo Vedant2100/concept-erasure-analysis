@@ -1,0 +1,14 @@
+prompt_id,category,role,vgness_baseline,vgness_speed_1c,vgness_esd_x,drift_speed_1c,n_speed_1c,drift_esd_x,n_esd_x
+named_vangogh,named,"Named: 'style of Van Gogh'",0.25499,0.21302,0.20362,0.34678,4,0.38770,4
+named_starry,named,"Named: 'Starry Night by Van Gogh'",0.27837,0.26861,0.20359,0.06773,4,0.28881,4
+para_swirl,paraphrase_desc,"Desc: swirling impasto night sky",0.23358,0.22438,0.20586,0.07903,4,0.17120,4
+para_wheat,paraphrase_desc,"Desc: golden wheat turbulent sky",0.24337,0.24404,0.22096,0.01937,4,0.11722,4
+para_cafe,paraphrase_desc,"Desc: cafe terrace complementary",0.24646,0.24735,0.22642,0.02900,4,0.10971,4
+para_postimpr_swirl,paraphrase_style,"Style: post-impr swirling rhythmic",0.24191,0.23080,0.19900,0.04555,4,0.17449,4
+para_expressive,paraphrase_style,"Style: expressionist impasto",0.21591,0.21499,0.22075,0.02118,4,0.11001,4
+para_cypress,paraphrase_style,"Style: cypress swirling sky",0.19024,0.19282,0.20182,0.00907,4,0.15844,4
+para_emotion,paraphrase_abstract,"Abstract: emotional turmoil",0.21466,0.20672,0.19991,0.01590,4,0.15042,4
+para_movement,paraphrase_abstract,"Abstract: sky moves with energy",0.21303,0.20584,0.19514,0.01294,4,0.11367,4
+ctrl_ukiyo,control_far,"Control: ukiyo-e woodblock",0.18116,0.17898,0.18164,0.01956,4,0.05745,4
+ctrl_rembrandt,control_far,"Control: Rembrandt chiaroscuro",0.18226,0.17729,0.17521,0.10011,4,0.26095,4
+ctrl_hokusai,control_far,"Control: Hokusai Mount Fuji",0.17873,0.17857,0.18222,0.02386,4,0.13482,4
