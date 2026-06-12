@@ -19,7 +19,7 @@ Large-scale text-to-image diffusion models learn to generate harmful, copyrighte
 3. [Target Paper: SPEED](#3-target-paper-speed)
 4. [Algorithmic Strengths](#4-algorithmic-strengths)
 5. [Experimental Methodology](#5-experimental-methodology)
-6. [Experiment 1: Sparse Multi-Concept Erasure (Positive Control)](#6-experiment-1-sparse-multi-concept-erasure)
+6. [Verification of Strengths: Sparse Multi-Concept Erasure](#6-verification-of-strengths-sparse-multi-concept-erasure)
 7. [Limitation 1: Rank Saturation Collapse Under Concentrated Mass Erasure](#7-limitation-1-rank-saturation-collapse)
 8. [Geometric Analysis: Why Only One Neighbor Failed](#8-geometric-analysis)
 9. [Ablation: The Refinement Contradiction](#9-ablation-the-refinement-contradiction)
@@ -185,11 +185,11 @@ A canary's drift is interpretable only relative to the style-far controls. If a 
 
 ---
 
-## 6. Experiment 1: Sparse Multi-Concept Erasure (Positive Control)
+## 6. Verification of Strengths: Sparse Multi-Concept Erasure
 
 ### 6.1 Design
 
-We erased three stylistically diverse painters simultaneously — **Van Gogh, Picasso, and Monet** — and measured drift on three held-out impressionist canaries (Gauguin, Seurat, Pissarro) and two style-far controls (Rembrandt, Hokusai). If the null-space leaked under multi-concept pressure, the canaries would show elevated drift relative to the controls.
+We verified the stated strengths of the SPEED algorithm by testing its baseline null-space protection. We erased three stylistically diverse painters simultaneously — **Van Gogh, Picasso, and Monet** — and measured drift on three held-out impressionist canaries (Gauguin, Seurat, Pissarro) and two style-far controls (Rembrandt, Hokusai). If the null-space leaked under multi-concept pressure, the canaries would show elevated drift relative to the controls.
 
 ### 6.2 Results
 

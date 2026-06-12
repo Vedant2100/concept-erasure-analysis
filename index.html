@@ -42,7 +42,7 @@
           <li><a href="#deep-dive-empirical-limitations">4. Empirical Limitations</a>
             <ul style="margin-top: 0.5rem; padding-left: 1rem; border-left: 2px solid var(--border-color); margin-left: 0.5rem;">
               <li><a href="#the-question">The Question</a></li>
-              <li><a href="#probe-1-sparse-multi-concept-erasure-speed-holds">Probe 1: Sparse Multi-Concept</a></li>
+              <li><a href="#verification-of-strengths">Verification of Strengths: Sparse Multi-Concept</a></li>
               <li><a href="#probe-2">Limitation 1: Rank Saturation Collapse</a></li>
               <li><a href="#why-only-one-neighbor-failed">Why Only One Neighbor Failed</a></li>
               <li><a href="#ablation-the-refinement-contradiction">Ablation: Refinement Contradiction</a></li>
@@ -331,10 +331,10 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
         <p><strong>How we measure damage.</strong> For each test we generate the same prompt at the same seeds before and after erasure, and compute <strong>CLIP image-to-image drift</strong> = 1 − cos(emb<sub>baseline</sub>, emb<sub>edited</sub>). CLIP responds to style, so this captures real stylistic change rather than the pixel-level noise ordinary metrics confuse for damage. Every number below is averaged over 4 seeds, and we always include <strong>style-far control artists</strong> (Rembrandt, Hokusai) — retained but stylistically distant — to calibrate how much drift is just "a bigger edit perturbs everything a little."</p>
       </section>
 
-      <!-- ===================== PROBE 1: SPARSE ===================== -->
+      <!-- ===================== VERIFICATION OF STRENGTHS ===================== -->
       <section class="card">
-        <h2 id="probe-1-sparse-multi-concept-erasure-speed-holds">Probe 1 — Sparse Multi-Concept Erasure (SPEED Holds)</h2>
-        <p>First, the easy case. We erased three painters at once — <strong>Van Gogh, Picasso, and Monet</strong> — and watched three un-targeted impressionist neighbors held out of the edit: Gauguin, Seurat, and Pissarro. If the null-space leaked under multi-concept pressure, these "canaries" would drift away from their original style.</p>
+        <h2 id="verification-of-strengths">Verification of Strengths: Sparse Multi-Concept Erasure</h2>
+        <p>To verify the stated strengths of the SPEED algorithm, we first tested its baseline null-space protection. We erased three painters at once — <strong>Van Gogh, Picasso, and Monet</strong> — and watched three un-targeted impressionist neighbors held out of the edit: Gauguin, Seurat, and Pissarro. If the null-space leaked under multi-concept pressure, these "canaries" would drift away from their original style.</p>
 
         <table>
           <thead>
