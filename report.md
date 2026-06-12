@@ -43,7 +43,7 @@ This project fulfills the EE 243 assignment requirements:
 1. **Trace the lineage.** We map the intellectual genealogy from the foundational Stable Diffusion architecture through to SPEED, identifying the key technical transitions.
 2. **Find the frontier.** We identify SPEED (ICLR 2026) as the current state-of-the-art open-source method for efficient concept erasure.
 3. **Articulate strengths.** We describe SPEED's genuine contributions: training-free closed-form editing, null-space preservation guarantees, and extreme computational efficiency.
-4. **Expose limitations through experiments.** We design and execute four targeted empirical probes that locate two concrete, reproducible bottlenecks in SPEED's architecture.
+4. **Expose limitations through experiments.** We design and execute two targeted empirical experiments that locate two concrete, reproducible bottlenecks in SPEED's architecture.
 
 No models were trained or fine-tuned for this analysis. All experiments use the publicly released SPEED and ESD checkpoints and the CompVis/stable-diffusion-v1-4 base model.
 
@@ -111,7 +111,7 @@ SPEED's authors acknowledge but never empirically demonstrate a fundamental limi
 
 > "As R increases, C_0 C_0^T gradually reaches full rank, its null space narrows and reduces to the trivial null space {0}."
 
-Our Experiment 3 locates precisely where this begins to bite.
+Our Experiment 1 locates precisely where this begins to bite.
 
 ---
 

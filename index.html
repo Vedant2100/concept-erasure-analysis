@@ -42,12 +42,12 @@
           <li><a href="#deep-dive-empirical-limitations">4. Empirical Limitations</a>
             <ul style="margin-top: 0.5rem; padding-left: 1rem; border-left: 2px solid var(--border-color); margin-left: 0.5rem;">
               <li><a href="#the-question">The Question</a></li>
-              <li><a href="#verification-of-strengths">Verification of Strengths: Sparse Multi-Concept</a></li>
-              <li><a href="#probe-2">Limitation 1: Rank Saturation Collapse</a></li>
-              <li><a href="#why-only-one-neighbor-failed">Why Only One Neighbor Failed</a></li>
-              <li><a href="#ablation-the-refinement-contradiction">Ablation: Refinement Contradiction</a></li>
-              <li><a href="#robustness-fidelity-vs-identity">Robustness: Fidelity vs. Identity</a></li>
-              <li><a href="#limitation-2">Limitation 2: Evasion Vulnerability</a></li>
+              <li><a href="#verification-of-strengths">Verification of Strengths: Sparse Multi-Concept (Exp. 1)</a></li>
+              <li><a href="#probe-2">Limitation 1: Rank Saturation Collapse (Exp. 1)</a></li>
+              <li><a href="#why-only-one-neighbor-failed">Why Only One Neighbor Failed (Exp. 1)</a></li>
+              <li><a href="#ablation-the-refinement-contradiction">Ablation: Refinement Contradiction (Exp. 1)</a></li>
+              <li><a href="#robustness-fidelity-vs-identity">Robustness: Fidelity vs. Identity (Exp. 1)</a></li>
+              <li><a href="#limitation-2">Limitation 2: Evasion Vulnerability (Exp. 2)</a></li>
               <li><a href="#methodology-amp-pitfalls-we-corrected">Methodology & Pitfalls</a></li>
             </ul>
           </li>
@@ -300,12 +300,11 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
 
 
 <h2 id="experiments">Empirical Experiments</h2>
-<p>To stress-test SPEED and analyze its limitations, targeted empirical experiments are executed in separate branches of this repository:</p>
+<p>To stress-test SPEED and analyze its limitations, we executed two targeted empirical experiments (code and data are hosted on the <code>experiment-3</code> and <code>all-experiments</code> branches respectively):</p>
 <ul>
-  <li><strong>Experiment 1 (Textual Inversion Recovery Probe)</strong> and <strong>Experiment 2 (Compositional Prompt Evasion)</strong> are stored on the <code>all-experiments</code> branch.</li>
-  <li><strong>Experiment 3 (Neighbor Collateral Damage &amp; Rank Saturation)</strong> shows SPEED is robust to sparse multi-concept erasure, but locates a <em>selective</em> failure of its null-space guarantee under concentrated mass erasure — the rank-saturation limit. Stored on the <code>experiment-3</code> branch.</li>
+  <li><strong>Experiment 1 (Neighbor Collateral Damage &amp; Rank Saturation)</strong>: Explores the null-space capacity limits under mass erasure.</li>
+  <li><strong>Experiment 2 (Style-Paraphrase Evasion)</strong>: Explores lexical overfitting and evasion vulnerabilities.</li>
 </ul>
-<p>Please refer to those branches to view the code, SLURM configs, generated images, and detailed analysis reports for each evaluation.</p>
 
 <h2 id="findings">Key Findings</h2>
 <p>Across our probes, SPEED proves to be a genuinely strong method with one precise, locatable limitation:</p>
@@ -333,7 +332,7 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
 
       <!-- ===================== VERIFICATION OF STRENGTHS ===================== -->
       <section class="card">
-        <h2 id="verification-of-strengths">Verification of Strengths: Sparse Multi-Concept Erasure</h2>
+        <h2 id="verification-of-strengths">Verification of Strengths: Sparse Multi-Concept Erasure (Exp. 1)</h2>
         <p>To verify the stated strengths of the SPEED algorithm, we first tested its baseline null-space protection. We erased three painters at once — <strong>Van Gogh, Picasso, and Monet</strong> — and watched three un-targeted impressionist neighbors held out of the edit: Gauguin, Seurat, and Pissarro. If the null-space leaked under multi-concept pressure, these "canaries" would drift away from their original style.</p>
 
         <table>
@@ -368,7 +367,7 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
 
       <!-- ===================== PROBE 2: CONCENTRATED ===================== -->
       <section class="card">
-        <h2 id="probe-2">Limitation 1: Rank Saturation Collapse (Probe 2)</h2>
+        <h2 id="probe-2">Limitation 1: Rank Saturation Collapse (Exp. 1)</h2>
         <p>So we concentrated the pressure. Instead of three mixed painters, we erased a growing, tightly-correlated cluster of <strong>impressionists</strong> — 5, then 10, then 20, then 40 — while strictly holding our three canaries (Gauguin, Seurat, Pissarro) out of every erasure set. Each list is nested inside the next, so the only thing changing is <em>how many same-movement concepts we pile on</em>. This is precisely the rank-saturation regime SPEED admits to but never tests.</p>
 
         <p>CLIP drift vs. baseline, 4 seeds per cell (zero corrupt frames). The erased-artist row (Renoir) confirms erasure actually fires; the style-far controls calibrate the noise floor.</p>
@@ -426,7 +425,7 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
 
       <!-- ===================== ABLATION: THE REFINEMENT CONTRADICTION ===================== -->
       <section class="card">
-        <h2 id="ablation-the-refinement-contradiction">Ablation: The Refinement Contradiction</h2>
+        <h2 id="ablation-the-refinement-contradiction">Ablation: The Refinement Contradiction (Exp. 1)</h2>
         <p>If rank saturation caused Pissarro's collapse at N=40, it exposes a massive internal contradiction in SPEED's architecture. SPEED uses a feature called <strong>Prior Knowledge Refinement (DPA)</strong> which generates perturbed, "fake" retain concepts to artificially increase the coverage of the retain space. But adding vectors to the retain set <em>consumes the rank budget</em> and shrinks the null-space.</p>
         <p>We hypothesized that DPA, designed to protect the prior, was actually accelerating the collapse under load. To test this, we repeated the N=40 erasure but turned SPEED's refinement machinery completely off (<code>aug_num=0</code>).</p>
 
@@ -465,7 +464,7 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
 
       <!-- ===================== ROBUSTNESS: FIDELITY VS IDENTITY ===================== -->
       <section class="card">
-        <h2 id="robustness-fidelity-vs-identity">Robustness: Fidelity vs. Identity</h2>
+        <h2 id="robustness-fidelity-vs-identity">Robustness: Fidelity vs. Identity (Exp. 1)</h2>
         <p>A common vulnerability in concept erasure is creating a "semantic illusion"—fooling the text encoder (CLIP) into recognizing a retained concept, while quietly trashing the pixel-level image quality with artifacts, blur, and structural breakage. To test if SPEED's preservation of neighbors was an illusion, we re-scanned the multi-concept erasure images.</p>
         <p>Instead of CLIP, we computed <strong>LPIPS</strong> (Learned Perceptual Image Patch Similarity) against the baseline, which explicitly catches perceptual degradation that semantic metrics ignore. If SPEED was cheating, canary LPIPS would spike above the control baseline.</p>
         
@@ -477,7 +476,7 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
 
       <!-- ===================== LIMITATION 2: EVASION VIA PARAPHRASING ===================== -->
       <section class="card">
-        <h2 id="limitation-2">Limitation 2: Evasion Vulnerability (Lexical Overfitting)</h2>
+        <h2 id="limitation-2">Limitation 2: Evasion Vulnerability (Exp. 2)</h2>
         <p>A true safety or concept-erasure mechanism must be robust against evasion. SPEED's paper <sup><a href="#ref1">[1]</a></sup> evaluates robustness against <em>nudity</em> prompts using adversarial attacks, but crucially leaves its <strong>style erasure</strong> un-evaluated against simple paraphrasing.</p>
         <p>We discovered that SPEED's null-space projection is mathematically precise but <strong>lexically overfit</strong>. It ties the erasure strictly to the text embeddings of the exact target tokens (e.g., "Van Gogh"). If a user describes the style without using the exact name, the erasure is trivially bypassed.</p>
         
