@@ -250,6 +250,20 @@ Key observations:
 
 **Finding:** Under concentrated mass erasure of a single dense semantic cluster, SPEED's null-space protection fails for the single retained concept most entangled with what was erased, while stylistically distinct neighbors and the broader style capability survive. This is a precise, locatable limitation — not a catastrophic failure.
 
+### 7.5 The Anatomy of Collapse: 5 Interlocking Mechanisms
+
+The progressive degradation from N=5 to N=40 is not a single point of failure, but a compounding collapse of five distinct mathematical mechanisms explicitly acknowledged (but never tested at scale) in the SPEED architecture.
+
+| Mechanism | Effect at N=5 | Effect at N=40 |
+|---|---|---|
+| **Rank Saturation** (Eq. 4) | Null-space is large, mathematical guarantee holds | Null-space near-empty, forced into a leaky approximation |
+| **Threshold Leakage** (Appx. C.2) | Few singular values near threshold | Many singular values cluster near threshold and leak through |
+| **DPA Capacity Hoarding** (Sec. 4.2) | Moderate augmentation, leaves room for the update | Massive augmentation, starves remaining capacity |
+| **Correlated Erasure Direction** (Sec. 3.1) | Diverse targets → spread shock | Collinear targets → concentrated, intensified beam |
+| **Linear Projection Limits** (Appx. F) | Works for cleanly separable concepts | Breaks down for highly entangled/subtle concepts |
+
+Crucially, the waterbed effect we observed earlier (where Rembrandt was damaged despite DPA protection) acts as the *embryonic form* of this limitation. In the sparse regime (N=5), IPF drops distant concepts and DPA hoards capacity, causing a small, localized leak. In the concentrated regime (N=40), this structural vulnerability is **amplified by a multiplicative scaling factor**: as the null-space shrinks, the required erasure update magnitude explodes, and as the concentrated erasure direction broadens, the unprotected surface area in embedding space enlarges. These forces multiply to produce the monotonic degradation observed across all concept categories.
+
 ---
 
 ## 8. Geometric Analysis: Why Only One Neighbor Failed

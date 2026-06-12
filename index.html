@@ -734,6 +734,53 @@
           </div>
         </section>
 
+        <!-- ===================== THE ANATOMY OF COLLAPSE ===================== -->
+        <section class="card">
+          <h2 id="the-anatomy-of-collapse">The Anatomy of Collapse: 5 Interlocking Mechanisms</h2>
+          <p>The progressive degradation from N=5 to N=40 is not a single point of failure, but a compounding collapse of five distinct mathematical mechanisms explicitly acknowledged (but never tested at scale) in the SPEED<sup><a href="#ref1">[1]</a></sup> architecture.</p>
+          
+          <div style="overflow-x:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Mechanism</th>
+                  <th>Effect at N=5</th>
+                  <th>Effect at N=40</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Rank Saturation</strong><br><span style="font-size:0.85rem;color:var(--text-secondary);">(Eq. 4)</span></td>
+                  <td>Null-space is large, mathematical guarantee holds</td>
+                  <td>Null-space near-empty, forced into a leaky approximation</td>
+                </tr>
+                <tr>
+                  <td><strong>Threshold Leakage</strong><br><span style="font-size:0.85rem;color:var(--text-secondary);">(Appx. C.2)</span></td>
+                  <td>Few singular values near threshold</td>
+                  <td>Many singular values cluster near threshold and leak through</td>
+                </tr>
+                <tr>
+                  <td><strong>DPA Capacity Hoarding</strong><br><span style="font-size:0.85rem;color:var(--text-secondary);">(Sec. 4.2)</span></td>
+                  <td>Moderate augmentation, leaves room for the update</td>
+                  <td>Massive augmentation, starves remaining capacity</td>
+                </tr>
+                <tr>
+                  <td><strong>Correlated Erasure Direction</strong><br><span style="font-size:0.85rem;color:var(--text-secondary);">(Sec. 3.1)</span></td>
+                  <td>Diverse targets → spread shock</td>
+                  <td>Collinear targets → concentrated, intensified beam</td>
+                </tr>
+                <tr>
+                  <td><strong>Linear Projection Limits</strong><br><span style="font-size:0.85rem;color:var(--text-secondary);">(Appx. F)</span></td>
+                  <td>Works for cleanly separable concepts</td>
+                  <td>Breaks down for highly entangled/subtle concepts</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>Crucially, the waterbed effect we observed earlier (where Rembrandt was damaged despite DPA protection) acts as the <em>embryonic form</em> of this limitation. In the sparse regime (N=5), IPF drops distant concepts and DPA hoards capacity, causing a small, localized leak. In the concentrated regime (N=40), this structural vulnerability is <strong>amplified by a multiplicative scaling factor</strong>: as the null-space shrinks, the required erasure update magnitude explodes, and as the concentrated erasure direction broadens, the unprotected surface area in embedding space enlarges. These forces multiply to produce the monotonic degradation observed across all concept categories.</p>
+        </section>
+
         <!-- ===================== WHY ONE ===================== -->
         <section class="card">
           <h2 id="why-only-one-neighbor-failed">Why Only One Neighbor Failed</h2>
