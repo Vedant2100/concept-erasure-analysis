@@ -37,13 +37,13 @@
         <ul>
           <li><a href="#tldr">TL;DR</a></li>
           <li><a href="#lineage">1. Research Lineage & The Frontier</a></li>
-          <li><a href="#how">2. Target Paper: SPEED (Scalable, Precise, and Efficient Concept Erasure)</a></li>
+          <li><a href="#how">2. Target Paper: SPEED<sup><a href="#ref1">[1]</a></sup> (Scalable, Precise, and Efficient Concept Erasure)</a></li>
           <li><a href="#strengths">3. Algorithmic Strengths</a></li>
           <li><a href="#deep-dive-empirical-limitations">4. Empirical Limitations</a>
             <ul style="margin-top: 0.5rem; padding-left: 1rem; border-left: 2px solid var(--border-color); margin-left: 0.5rem;">
               <li><a href="#the-question">The Question</a></li>
               <li><a href="#verification-of-strengths">Verification of Strengths: Sparse Multi-Concept (Exp. 1)</a></li>
-              <li><a href="#probe-2">Limitation 1: Neighbor Collateral Damage Because of Rank Saturation (Exp. 1)</a></li>
+              <li><a href="#probe-2">Limitation 1: Neighbor Collateral Damage Due to Rank Saturation (Exp. 1)</a></li>
               <li><a href="#why-only-one-neighbor-failed">Why Only One Neighbor Failed (Exp. 1)</a></li>
               <li><a href="#ablation-the-refinement-contradiction">Ablation: Refinement Contradiction (Exp. 1)</a></li>
               <li><a href="#robustness-fidelity-vs-identity">Robustness: Fidelity vs. Identity (Exp. 1)</a></li>
@@ -60,11 +60,11 @@
 
     
 
-<h1>SPEED: Scalable, Precise, and Efficient Concept Erasure<br>Project Analysis</h1>
+<h1>SPEED<sup><a href="#ref1">[1]</a></sup>: Scalable, Precise, and Efficient Concept Erasure<br>Project Analysis</h1>
 
 <h2 id="tldr">TL;DR</h2>
 <p>Large-scale text-to-image models are trained on internet-scale data and inevitably learn to generate harmful, copyrighted, or otherwise undesirable content. <strong>Concept erasure</strong> is the task of surgically removing specific visual concepts from a pretrained model's weights — without retraining from scratch and without post-hoc filters that can be bypassed.</p>
-<p>This project traces the lineage from the original ESD method (Gandikota et al., 2023) <sup><a href="#ref2">[2]</a></sup> through to <strong>SPEED</strong> (Li et al., ICLR 2026) <sup><a href="#ref1">[1]</a></sup>, identifying SPEED as the current open-source frontier.</p>
+<p>This project traces the lineage from the original ESD method (Gandikota et al., 2023) <sup><a href="#ref2">[2]</a></sup> through to <strong>SPEED<sup><a href="#ref1">[1]</a></sup></strong> (Li et al., ICLR 2026) <sup><a href="#ref1">[1]</a></sup>, identifying SPEED<sup><a href="#ref1">[1]</a></sup> as the current open-source frontier.</p>
 
 <h2 id="lineage">1. Research Lineage & The Frontier</h2>
 
@@ -113,8 +113,8 @@ graph TD
   UCE --> RECE[RECE<br/>Gong et al. ECCV'24]
   UCE --> MACE[MACE<br/>Lu et al. CVPR'24]
 
-  RECE --> SPEED[SPEED Frontier<br/>Li et al. ICLR'26]
-  MACE --> SPEED
+  RECE --> SPEED<sup><a href="#ref1">[1]</a></sup>[SPEED<sup><a href="#ref1">[1]</a></sup> Frontier<br/>Li et al. ICLR'26]
+  MACE --> SPEED<sup><a href="#ref1">[1]</a></sup>
 
   MACE --> ETC[ETC: Thousands of Concepts<br/>Seo et al. CVPR'26]
 
@@ -125,11 +125,11 @@ graph TD
   GLoCE --> LACE[LACE<br/>Localized Erasure]
 
   classDef frontier fill:#e1f5fe,stroke:#039be5,stroke-width:3px;
-  class SPEED frontier;
+  class SPEED<sup><a href="#ref1">[1]</a></sup> frontier;
 </div>
 
 <p>
-The literature subsequently diverged into four major research branches: <strong>closed-form efficient editing</strong>, <strong>mass concept erasure</strong>, <strong>robustness against adversarial prompting</strong>, and <strong>localized erasure for spatial precision</strong>. Our project focuses on the frontier of the efficiency branch,  culminating in SPEED, however it could be argued it is the frontier of concept erasure in general.
+The literature subsequently diverged into four major research branches: <strong>closed-form efficient editing</strong>, <strong>mass concept erasure</strong>, <strong>robustness against adversarial prompting</strong>, and <strong>localized erasure for spatial precision</strong>. Our project focuses on the frontier of the efficiency branch,  culminating in SPEED<sup><a href="#ref1">[1]</a></sup>, however it could be argued it is the frontier of concept erasure in general.
 </p>
 
 <h3>The Second Generation: Weight-Level Erasure</h3>
@@ -195,18 +195,18 @@ Preservation Error ↓ &nbsp;&nbsp;&nbsp; Erasure Error ↑
 </div>
 
 <p>
-Weighted least-squares inherently balances these objectives, meaning both cannot simultaneously be minimized to zero. As more concepts are erased, collateral damage compounds. SPEED emerged as the first method claiming to eliminate this tradeoff via null-space constrained editing.
+Weighted least-squares inherently balances these objectives, meaning both cannot simultaneously be minimized to zero. As more concepts are erased, collateral damage compounds. SPEED<sup><a href="#ref1">[1]</a></sup> emerged as the first method claiming to eliminate this tradeoff via null-space constrained editing.
 </p>
 
 
-<h2 id="how">2. Target Paper: SPEED (Scalable, Precise, and Efficient Concept Erasure)</h2>
+<h2 id="how">2. Target Paper: SPEED<sup><a href="#ref1">[1]</a></sup> (Scalable, Precise, and Efficient Concept Erasure)</h2>
 
 <p>
-SPEED proposes a fundamentally different idea: instead of minimizing preservation error, it attempts to make preservation error theoretically zero.
+SPEED<sup><a href="#ref1">[1]</a></sup> proposes a fundamentally different idea: instead of minimizing preservation error, it attempts to make preservation error theoretically zero.
 </p>
 
 <p>
-In a diffusion U-Net, text prompts influence image generation through cross-attention layers, where token embeddings are projected using key and value matrices (W<sub>K</sub>, W<sub>V</sub>). SPEED performs closed-form editing directly on these matrices.
+In a diffusion U-Net, text prompts influence image generation through cross-attention layers, where token embeddings are projected using key and value matrices (W<sub>K</sub>, W<sub>V</sub>). SPEED<sup><a href="#ref1">[1]</a></sup> performs closed-form editing directly on these matrices.
 </p>
 
 <div style="text-align:center; margin:25px 0; font-family:monospace;">
@@ -244,19 +244,19 @@ As the protected retain set grows, the null-space shrinks and may eventually col
 </p>
 
 <p>
-Although acknowledged by SPEED’s authors, the paper never experimentally characterizes where rank saturation begins. Our Experiment 3 specifically investigates this failure mode.
+Although acknowledged by SPEED<sup><a href="#ref1">[1]</a></sup>’s authors, the paper never experimentally characterizes where rank saturation begins. Our Experiment 3 specifically investigates this failure mode.
 </p>
 
 
 <h2 id="strengths">3. Algorithmic Strengths</h2>
 
 <p>
-SPEED improves upon earlier methods like ESD, UCE, and MACE through three major algorithmic innovations.
+SPEED<sup><a href="#ref1">[1]</a></sup> improves upon earlier methods like ESD, UCE, and MACE through three major algorithmic innovations.
 </p>
 
 <h3>Influence-Based Prior Filtering (IPF)</h3>
 <p>
-Large retain sets improve preservation but increase matrix rank, shrinking the null-space. SPEED observes that concept erasure typically affects only semantically related concepts, not all concepts equally.
+Large retain sets improve preservation but increase matrix rank, shrinking the null-space. SPEED<sup><a href="#ref1">[1]</a></sup> observes that concept erasure typically affects only semantically related concepts, not all concepts equally.
 </p>
 
 <p>
@@ -278,35 +278,35 @@ Certain embeddings remain invariant during generation, including the Start-of-Te
 </p>
 
 <p>
-SPEED preserves these exactly using equality constraints solved via Lagrange multipliers, improving generation stability and preventing unintended global drift.
+SPEED<sup><a href="#ref1">[1]</a></sup> preserves these exactly using equality constraints solved via Lagrange multipliers, improving generation stability and preventing unintended global drift.
 </p>
 
 <h3>Extreme Efficiency</h3>
 <ul>
   <li><strong>ESD:</strong> minutes to hours</li>
   <li><strong>MACE:</strong> tens of minutes</li>
-  <li><strong>SPEED:</strong> ~5 seconds for 100 concepts</li>
+  <li><strong>SPEED<sup><a href="#ref1">[1]</a></sup>:</strong> ~5 seconds for 100 concepts</li>
 </ul>
 
 <h3>Precision & Minimal Collateral Damage</h3>
 <p>
-Previous methods attempt to minimize collateral damage. SPEED instead attempts to eliminate it by restricting edits strictly to the null-space of retained concepts, making it theoretically one of the most precise editing methods proposed to date.
+Previous methods attempt to minimize collateral damage. SPEED<sup><a href="#ref1">[1]</a></sup> instead attempts to eliminate it by restricting edits strictly to the null-space of retained concepts, making it theoretically one of the most precise editing methods proposed to date.
 </p>
 
 <h3>Open Source Accessibility</h3>
 <p>
-Unlike many recent mass-erasure approaches, SPEED provides publicly available checkpoints and code, enabling direct reproducibility and empirical evaluation without expensive fine-tuning.
+Unlike many recent mass-erasure approaches, SPEED<sup><a href="#ref1">[1]</a></sup> provides publicly available checkpoints and code, enabling direct reproducibility and empirical evaluation without expensive fine-tuning.
 </p>
 
 
 <h2 id="experiments">Experiments and Key Findings</h2>
-<p>To stress-test SPEED and analyze its limitations, we executed two targeted empirical experiments:</p>
+<p>To stress-test SPEED<sup><a href="#ref1">[1]</a></sup> and analyze its limitations, we executed two targeted empirical experiments:</p>
 <ul>
-  <li><strong>Experiment 1 (Neighbor Collateral Damage &amp; Rank Saturation)</strong>: Explores the null-space capacity limits under mass erasure.</li>
+  <li><strong>Experiment 1 (Neighbor Collateral Damage Due to Rank Saturation)</strong>: Explores the null-space capacity limits under mass erasure.</li>
   <li><strong>Experiment 2 (Style-Paraphrase Evasion)</strong>: Explores lexical overfitting and evasion vulnerabilities.</li>
 </ul>
 
-<p>Across our probes, SPEED proves to be a genuinely strong method with one precise, locatable limitation:</p>
+<p>Across our probes, SPEED<sup><a href="#ref1">[1]</a></sup> proves to be a genuinely strong method with one precise, locatable limitation:</p>
 <ul>
   <li><strong>It erases cleanly and preserves neighbors.</strong> Even when several mixed concepts are removed at once, un-targeted neighbors drift no more than stylistically unrelated control artists — the null-space guarantee holds.</li>
   <li><strong>Its guarantee is bounded by rank saturation.</strong> Under concentrated mass erasure of a single dense semantic cluster (e.g. 40 impressionists), protection fails <em>selectively</em> for the one retained concept most entangled with the erased set, while stylistically distinct neighbors and the broader style capability survive.</li>
@@ -324,15 +324,15 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
       <!-- ===================== FRAMING ===================== -->
       <section class="card">
         <h2 id="the-question">The Question</h2>
-        <p>SPEED's core promise is a <strong>null-space guarantee</strong>: weight edits are projected into a subspace that, by construction, leaves a large retain set of ~1,700 artists untouched. Erase Van Gogh and Monet still looks like Monet. The guarantee is real — but it is only as strong as the regime it is tested in.</p>
-        <p>SPEED's own evaluation erases either many <em>diverse</em> concepts (100 different celebrities) or single painters in isolation. We probe the harder, less-tested direction: erasing concepts densely <em>entangled</em> with the very neighbors we want to protect. That is exactly where SPEED's own admitted <strong>rank-saturation</strong> dilemma — "as the retain set grows, the null space narrows toward {0}" — should begin to bite.</p>
+        <p>SPEED's<sup><a href="#ref1">[1]</a></sup> core promise is a <strong>null-space guarantee</strong>: weight edits are projected into a subspace that, by construction, leaves a large retain set of ~1,700 artists untouched. Erase Van Gogh and Monet still looks like Monet. The guarantee is real — but it is only as strong as the regime it is tested in.</p>
+        <p>SPEED's<sup><a href="#ref1">[1]</a></sup> own evaluation erases either many <em>diverse</em> concepts (100 different celebrities) or single painters in isolation. We probe the harder, less-tested direction: erasing concepts densely <em>entangled</em> with the very neighbors we want to protect. That is exactly where SPEED's<sup><a href="#ref1">[1]</a></sup> own admitted <strong>rank-saturation</strong> dilemma — "as the retain set grows, the null space narrows toward {0}" — should begin to bite.</p>
         <p><strong>How we measure damage.</strong> For each test we generate the same prompt at the same seeds before and after erasure, and compute <strong>CLIP image-to-image drift</strong> = 1 − cos(emb<sub>baseline</sub>, emb<sub>edited</sub>). CLIP responds to style, so this captures real stylistic change rather than the pixel-level noise ordinary metrics confuse for damage. Every number below is averaged over 4 seeds, and we always include <strong>style-far control artists</strong> (Rembrandt, Hokusai) — retained but stylistically distant — to calibrate how much drift is just "a bigger edit perturbs everything a little."</p>
       </section>
 
       <!-- ===================== VERIFICATION OF STRENGTHS ===================== -->
       <section class="card">
         <h2 id="verification-of-strengths">Verification of Strengths: Sparse Multi-Concept Erasure (Exp. 1)</h2>
-        <p>To verify the stated strengths of the SPEED algorithm, we first tested its baseline null-space protection. We erased three painters at once — <strong>Van Gogh, Picasso, and Monet</strong> — and watched three un-targeted impressionist neighbors held out of the edit: Gauguin, Seurat, and Pissarro. If the null-space leaked under multi-concept pressure, these "canaries" would drift away from their original style.</p>
+        <p>To verify the stated strengths of the SPEED<sup><a href="#ref1">[1]</a></sup> algorithm, we first tested its baseline null-space protection. We erased three painters at once — <strong>Van Gogh, Picasso, and Monet</strong> — and watched three un-targeted impressionist neighbors held out of the edit: Gauguin, Seurat, and Pissarro. If the null-space leaked under multi-concept pressure, these "canaries" would drift away from their original style.</p>
 
         <table>
           <thead>
@@ -430,15 +430,15 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
 
         <div class="verdict-box">
           <h3>Finding: genuine robustness</h3>
-          <p>The canaries drift <em>no more than</em> the style-far controls — Gauguin (0.109) is statistically indistinguishable from Rembrandt (0.114), a painter with nothing in common with the targets. There is no concentrated leakage onto the neighbors. For sparse, mixed erasure, SPEED's null-space does exactly what it advertises. This is an honest positive result — and it told us the limitation, if one existed, had to live somewhere harder.</p>
+          <p>The canaries drift <em>no more than</em> the style-far controls — Gauguin (0.109) is statistically indistinguishable from Rembrandt (0.114), a painter with nothing in common with the targets. There is no concentrated leakage onto the neighbors. For sparse, mixed erasure, SPEED's<sup><a href="#ref1">[1]</a></sup> null-space does exactly what it advertises. This is an honest positive result — and it told us the limitation, if one existed, had to live somewhere harder.</p>
         </div>
       </section>
 
 
       <!-- ===================== PROBE 2: CONCENTRATED ===================== -->
       <section class="card">
-        <h2 id="probe-2">Limitation 1: Neighbor Collateral Damage Because of Rank Saturation (Exp. 1)</h2>
-        <p>So we concentrated the pressure. Instead of three mixed painters, we erased a growing, tightly-correlated cluster of <strong>impressionists</strong> — 5, then 10, then 20, then 40 — while strictly holding our three canaries (Gauguin, Seurat, Pissarro) out of every erasure set. Each list is nested inside the next, so the only thing changing is <em>how many same-movement concepts we pile on</em>. This is precisely the rank-saturation regime SPEED admits to but never tests.</p>
+        <h2 id="probe-2">Limitation 1: Neighbor Collateral Damage Due to Rank Saturation (Exp. 1)</h2>
+        <p>So we concentrated the pressure. Instead of three mixed painters, we erased a growing, tightly-correlated cluster of <strong>impressionists</strong> — 5, then 10, then 20, then 40 — while strictly holding our three canaries (Gauguin, Seurat, Pissarro) out of every erasure set. Each list is nested inside the next, so the only thing changing is <em>how many same-movement concepts we pile on</em>. This is precisely the rank-saturation regime SPEED<sup><a href="#ref1">[1]</a></sup> admits to but never tests.</p>
 
         <p>CLIP drift vs. baseline, 4 seeds per cell (zero corrupt frames). The erased-artist row (Renoir) confirms erasure actually fires; the style-far controls calibrate the noise floor.</p>
 
@@ -480,15 +480,15 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
 
         <div class="verdict-box">
           <h3>The limitation: selective collateral collapse under rank saturation</h3>
-          <p>This is the bottleneck. Under concentrated mass erasure, SPEED's null-space protection <strong>fails for the single retained concept most entangled with what was erased</strong> — Pissarro, a core impressionist whose style sits in the middle of the very cluster being removed. The guarantee SPEED advertises for its retain set does not hold for him at scale: he becomes collateral damage, visibly and reproducibly.</p>
-          <p>What keeps this honest — and makes it a <em>precise</em> finding rather than a sweeping one — is the rest of the table. The effect is <strong>localized, not catastrophic</strong>: the stylistically distinct neighbors (Gauguin, Seurat) hold at control levels, and the broad "impressionist painting" capability is untouched (0.036). SPEED does not collapse the neighborhood; it springs a leak at its single weakest point, exactly where its admitted rank-saturation dilemma predicts.</p>
+          <p>This is the bottleneck. Under concentrated mass erasure, SPEED's<sup><a href="#ref1">[1]</a></sup> null-space protection <strong>fails for the single retained concept most entangled with what was erased</strong> — Pissarro, a core impressionist whose style sits in the middle of the very cluster being removed. The guarantee SPEED<sup><a href="#ref1">[1]</a></sup> advertises for its retain set does not hold for him at scale: he becomes collateral damage, visibly and reproducibly.</p>
+          <p>What keeps this honest — and makes it a <em>precise</em> finding rather than a sweeping one — is the rest of the table. The effect is <strong>localized, not catastrophic</strong>: the stylistically distinct neighbors (Gauguin, Seurat) hold at control levels, and the broad "impressionist painting" capability is untouched (0.036). SPEED<sup><a href="#ref1">[1]</a></sup> does not collapse the neighborhood; it springs a leak at its single weakest point, exactly where its admitted rank-saturation dilemma predicts.</p>
         </div>
       </section>
 
       <!-- ===================== WHY ONE ===================== -->
       <section class="card">
         <h2 id="why-only-one-neighbor-failed">Why Only One Neighbor Failed</h2>
-        <p>The failure is geometric, not random. SPEED pushes its edit along the <em>shared direction</em> of everything in the erased set, while keeping that edit orthogonal to retained concepts. When you erase 40 impressionists, that shared direction collapses onto one thing — soft, plein-air impressionist landscape — because that is what most of those 40 painters are.</p>
+        <p>The failure is geometric, not random. SPEED<sup><a href="#ref1">[1]</a></sup> pushes its edit along the <em>shared direction</em> of everything in the erased set, while keeping that edit orthogonal to retained concepts. When you erase 40 impressionists, that shared direction collapses onto one thing — soft, plein-air impressionist landscape — because that is what most of those 40 painters are.</p>
         <p>Place each held-out neighbor relative to that direction. <strong>Pissarro is that direction</strong>: the most prototypical impressionist of the three, near-indistinguishable from the Monets and Sisleys being erased — so when the null-space runs low on degrees of freedom, he is the one concept it cannot keep orthogonal. <strong>Gauguin</strong> (flat cloisonnist planes) and <strong>Seurat</strong> (rigid pointillist dots) sit <em>off</em> that axis; their distinctive techniques give the projection room to protect them. It is also why only Pissarro's drift <em>grows with N</em> — every additional impressionist reinforces the exact direction he lives on.</p>
         <p>One honest caveat: this is a single collapsing artist, so the geometric story is the best-supported explanation rather than a proven one. The clean confirmation would be to invert the experiment — erase 40 <em>pointillists</em> and predict that Seurat becomes the casualty while Pissarro survives.</p>
       </section>
@@ -496,8 +496,8 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
       <!-- ===================== ABLATION: THE REFINEMENT CONTRADICTION ===================== -->
       <section class="card">
         <h2 id="ablation-the-refinement-contradiction">Ablation: The Refinement Contradiction (Exp. 1)</h2>
-        <p>If rank saturation caused Pissarro's collapse at N=40, it exposes a massive internal contradiction in SPEED's architecture. SPEED uses a feature called <strong>Prior Knowledge Refinement (DPA)</strong> which generates perturbed, "fake" retain concepts to artificially increase the coverage of the retain space. But adding vectors to the retain set <em>consumes the rank budget</em> and shrinks the null-space.</p>
-        <p>We hypothesized that DPA, designed to protect the prior, was actually accelerating the collapse under load. To test this, we repeated the N=40 erasure but turned SPEED's refinement machinery completely off (<code>aug_num=0</code>).</p>
+        <p>If rank saturation caused Pissarro's collapse at N=40, it exposes a massive internal contradiction in SPEED's<sup><a href="#ref1">[1]</a></sup> architecture. SPEED<sup><a href="#ref1">[1]</a></sup> uses a feature called <strong>Prior Knowledge Refinement (DPA)</strong> which generates perturbed, "fake" retain concepts to artificially increase the coverage of the retain space. But adding vectors to the retain set <em>consumes the rank budget</em> and shrinks the null-space.</p>
+        <p>We hypothesized that DPA, designed to protect the prior, was actually accelerating the collapse under load. To test this, we repeated the N=40 erasure but turned SPEED's<sup><a href="#ref1">[1]</a></sup> refinement machinery completely off (<code>aug_num=0</code>).</p>
 
         <table>
           <thead>
@@ -526,8 +526,8 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
         </div>
 
         <div class="verdict-box">
-          <h3>SPEED sabotages its own null-space</h3>
-          <p>By turning <em>off</em> the safety feature, Pissarro's drift plummeted from a devastating 0.253 back down to 0.141 (barely above the noise floor). DPA artificially inflates the retain rank, starving the null-space of the exact degrees of freedom it desperately needs under dense entanglement. SPEED's preservation machinery actively accelerates its own capacity collapse.</p>
+          <h3>SPEED<sup><a href="#ref1">[1]</a></sup> sabotages its own null-space</h3>
+          <p>By turning <em>off</em> the safety feature, Pissarro's drift plummeted from a devastating 0.253 back down to 0.141 (barely above the noise floor). DPA artificially inflates the retain rank, starving the null-space of the exact degrees of freedom it desperately needs under dense entanglement. SPEED's<sup><a href="#ref1">[1]</a></sup> preservation machinery actively accelerates its own capacity collapse.</p>
           <p><strong>An honest caveat on the noise floor:</strong> The ablation isn't perfectly smooth. Notice that in the intermediate "DPA Off" column, the style-far control (Rembrandt) spikes to 0.187, eclipsing Pissarro. This implies that turning off DPA initially destabilizes the model globally, introducing systemic noise rather than just cleanly fixing the leak. However, turning off the refinement machinery entirely ("Zero Refinement") eliminates this systemic noise, stabilizing the controls back down to 0.084 while locking in the repair to Pissarro.</p>
         </div>
       </section>
@@ -535,23 +535,23 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
       <!-- ===================== ROBUSTNESS: FIDELITY VS IDENTITY ===================== -->
       <section class="card">
         <h2 id="robustness-fidelity-vs-identity">Robustness: Fidelity vs. Identity (Exp. 1)</h2>
-        <p>A common vulnerability in concept erasure is creating a "semantic illusion"—fooling the text encoder (CLIP) into recognizing a retained concept, while quietly trashing the pixel-level image quality with artifacts, blur, and structural breakage. To test if SPEED's preservation of neighbors was an illusion, we re-scanned the multi-concept erasure images.</p>
-        <p>Instead of CLIP, we computed <strong>LPIPS</strong> (Learned Perceptual Image Patch Similarity) against the baseline, which explicitly catches perceptual degradation that semantic metrics ignore. If SPEED was cheating, canary LPIPS would spike above the control baseline.</p>
+        <p>A common vulnerability in concept erasure is creating a "semantic illusion"—fooling the text encoder (CLIP) into recognizing a retained concept, while quietly trashing the pixel-level image quality with artifacts, blur, and structural breakage. To test if SPEED's<sup><a href="#ref1">[1]</a></sup> preservation of neighbors was an illusion, we re-scanned the multi-concept erasure images.</p>
+        <p>Instead of CLIP, we computed <strong>LPIPS</strong> (Learned Perceptual Image Patch Similarity) against the baseline, which explicitly catches perceptual degradation that semantic metrics ignore. If SPEED<sup><a href="#ref1">[1]</a></sup> was cheating, canary LPIPS would spike above the control baseline.</p>
         
         <div class="verdict-box">
-          <h3 style="color: var(--success);">SPEED genuinely preserves perceptual fidelity</h3>
-          <p>The results were an honest negative: SPEED completely passed the test. In the 3-concept erasure regime, the perceptual damage to the protected canaries (Pissarro LPIPS = 0.244, Seurat = 0.260) was strictly <strong>bounded below</strong> the baseline drift of the style-far controls (Rembrandt = 0.331, Hokusai = 0.272). SPEED doesn't just preserve the semantic label of its neighbors—it preserves their true, pixel-level structural fidelity.</p>
+          <h3 style="color: var(--success);">SPEED<sup><a href="#ref1">[1]</a></sup> genuinely preserves perceptual fidelity</h3>
+          <p>The results were an honest negative: SPEED<sup><a href="#ref1">[1]</a></sup> completely passed the test. In the 3-concept erasure regime, the perceptual damage to the protected canaries (Pissarro LPIPS = 0.244, Seurat = 0.260) was strictly <strong>bounded below</strong> the baseline drift of the style-far controls (Rembrandt = 0.331, Hokusai = 0.272). SPEED<sup><a href="#ref1">[1]</a></sup> doesn't just preserve the semantic label of its neighbors—it preserves their true, pixel-level structural fidelity.</p>
         </div>
       </section>
 
       <!-- ===================== LIMITATION 2: EVASION VIA PARAPHRASING ===================== -->
       <section class="card">
         <h2 id="limitation-2">Limitation 2: Evasion Vulnerability (Exp. 2)</h2>
-        <p>A true safety or concept-erasure mechanism must be robust against evasion. SPEED's paper <sup><a href="#ref1">[1]</a></sup> evaluates robustness against <em>nudity</em> prompts using adversarial attacks, but crucially leaves its <strong>style erasure</strong> un-evaluated against simple paraphrasing.</p>
-        <p>We discovered that SPEED's null-space projection is mathematically precise but <strong>lexically overfit</strong>. It ties the erasure strictly to the text embeddings of the exact target tokens (e.g., "Van Gogh"). If a user describes the style without using the exact name, the erasure is trivially bypassed.</p>
+        <p>A true safety or concept-erasure mechanism must be robust against evasion. SPEED's<sup><a href="#ref1">[1]</a></sup> paper <sup><a href="#ref1">[1]</a></sup> evaluates robustness against <em>nudity</em> prompts using adversarial attacks, but crucially leaves its <strong>style erasure</strong> un-evaluated against simple paraphrasing.</p>
+        <p>We discovered that SPEED's<sup><a href="#ref1">[1]</a></sup> null-space projection is mathematically precise but <strong>lexically overfit</strong>. It ties the erasure strictly to the text embeddings of the exact target tokens (e.g., "Van Gogh"). If a user describes the style without using the exact name, the erasure is trivially bypassed.</p>
         
         <h3>The Paraphrase Evasion Test</h3>
-        <p>We tested three prompt tiers, comparing <strong>Baseline SD 1.4</strong>, <strong>SPEED</strong> (Van Gogh erased), and <strong>ESD-x</strong> (Van Gogh erased):</p>
+        <p>We tested three prompt tiers, comparing <strong>Baseline SD 1.4</strong>, <strong>SPEED<sup><a href="#ref1">[1]</a></sup></strong> (Van Gogh erased), and <strong>ESD-x</strong> (Van Gogh erased):</p>
         <ul>
           <li><strong>Named:</strong> <em>"a painting in the style of Van Gogh"</em> (Sanity check: must be suppressed)</li>
           <li><strong>Named Artwork:</strong> <em>"Starry Night by Vincent van Gogh"</em></li>
@@ -561,18 +561,18 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
         <div class="metrics-grid">
           <div class="metric-card">
             <div class="metric-value" style="color: var(--success);">0.255 &rarr; 0.213</div>
-            <div class="metric-label">Van-Gogh-ness: Named (Baseline &rarr; SPEED)</div>
-            <p>With the exact name, SPEED pulls the style toward the "not Van Gogh" floor (~0.18) and visibly transforms the image. Erasure fires.</p>
+            <div class="metric-label">Van-Gogh-ness: Named (Baseline &rarr; SPEED<sup><a href="#ref1">[1]</a></sup>)</div>
+            <p>With the exact name, SPEED<sup><a href="#ref1">[1]</a></sup> pulls the style toward the "not Van Gogh" floor (~0.18) and visibly transforms the image. Erasure fires.</p>
           </div>
           <div class="metric-card">
             <div class="metric-value" style="color: var(--danger);">0.243 &rarr; 0.244</div>
-            <div class="metric-label">Van-Gogh-ness: Paraphrase (Baseline &rarr; SPEED)</div>
-            <p>Describe the style without the name and SPEED leaves its Van-Gogh-ness essentially unchanged — far above the 0.18 floor. The style leaks straight through.</p>
+            <div class="metric-label">Van-Gogh-ness: Paraphrase (Baseline &rarr; SPEED<sup><a href="#ref1">[1]</a></sup>)</div>
+            <p>Describe the style without the name and SPEED<sup><a href="#ref1">[1]</a></sup> leaves its Van-Gogh-ness essentially unchanged — far above the 0.18 floor. The style leaks straight through.</p>
           </div>
           <div class="metric-card">
             <div class="metric-value" style="color: var(--danger);">0.019</div>
-            <div class="metric-label">SPEED Image Drift (Paraphrase)</div>
-            <p>Corroborating: SPEED barely alters the paraphrase image from the (Van-Gogh-looking) baseline — a near-zero edit.</p>
+            <div class="metric-label">SPEED<sup><a href="#ref1">[1]</a></sup> Image Drift (Paraphrase)</div>
+            <p>Corroborating: SPEED<sup><a href="#ref1">[1]</a></sup> barely alters the paraphrase image from the (Van-Gogh-looking) baseline — a near-zero edit.</p>
           </div>
         </div>
 
@@ -580,7 +580,7 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
         <p><strong>Van-Gogh-ness</strong> = CLIP image-to-text similarity to "a painting in the style of Vincent van Gogh" — the metric that actually tracks <em>does this look like Van Gogh</em>. The style-far controls (ukiyo-e, Rembrandt, Hokusai) sit at ~<code>0.18</code>, the "not Van Gogh" floor. <strong>Image drift</strong> = how much each method changed the image from the un-erased baseline (high = transformed, near-zero = left alone). Every paraphrase below has a <em>baseline</em> Van-Gogh-ness of ~0.24, well above the floor — confirming the baseline genuinely renders Van Gogh from the description, so a non-suppression is a real leak, not a prompt the model couldn't realize.</p>
         <table>
           <thead>
-            <tr><th>Prompt</th><th>Tier</th><th>VG-ness: Base &rarr; SPEED</th><th>SPEED Drift</th><th>VG-ness: ESD</th><th>ESD Drift</th></tr>
+            <tr><th>Prompt</th><th>Tier</th><th>VG-ness: Base &rarr; SPEED<sup><a href="#ref1">[1]</a></sup></th><th>SPEED<sup><a href="#ref1">[1]</a></sup> Drift</th><th>VG-ness: ESD</th><th>ESD Drift</th></tr>
           </thead>
           <tbody>
             <tr><td>"in the style of Van Gogh"</td><td>Named</td><td>0.255 &rarr; 0.213 (suppressed)</td><td>0.347</td><td>0.204</td><td>0.388</td></tr>
@@ -590,7 +590,7 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
             <tr><td>"post-impr swirling rhythmic..."</td><td>Paraphrase</td><td class="danger" style="font-weight:bold;">0.242 &rarr; 0.231 (leaked)</td><td class="danger">0.046</td><td>0.199</td><td>0.174</td></tr>
           </tbody>
         </table>
-        <p style="color: var(--text-muted); font-size: 0.9em;">SPEED's Van-Gogh-ness on every paraphrase stays at the baseline level (~0.24) while the named prompt drops toward the floor — SPEED erases the <em>token</em>, not the <em>style</em>. ESD reduces paraphrase Van-Gogh-ness further (0.20–0.23) and alters the images far more (higher drift), but note it still sits <em>above</em> the 0.18 floor: ESD suppresses the style substantially more than SPEED, though not completely.</p>
+        <p style="color: var(--text-muted); font-size: 0.9em;">SPEED's<sup><a href="#ref1">[1]</a></sup> Van-Gogh-ness on every paraphrase stays at the baseline level (~0.24) while the named prompt drops toward the floor — SPEED<sup><a href="#ref1">[1]</a></sup> erases the <em>token</em>, not the <em>style</em>. ESD reduces paraphrase Van-Gogh-ness further (0.20–0.23) and alters the images far more (higher drift), but note it still sits <em>above</em> the 0.18 floor: ESD suppresses the style substantially more than SPEED<sup><a href="#ref1">[1]</a></sup>, though not completely.</p>
 
         <h3>Visual Proof 1: The Explicit Name Test (Sanity Check)</h3>
         <p>Prompt: <em>"a painting in the style of Van Gogh"</em></p>
@@ -600,8 +600,8 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
             <div class="image-label">Baseline (Unerased)</div>
           </div>
           <div class="image-card">
-            <img src="experiment4/results/paraphrase/speed_1c/named/named_vangogh/seed0.png" alt="SPEED" style="border: 3px solid var(--success);">
-            <div class="image-label" style="color: var(--success);">SPEED (Erased) — Successfully suppressed</div>
+            <img src="experiment4/results/paraphrase/speed_1c/named/named_vangogh/seed0.png" alt="SPEED<sup><a href="#ref1">[1]</a></sup>" style="border: 3px solid var(--success);">
+            <div class="image-label" style="color: var(--success);">SPEED<sup><a href="#ref1">[1]</a></sup> (Erased) — Successfully suppressed</div>
           </div>
           <div class="image-card">
             <img src="experiment4/results/paraphrase/esd_x/named/named_vangogh/seed0.png" alt="ESD-x" style="border: 3px solid var(--success);">
@@ -618,8 +618,8 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
             <div class="image-label">Baseline (Unerased)</div>
           </div>
           <div class="image-card">
-            <img src="experiment4/results/paraphrase/speed_1c/paraphrase_desc/para_wheat/seed0.png" alt="SPEED" style="border: 3px solid var(--danger);">
-            <div class="image-label" style="color: var(--danger);">SPEED (Evaded) — Style leaks completely</div>
+            <img src="experiment4/results/paraphrase/speed_1c/paraphrase_desc/para_wheat/seed0.png" alt="SPEED<sup><a href="#ref1">[1]</a></sup>" style="border: 3px solid var(--danger);">
+            <div class="image-label" style="color: var(--danger);">SPEED<sup><a href="#ref1">[1]</a></sup> (Evaded) — Style leaks completely</div>
           </div>
           <div class="image-card">
             <img src="experiment4/results/paraphrase/esd_x/paraphrase_desc/para_wheat/seed0.png" alt="ESD-x" style="border: 3px solid var(--success);">
@@ -629,7 +629,7 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
 
         <div class="verdict-box" style="margin-top: 25px;">
           <h3>Conclusion</h3>
-          <p>Because ESD-x fine-tunes the actual UNet cross-attention weights, it alters the paraphrased images far more than SPEED — reducing (though not fully erasing — its Van-Gogh-ness stays above the 0.18 floor) the swirling impasto style even when the name is absent. SPEED's closed-form null-space projection, by contrast, behaves like a brittle lexical filter: if you don't trigger the exact token, the style leaks straight out of the model's prior essentially untouched.</p>
+          <p>Because ESD-x fine-tunes the actual UNet cross-attention weights, it alters the paraphrased images far more than SPEED<sup><a href="#ref1">[1]</a></sup> — reducing (though not fully erasing — its Van-Gogh-ness stays above the 0.18 floor) the swirling impasto style even when the name is absent. SPEED's<sup><a href="#ref1">[1]</a></sup> closed-form null-space projection, by contrast, behaves like a brittle lexical filter: if you don't trigger the exact token, the style leaks straight out of the model's prior essentially untouched.</p>
         </div>
       </section>
 
@@ -645,7 +645,7 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
         <p>An early concentrated-erasure run showed a dramatic "Gauguin collapses to 0.267 drift" signal — and it was entirely an artifact. Stable Diffusion's NSFW safety checker blanks flagged generations to <em>solid black</em>, and it fires on nude-heavy painters like Gauguin (his Tahitian series). A black frame compared against a normal painting maxes out CLIP distance, manufacturing a fake collapse. We fixed it at the source: generation now runs in <code>fp32</code> with the safety checker disabled, and the analyzer explicitly excludes any black frame and reports how many valid seeds each number rests on. The "zero corrupt frames" note on the results above is the receipt for this fix.</p>
 
         <h3>3. A neighbor "suppression" claim that reversed under measurement</h3>
-        <p>An initial single-concept framing claimed SPEED visibly suppressed a neighbor's color saturation. Measuring it directly told the opposite story — saturation actually rose slightly. It was confirmation bias reading damage into noise. Discarding that false start is what pushed us toward the controlled, multi-seed, control-calibrated design used here.</p>
+        <p>An initial single-concept framing claimed SPEED<sup><a href="#ref1">[1]</a></sup> visibly suppressed a neighbor's color saturation. Measuring it directly told the opposite story — saturation actually rose slightly. It was confirmation bias reading damage into noise. Discarding that false start is what pushed us toward the controlled, multi-seed, control-calibrated design used here.</p>
 
         <div class="verdict-box">
           <h3>Why this matters</h3>

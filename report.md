@@ -20,7 +20,7 @@ Large-scale text-to-image diffusion models learn to generate harmful, copyrighte
 4. [Algorithmic Strengths](#4-algorithmic-strengths)
 5. [Experimental Methodology](#5-experimental-methodology)
 6. [Verification of Strengths: Sparse Multi-Concept Erasure](#6-verification-of-strengths-sparse-multi-concept-erasure)
-7. [Limitation 1: Neighbor Collateral Damage Because of Rank Saturation](#7-limitation-1-neighbor-collateral-damage-because-of-rank-saturation)
+7. [Limitation 1: Neighbor Collateral Damage Due to Rank Saturation](#7-limitation-1-neighbor-collateral-damage-because-of-rank-saturation)
 8. [Geometric Analysis: Why Only One Neighbor Failed](#8-geometric-analysis)
 9. [Ablation: The Refinement Contradiction](#9-ablation-the-refinement-contradiction)
 10. [Robustness Check: Fidelity vs. Identity](#10-robustness-check-fidelity-vs-identity)
@@ -209,7 +209,7 @@ This is an honest negative result — and it told us the limitation, if one exis
 
 ---
 
-## 7. Limitation 1: Neighbor Collateral Damage Because of Rank Saturation
+## 7. Limitation 1: Neighbor Collateral Damage Due to Rank Saturation
 
 ### 7.1 Motivation
 
