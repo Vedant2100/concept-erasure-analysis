@@ -207,6 +207,8 @@ The canaries drift *no more than* the style-far controls. Gauguin (0.109) is sta
 
 This is an honest negative result — and it told us the limitation, if one existed, had to live somewhere harder. The null-space guarantee holds when the erased concepts are stylistically diverse and few in number.
 
+**Caveat: Localized Anatomy Distortion.** While global LPIPS scores remain strong and the overall macro-style is protected, human inspection reveals that highly localized semantic features can still suffer collateral damage. For instance, in the Gauguin canary image, the subject's left eye degrades into a solid black blob after the edit, distorting the human anatomy compared to the baseline. This suggests that while SPEED's null-space successfully shields global stylistic geometry from the erasure, fine-grained semantic structures within the image can still experience minor collateral degradation.
+
 ---
 
 ## 7. Limitation 1: Neighbor Collateral Damage Due to Rank Saturation
@@ -320,8 +322,6 @@ SPEED completely passed the test. The perceptual damage to the protected canarie
 | Hokusai | Control (style-far) | 0.272 |
 
 SPEED does not just preserve the semantic label of its neighbors — it preserves their true, pixel-level structural fidelity. The null-space guarantee operates at the perceptual level, not just at the CLIP embedding level.
-
-**Caveat: Localized Anatomy Distortion.** While global LPIPS scores remain strong and the overall macro-style is protected, human inspection reveals that highly localized semantic features can still suffer collateral damage. For instance, in the Gauguin canary image, the subject's left eye degrades into a solid black blob after the edit, distorting the human anatomy compared to the baseline. This suggests that while SPEED's null-space successfully shields global stylistic geometry from the erasure, fine-grained semantic structures within the image can still experience minor collateral degradation.
 
 ---
 

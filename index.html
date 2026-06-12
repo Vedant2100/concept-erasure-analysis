@@ -432,6 +432,11 @@ Unlike many recent mass-erasure approaches, SPEED<sup><a href="#ref1">[1]</a></s
           <h3>Finding: genuine robustness</h3>
           <p>The canaries drift <em>no more than</em> the style-far controls — Gauguin (0.109) is statistically indistinguishable from Rembrandt (0.114), a painter with nothing in common with the targets. There is no concentrated leakage onto the neighbors. For sparse, mixed erasure, SPEED's<sup><a href="#ref1">[1]</a></sup> null-space does exactly what it advertises. This is an honest positive result — and it told us the limitation, if one existed, had to live somewhere harder.</p>
         </div>
+
+        <div class="verdict-box" style="border-left: 4px solid var(--warning); margin-top: 1rem;">
+          <h3 style="color: var(--warning);">Caveat: Localized Anatomy Distortion</h3>
+          <p>While global LPIPS scores remain strong and the overall macro-style is protected, human inspection reveals that highly localized semantic features can still suffer collateral damage. For instance, in the Gauguin canary image above, the subject's left eye degrades into a solid black blob after the edit, distorting the human anatomy compared to the baseline. This suggests that while SPEED's<sup><a href="#ref1">[1]</a></sup> null-space successfully shields global stylistic geometry from the erasure, fine-grained semantic structures within the image can still experience minor collateral degradation.</p>
+        </div>
       </section>
 
 
@@ -541,11 +546,6 @@ Unlike many recent mass-erasure approaches, SPEED<sup><a href="#ref1">[1]</a></s
         <div class="verdict-box">
           <h3 style="color: var(--success);">SPEED<sup><a href="#ref1">[1]</a></sup> genuinely preserves perceptual fidelity</h3>
           <p>The results were an honest negative: SPEED<sup><a href="#ref1">[1]</a></sup> completely passed the test. In the 3-concept erasure regime, the perceptual damage to the protected canaries (Pissarro LPIPS = 0.244, Seurat = 0.260) was strictly <strong>bounded below</strong> the baseline drift of the style-far controls (Rembrandt = 0.331, Hokusai = 0.272). SPEED<sup><a href="#ref1">[1]</a></sup> doesn't just preserve the semantic label of its neighbors—it preserves their true, pixel-level structural fidelity.</p>
-        </div>
-
-        <div class="verdict-box" style="border-left: 4px solid var(--warning); margin-top: 1rem;">
-          <h3 style="color: var(--warning);">Caveat: Localized Anatomy Distortion</h3>
-          <p>While global LPIPS scores remain strong and the overall macro-style is protected, human inspection reveals that highly localized semantic features can still suffer collateral damage. For instance, in the Gauguin canary image above, the subject's left eye degrades into a solid black blob after the edit, distorting the human anatomy compared to the baseline. This suggests that while SPEED's<sup><a href="#ref1">[1]</a></sup> null-space successfully shields global stylistic geometry from the erasure, fine-grained semantic structures within the image can still experience minor collateral degradation.</p>
         </div>
       </section>
 
