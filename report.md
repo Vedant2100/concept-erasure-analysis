@@ -189,7 +189,7 @@ A canary's drift is interpretable only relative to the style-far controls. If a 
 
 ### 6.1 Design
 
-We verified the stated strengths of the SPEED algorithm by testing its baseline null-space protection. We erased three stylistically diverse painters simultaneously — **Van Gogh, Picasso, and Monet** — and measured drift on three held-out impressionist canaries (Gauguin, Seurat, Pissarro) and two style-far controls (Rembrandt, Hokusai). If the null-space leaked under multi-concept pressure, the canaries would show elevated drift relative to the controls.
+We verified the stated strengths of the SPEED algorithm by testing its null-space protection. We erased three stylistically diverse painters simultaneously — **Van Gogh, Picasso, and Monet** — and measured drift on three held-out impressionist canaries (Gauguin, Seurat, Pissarro) and two style-far controls (Rembrandt, Hokusai). If the null-space leaked under multi-concept pressure, the canaries would show elevated drift relative to the controls.
 
 ### 6.2 Results
 
