@@ -259,36 +259,37 @@ graph TD
 
         <div class="metrics-grid">
           <div class="metric-card">
-            <div class="metric-value">0.346</div>
-            <div class="metric-label">SPEED Image Drift (Named)</div>
-            <p>Erasure succeeds when the exact name is used.</p>
+            <div class="metric-value" style="color: var(--success);">0.255 &rarr; 0.213</div>
+            <div class="metric-label">Van-Gogh-ness: Named (Baseline &rarr; SPEED)</div>
+            <p>With the exact name, SPEED pulls the style toward the "not Van Gogh" floor (~0.18) and visibly transforms the image. Erasure fires.</p>
           </div>
           <div class="metric-card">
-            <div class="metric-value" style="color: var(--danger);">0.067</div>
-            <div class="metric-label">SPEED Image Drift ("Starry Night")</div>
-            <p>SPEED completely fails to erase the named artwork.</p>
+            <div class="metric-value" style="color: var(--danger);">0.243 &rarr; 0.244</div>
+            <div class="metric-label">Van-Gogh-ness: Paraphrase (Baseline &rarr; SPEED)</div>
+            <p>Describe the style without the name and SPEED leaves its Van-Gogh-ness essentially unchanged — far above the 0.18 floor. The style leaks straight through.</p>
           </div>
           <div class="metric-card">
             <div class="metric-value" style="color: var(--danger);">0.019</div>
             <div class="metric-label">SPEED Image Drift (Paraphrase)</div>
-            <p>0.019 means the image is visually identical to the un-erased baseline. 100% bypassed.</p>
+            <p>Corroborating: SPEED barely alters the paraphrase image from the (Van-Gogh-looking) baseline — a near-zero edit.</p>
           </div>
         </div>
 
-        <h3 style="margin-top: 25px;">Evasion Data: Image Drift vs. Baseline</h3>
-        <p>A drift near <code>0.00</code> means the model generated an image visually identical to the unerased baseline (100% style leakage/evasion). A high drift means the model successfully altered the image to suppress the concept.</p>
+        <h3 style="margin-top: 25px;">Evasion Data: Van-Gogh-ness and Image Drift</h3>
+        <p><strong>Van-Gogh-ness</strong> = CLIP image-to-text similarity to "a painting in the style of Vincent van Gogh" — the metric that actually tracks <em>does this look like Van Gogh</em>. The style-far controls (ukiyo-e, Rembrandt, Hokusai) sit at ~<code>0.18</code>, the "not Van Gogh" floor. <strong>Image drift</strong> = how much each method changed the image from the un-erased baseline (high = transformed, near-zero = left alone). Every paraphrase below has a <em>baseline</em> Van-Gogh-ness of ~0.24, well above the floor — confirming the baseline genuinely renders Van Gogh from the description, so a non-suppression is a real leak, not a prompt the model couldn't realize.</p>
         <table>
           <thead>
-            <tr><th>Prompt</th><th>Tier</th><th>SPEED Image Drift</th><th>ESD-x Image Drift</th></tr>
+            <tr><th>Prompt</th><th>Tier</th><th>VG-ness: Base &rarr; SPEED</th><th>SPEED Drift</th><th>VG-ness: ESD</th><th>ESD Drift</th></tr>
           </thead>
           <tbody>
-            <tr><td>"in the style of Van Gogh"</td><td>Named</td><td>0.346 (Suppressed)</td><td>0.387 (Suppressed)</td></tr>
-            <tr><td>"Starry Night by Vincent van Gogh"</td><td>Named</td><td class="danger" style="font-weight:bold;">0.067 (Evaded)</td><td>0.288 (Suppressed)</td></tr>
-            <tr><td>"golden wheat fields... expressive brushwork"</td><td>Paraphrase</td><td class="danger" style="font-weight:bold;">0.019 (Evaded)</td><td>0.117 (Suppressed)</td></tr>
-            <tr><td>"cafe terrace complementary..."</td><td>Paraphrase</td><td class="danger" style="font-weight:bold;">0.029 (Evaded)</td><td>0.109 (Suppressed)</td></tr>
-            <tr><td>"post-impr swirling rhythmic..."</td><td>Paraphrase</td><td class="danger" style="font-weight:bold;">0.045 (Evaded)</td><td>0.174 (Suppressed)</td></tr>
+            <tr><td>"in the style of Van Gogh"</td><td>Named</td><td>0.255 &rarr; 0.213 (suppressed)</td><td>0.347</td><td>0.204</td><td>0.388</td></tr>
+            <tr><td>"Starry Night by Vincent van Gogh"</td><td>Named</td><td class="danger" style="font-weight:bold;">0.278 &rarr; 0.269 (leaked)</td><td class="danger">0.067</td><td>0.204</td><td>0.289</td></tr>
+            <tr><td>"golden wheat fields... expressive brushwork"</td><td>Paraphrase</td><td class="danger" style="font-weight:bold;">0.243 &rarr; 0.244 (leaked)</td><td class="danger">0.019</td><td>0.221</td><td>0.117</td></tr>
+            <tr><td>"cafe terrace complementary..."</td><td>Paraphrase</td><td class="danger" style="font-weight:bold;">0.246 &rarr; 0.247 (leaked)</td><td class="danger">0.029</td><td>0.226</td><td>0.110</td></tr>
+            <tr><td>"post-impr swirling rhythmic..."</td><td>Paraphrase</td><td class="danger" style="font-weight:bold;">0.242 &rarr; 0.231 (leaked)</td><td class="danger">0.046</td><td>0.199</td><td>0.174</td></tr>
           </tbody>
         </table>
+        <p style="color: var(--text-muted); font-size: 0.9em;">SPEED's Van-Gogh-ness on every paraphrase stays at the baseline level (~0.24) while the named prompt drops toward the floor — SPEED erases the <em>token</em>, not the <em>style</em>. ESD reduces paraphrase Van-Gogh-ness further (0.20–0.23) and alters the images far more (higher drift), but note it still sits <em>above</em> the 0.18 floor: ESD suppresses the style substantially more than SPEED, though not completely.</p>
 
         <h3>Visual Proof 1: The Explicit Name Test (Sanity Check)</h3>
         <p>Prompt: <em>"a painting in the style of Van Gogh"</em></p>
@@ -321,13 +322,13 @@ graph TD
           </div>
           <div class="image-card">
             <img src="experiment4/results/paraphrase/esd_x/paraphrase_desc/para_wheat/seed0.png" alt="ESD-x" style="border: 3px solid var(--success);">
-            <div class="image-label" style="color: var(--success);">ESD-x (Suppressed) — Fine-tuning caught it</div>
+            <div class="image-label" style="color: var(--success);">ESD-x (Reduced) — Fine-tuning altered it far more</div>
           </div>
         </div>
 
         <div class="verdict-box" style="margin-top: 25px;">
           <h3>Conclusion</h3>
-          <p>Because ESD-x fine-tunes the actual UNet cross-attention weights, it successfully unlearns the <em>visual features</em> of Van Gogh, suppressing the swirling impasto style even when paraphrased. SPEED’s closed-form null-space projection acts more like a brittle lexical filter—if you don't trigger the exact token, the style leaks right out of the model's prior.</p>
+          <p>Because ESD-x fine-tunes the actual UNet cross-attention weights, it alters the paraphrased images far more than SPEED — reducing (though not fully erasing — its Van-Gogh-ness stays above the 0.18 floor) the swirling impasto style even when the name is absent. SPEED's closed-form null-space projection, by contrast, behaves like a brittle lexical filter: if you don't trigger the exact token, the style leaks straight out of the model's prior essentially untouched.</p>
         </div>
       </section>
 
