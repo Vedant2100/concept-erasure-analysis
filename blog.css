@@ -114,20 +114,20 @@ h1 {
 h2 {
   font-size: 1.4rem;
   font-weight: 700;
-  margin-top: 3.5rem;
-  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.5rem;
 }
 
 h3 {
   font-size: 1.15rem;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 
 p {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   font-size: 1rem;
 }
 
@@ -143,12 +143,12 @@ li {
 
 /* We remove the heavy 'card' styling to make it feel like a flowing academic document */
 .card {
-  padding: 1rem 0;
-  margin: 1rem 0;
+  padding: 0.5rem 0;
+  margin: 0.5rem 0;
 }
 
-.card h2:first-child,
-.card h3:first-child {
+.card h2:first-of-type,
+.card h3:first-of-type {
   margin-top: 0;
 }
 
