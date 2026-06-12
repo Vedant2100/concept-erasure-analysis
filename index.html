@@ -256,6 +256,7 @@ graph TD
         <div class="verdict-box">
           <h3>SPEED sabotages its own null-space</h3>
           <p>By turning <em>off</em> the safety feature, Pissarro's drift plummeted from a devastating 0.253 back down to 0.141 (barely above the noise floor). DPA artificially inflates the retain rank, starving the null-space of the exact degrees of freedom it desperately needs under dense entanglement. SPEED's preservation machinery actively accelerates its own capacity collapse.</p>
+          <p><strong>An honest caveat on the noise floor:</strong> The ablation isn't perfectly smooth. Notice that in the intermediate "DPA Off" column, the style-far control (Rembrandt) spikes to 0.187, eclipsing Pissarro. This implies that turning off DPA initially destabilizes the model globally, introducing systemic noise rather than just cleanly fixing the leak. However, turning off the refinement machinery entirely ("Zero Refinement") eliminates this systemic noise, stabilizing the controls back down to 0.084 while locking in the repair to Pissarro.</p>
         </div>
       </section>
 
