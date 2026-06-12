@@ -452,6 +452,4 @@ As long as erasure operates by projecting in cross-attention text-embedding spac
 12. Amara, I., et al. (2025). "Erasing More Than Intended? How Concept Erasure Degrades the Generation of Non-Target Concepts." *arXiv:2501.09833*.
 13. Lu, K., Kriplani, N., Cohen, N., et al. (2025). "When Are Concepts Erased From Diffusion Models?" *NeurIPS 2025*.
 
----
 
-*All code, SLURM configurations, generated images, and raw analysis logs are available on the project repository branches: `main`, `all-experiments`, `experiment-3`, `experiment-3-rank-saturation`, and `experiment-4-paraphrase-evasion`.*
