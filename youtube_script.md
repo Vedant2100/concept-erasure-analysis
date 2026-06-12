@@ -1,7 +1,7 @@
 # YouTube Code Walkthrough: Testing the Limits of Concept Erasure (SPEED)
 
 ## 0:00 – Introduction
-Hey everyone, welcome back. Today, we're doing a deep dive into the code behind our latest research project. We've been analyzing a state-of-the-art concept erasure algorithm called **SPEED**—which claims to safely remove concepts from Stable Diffusion without damaging anything else. 
+Hey everyone, welcome back. Today, we're going to go through the code behind our course project. We've been analyzing a state-of-the-art concept erasure algorithm called **SPEED**—which claims to safely remove concepts from Stable Diffusion without damaging anything else. 
 
 The core of our project was asking: *Does its mathematical guarantee actually hold up under extreme pressure?* Spoiler alert: it doesn't. We discovered two major vulnerabilities: **Rank Saturation** and **Lexical Overfitting**. I’m going to walk you through exactly how we wrote the code to prove this.
 
