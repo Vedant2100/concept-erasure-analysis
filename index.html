@@ -43,7 +43,7 @@
             <ul style="margin-top: 0.5rem; padding-left: 1rem; border-left: 2px solid var(--border-color); margin-left: 0.5rem;">
               <li><a href="#the-question">The Question</a></li>
               <li><a href="#verification-of-strengths">Verification of Strengths: Sparse Multi-Concept (Exp. 1)</a></li>
-              <li><a href="#probe-2">Limitation 1: Rank Saturation Collapse (Exp. 1)</a></li>
+              <li><a href="#probe-2">Limitation 1: Neighbor Collateral Damage Because of Rank Saturation (Exp. 1)</a></li>
               <li><a href="#why-only-one-neighbor-failed">Why Only One Neighbor Failed (Exp. 1)</a></li>
               <li><a href="#ablation-the-refinement-contradiction">Ablation: Refinement Contradiction (Exp. 1)</a></li>
               <li><a href="#robustness-fidelity-vs-identity">Robustness: Fidelity vs. Identity (Exp. 1)</a></li>
@@ -367,7 +367,7 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
 
       <!-- ===================== PROBE 2: CONCENTRATED ===================== -->
       <section class="card">
-        <h2 id="probe-2">Limitation 1: Rank Saturation Collapse (Exp. 1)</h2>
+        <h2 id="probe-2">Limitation 1: Neighbor Collateral Damage Because of Rank Saturation (Exp. 1)</h2>
         <p>So we concentrated the pressure. Instead of three mixed painters, we erased a growing, tightly-correlated cluster of <strong>impressionists</strong> — 5, then 10, then 20, then 40 — while strictly holding our three canaries (Gauguin, Seurat, Pissarro) out of every erasure set. Each list is nested inside the next, so the only thing changing is <em>how many same-movement concepts we pile on</em>. This is precisely the rank-saturation regime SPEED admits to but never tests.</p>
 
         <p>CLIP drift vs. baseline, 4 seeds per cell (zero corrupt frames). The erased-artist row (Renoir) confirms erasure actually fires; the style-far controls calibrate the noise floor.</p>
