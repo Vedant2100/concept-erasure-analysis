@@ -203,9 +203,9 @@ We verified the stated strengths of the SPEED algorithm by testing its null-spac
 
 ### 6.3 Findings
 
-- **✅ Macro-style is perfectly preserved:** The canaries drift *no more than* the style-far controls. Gauguin (0.109) is statistically indistinguishable from Rembrandt (0.114). There is no concentrated leakage onto the neighbors, proving SPEED's null-space guarantee holds for global stylistic geometry.
-- **❌ Highly localized semantic features suffer collateral damage:** While global style is protected, human inspection reveals that fine-grained semantic structures degrade. For instance, in the Gauguin canary image, the subject's left eye distorts into a solid black blob.
-- **ℹ️ Distant controls float slightly more than locked neighbors:** Counter-intuitively, distant controls (Rembrandt 0.114) drift slightly more than the closest protected neighbors (Seurat 0.049). This reveals SPEED's Influence-Based Prior Filtering (IPF) in action: distant concepts are deemed safely unaffected and dropped from the strict mathematical lock-down to save capacity, allowing them to float slightly in the background noise.
+- **✅ Macro-style is perfectly preserved**
+- **❌ Highly localized semantic features suffer collateral damage**
+- **ℹ️ Distant controls float slightly more than locked neighbors**
 
 ---
 
