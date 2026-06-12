@@ -144,7 +144,12 @@ li {
 /* We remove the heavy 'card' styling to make it feel like a flowing academic document */
 .card {
   padding: 1rem 0;
-  margin: 1.5rem 0;
+  margin: 1rem 0;
+}
+
+.card h2:first-child,
+.card h3:first-child {
+  margin-top: 0;
 }
 
 .highlight {
