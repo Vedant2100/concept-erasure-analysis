@@ -361,36 +361,78 @@
       </p>
 
 
+
+
       <h2 id="experiments">Experiments and Key Findings</h2>
-      <p>To stress-test SPEED<sup><a href="#ref1">[1]</a></sup> and analyze its limitations, we executed two targeted
-        empirical experiments:</p>
+
+      <p>
+        To stress-test SPEED<sup><a href="#ref1">[1]</a></sup> and analyze its limitations, we executed two targeted empirical experiments:
+      </p>
+
       <ul>
-        <li><strong>Experiment 1 (Neighbor Collateral Damage Due to Rank Saturation)</strong>: Explores the null-space
-          capacity limits under mass erasure.</li>
-        <li><strong>Experiment 2 (Style-Paraphrase Evasion)</strong>: Explores lexical overfitting and evasion
-          vulnerabilities.</li>
+        <li>
+          <strong>Experiment 1 (Collateral Damage Due to Rank Saturation)</strong>:
+          Explores the null-space capacity limits under both singular and mass concept erasure.
+        </li>
+        <li>
+          <strong>Experiment 2 (Style-Paraphrase Evasion)</strong>:
+          Explores lexical overfitting and evasion vulnerabilities.
+        </li>
       </ul>
 
-      <p>Across our probes, SPEED<sup><a href="#ref1">[1]</a></sup> proves to be a genuinely strong method with one
-        precise, locatable limitation:</p>
+      <h3>Experiment 1: Collateral Damage Due to Rank Saturation</h3>
+
+      <p><strong>Key Findings:</strong></p>
+
+      <h4>Part 1: Erasure of 3 Artistic Styles</h4>
+
       <ul>
-        <li><strong>It erases cleanly and preserves neighbors.</strong> Even when several mixed concepts are removed at
-          once, un-targeted neighbors drift no more than stylistically unrelated control artists — the null-space
-          guarantee holds.</li>
-        <li><strong>Its guarantee is bounded by rank saturation.</strong> Under concentrated mass erasure of a single
-          dense semantic cluster (e.g. 40 impressionists), protection fails <em>selectively</em> for the one retained
-          concept most entangled with the erased set, while stylistically distinct neighbors and the broader style
-          capability survive.</li>
+        <li>
+          The retention set, which should theoretically remain preserved under SPEED’s null-space guarantee, largely retains its stylistic characteristics. However, subtle but important foundational semantic degradation is observed. For example, in Gauguin-style generations, semantic structures such as the anatomy of the human eye degrade noticeably.
+        </li>
+        <li>
+          More surprisingly, <strong>Rembrandt</strong>—a style more distant from the erased concepts and one that did not even survive IPF filtering into the retention set—suffered substantial degradation, in some cases even more severe than concepts inside the retention set.
+        </li>
       </ul>
-      <p>The takeaway: as long as erasure operates by projecting in cross-attention space, the most entangled neighbors
-        will be the first to leak under heavy load — a direction future, disentanglement-based methods will need to
-        address.</p>
+
+      <h4>Part 2: Mass Concept Erasure (Up to 40 Artistic Styles)</h4>
+
+      <ul>
+        <li>
+          The previously observed collateral damage compounds significantly during mass concept erasure. Concepts such as <strong>Rembrandt</strong>, which lie outside the retention set, degrade progressively as more styles are erased simultaneously.
+        </li>
+        <li>
+          A second phenomenon becomes dominant at scale: <strong>null-space shrinkage</strong>. As more concepts are added to the retention set—and further expanded using DPA—the available null-space becomes increasingly constrained and may approach near-zero dimensionality.
+        </li>
+        <li>
+          When this occurs, the model can no longer perform ideal null-space projection and is forced to approximate the edit. This approximation introduces collateral damage, disproportionately harming the most semantically entangled neighboring concepts, even if they belong to the protected retention set.
+        </li>
+      </ul>
+
+      <h3>Experiment 2: Style-Paraphrase Evasion</h3>
+
+      <p><strong>Key Findings:</strong></p>
+
+      <ul>
+        <li>
+          SPEED’s null-space projection is mathematically precise but <strong>lexically overfit</strong>. The erasure is tied strictly to the text embeddings of the exact target tokens (for example, “Van Gogh”).
+        </li>
+        <li>
+          If a user describes the target style indirectly without using the exact name—for example through descriptive prompts referring to brush strokes, color palette, or composition—the erasure can be bypassed with surprising ease.
+        </li>
+      </ul>
+
+      <p>
+        The overall takeaway is that SPEED remains an exceptionally strong concept erasure method, but its guarantees are bounded by two practical limitations: <strong>rank saturation under dense erasure</strong> and <strong>lexical overfitting under paraphrased prompting</strong>. Future methods may need stronger semantic disentanglement and prompt-invariant erasure mechanisms to overcome these limitations.
+      </p>
+
+
 
 
 
       <hr style="margin: 40px 0; border: 1px solid #ddd;">
       <h2 id="deep-dive-empirical-limitations" style="text-align:center; font-size: 2.5em; margin-bottom: 20px;">4.
-        Findings</h2>
+        Findings of Investigation into Limitations</h2>
 
       <main>
 
@@ -417,7 +459,7 @@
 
         <!-- ===================== VERIFICATION OF STRENGTHS ===================== -->
         <section class="card">
-          <h2 id="verification-of-strengths">Verification of Strengths: Sparse Multi-Concept Erasure (Exp. 1)</h2>
+          <h2 id="verification-of-strengths">Exp. 1 - Part 1: Removal of 3 Concepts</h2>
           <p>To verify the stated strengths of the SPEED<sup><a href="#ref1">[1]</a></sup> algorithm, we first tested
             its null-space protection. We erased three painters at once — <strong>Van Gogh, Picasso, and Monet</strong>
             — and watched three un-targeted impressionist neighbors held out of the edit: Gauguin, Seurat, and Pissarro.
@@ -510,10 +552,12 @@
             </div>
           </div>
 
-          <h3>Canary Neighbors: Null-Space Guarantee Holds</h3>
-          <p>The three impressionist neighbors — Gauguin, Seurat, Pissarro — were <em>not</em> erased. After the
-            3-concept edit, their output is visually and semantically unchanged. The null-space guarantee is working
-            exactly as claimed.</p>
+          <h3>Canary Neighbors: Null-Space Guarantee Holds Stylistically But With a Caveat</h3>
+          <p>
+          The three impressionist neighbors — Gauguin, Seurat, and Pissarro — were <em>not</em> erased. 
+          After the 3-concept edit, their macro-stylistic characteristics remain largely intact. 
+          However, subtle semantic degradation appears in localized regions; for example, in the Gauguin sample, the left eye collapses into a black artifact, indicating loss of lower-level structural knowledge despite style preservation.
+          </p>
           <div class="image-grid" style="grid-template-columns: repeat(3, 1fr);">
             <div class="image-card">
               <img src="experiment3/results/multi_concept/baseline/retain_canary/gauguin/seed0.png"
@@ -523,11 +567,11 @@
             <div class="image-card">
               <img src="experiment3/results/multi_concept/speed_3c/retain_canary/gauguin/seed0.png"
                 alt="Gauguin after 3c erasure">
-              <div class="image-label">Gauguin — after N=3 erasure (intact)</div>
+              <div class="image-label">Gauguin — after N=3 erasure</div>
             </div>
             <div class="image-card"
               style="display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg-secondary);border-radius:8px;font-size:0.85rem;color:var(--text-secondary);">
-              CLIP drift: <strong style="margin-left:0.3rem;">0.109</strong> — matches controls
+              CLIP drift: <strong style="margin-left:0.3rem;">0.109</strong> - noticeable artifacts
             </div>
 
             <div class="image-card">
@@ -542,7 +586,7 @@
             </div>
             <div class="image-card"
               style="display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg-secondary);border-radius:8px;font-size:0.85rem;color:var(--text-secondary);">
-              CLIP drift: <strong style="margin-left:0.3rem;">0.049</strong> — near-zero, pristine
+              CLIP drift: <strong style="margin-left:0.3rem;">0.049</strong> — near-zero, few artifacts
             </div>
 
             <div class="image-card">
@@ -557,13 +601,13 @@
             </div>
             <div class="image-card"
               style="display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg-secondary);border-radius:8px;font-size:0.85rem;color:var(--text-secondary);">
-              CLIP drift: <strong style="margin-left:0.3rem;">0.076</strong> — matches controls
+              CLIP drift: <strong style="margin-left:0.3rem;">0.076</strong> few artifacts, overall good match
             </div>
           </div>
 
-          <h3>Control Artists: The Waterbed Effect of Over-Protection</h3>
+          <h3>LIMITATION - Control Artists: The Waterbed Effect of Over-Protection</h3>
           <p>Counter-intuitively, distant control concepts like Rembrandt and Hokusai suffer more drift than the immediate canary neighbors. This exposes a fundamental mathematical flaw in SPEED's<sup><a href="#ref1">[1]</a></sup> Influence-Based Prior Filtering (IPF) and Directed Prior Augmentation (DPA).</p>
-          <p>IPF drops distant concepts from the protection list because they are seemingly unaffected by an unconstrained erasure. However, DPA then hoards the remaining null-space capacity by generating hundreds of augmented fake embeddings to build a buffer zone around the retained canaries. Because the mathematical update is forced entirely into whatever unprotected dimensions remain, the shock of the erasure is squeezed directly into the distant concepts. <strong>"SPEED builds a perfect concrete bunker for nearby concepts, but does so by detonating the erasure directly inside the unprotected homes of distant concepts."</strong></p>
+          <p>IPF drops distant concepts from the protection list because they are seemingly unaffected by an unconstrained erasure. In addition, DPA is supposed to introduce directed noise that would intuitively expan the retention list boundaries, but it is still not able to protect Rembrandt from the collateral damage, which is curious. This might indicate failure of both IPF and DPA in this case. It won't be farfetched to conclude for this case atleast: <strong>"SPEED appears to strongly protect nearby retained concepts, but this protection may come at the cost of increased collateral damage to semantically distant concepts excluded from the retain set."</strong></p>
           <div class="image-grid" style="grid-template-columns: repeat(3, 1fr);">
             <div class="image-card">
               <img src="experiment3/results/multi_concept/baseline/retain_control_far/rembrandt/seed0.png"
@@ -592,19 +636,16 @@
             </div>
             <div class="image-card"
               style="display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg-secondary);border-radius:8px;font-size:0.85rem;color:var(--text-secondary);">
-              CLIP drift: <strong style="margin-left:0.3rem;">0.063</strong> — waterbed collateral
+              CLIP drift: <strong style="margin-left:0.3rem;">0.063</strong> — waterbed collateral, but mild impact
             </div>
           </div>
 
         <div class="verdict-box">
           <h3>Findings</h3>
-          <ul style="list-style: none; padding-left: 0;">
-            <li style="margin-bottom: 0.75rem;">
-              <strong>✅ Macro-style is perfectly preserved</strong>
-            </li>
-            <li style="margin-bottom: 0.75rem;">
-              <strong>❌ Highly localized semantic features suffer collateral damage</strong>
-            </li>
+          <ul style="list-style:none;padding-left:0;">
+            <li><strong>Global artistic style is strongly preserved under 3-concept erasure.</strong></li>
+            <li><strong>Fine-grained semantic structure (eyes, facial geometry, object details) remains vulnerable to collateral damage.</strong></li>
+            <li><strong>Damage may be displaced toward unprotected distant concepts, suggesting a waterbed effect in SPEED’s protection mechanism.</strong></li>
           </ul>
         </div>
         </section>
@@ -612,7 +653,7 @@
 
         <!-- ===================== PROBE 2: CONCENTRATED ===================== -->
         <section class="card">
-          <h2 id="probe-2">Limitation 1: Neighbor Collateral Damage Due to Rank Saturation (Exp. 1)</h2>
+          <h2 id="probe-2">Exp. 1 - Part 2: Mass Concept Erasure</h2>
           <p>So we concentrated the pressure. Instead of three mixed painters, we erased a growing, tightly-correlated
             cluster of <strong>impressionists</strong> — 5, then 10, then 20, then 40 — while strictly holding our three
             canaries (Gauguin, Seurat, Pissarro) out of every erasure set. Each list is nested inside the next, so the
@@ -693,11 +734,7 @@
             </tbody>
           </table>
 
-          <p>One row breaks away from the pack. <strong>Pissarro</strong> climbs monotonically — 0.05 → 0.13 → 0.17 →
-            <span class="danger">0.25</span> — until, at N=40, he has drifted to roughly <em>double</em> the style-far
-            controls. And it is visible: his soft, broken-brushwork impressionism flattens into bolder, more saturated,
-            less characteristic forms. Gauguin, erased alongside the same cluster, stays put.</p>
-
+          
           <div class="image-grid">
             <div class="image-card">
               <img src="experiment3/results/rank_saturation/baseline/canary/pissarro/seed0.png" alt="Pissarro original">
@@ -719,6 +756,12 @@
             </div>
           </div>
 
+          <p>Degradation is almost everywhere, but it stands out in 1 particular row. <strong>Pissarro</strong> climbs monotonically — 0.05 → 0.13 → 0.17 →
+            <span class="danger">0.25</span> — until, at N=40, he has drifted to roughly <em>double</em> the style-far
+            controls. And it is visible: his soft, broken-brushwork impressionism flattens into bolder, more saturated,
+            less characteristic forms. Gauguin, erased alongside the same cluster, stays put.</p>
+
+
           <div class="verdict-box">
             <h3>The limitation: selective collateral collapse under rank saturation</h3>
             <p>This is the bottleneck. Under concentrated mass erasure, SPEED's<sup><a href="#ref1">[1]</a></sup>
@@ -726,17 +769,12 @@
                 erased</strong> — Pissarro, a core impressionist whose style sits in the middle of the very cluster
               being removed. The guarantee SPEED<sup><a href="#ref1">[1]</a></sup> advertises for its retain set does
               not hold for him at scale: he becomes collateral damage, visibly and reproducibly.</p>
-            <p>What keeps this honest — and makes it a <em>precise</em> finding rather than a sweeping one — is the rest
-              of the table. The effect is <strong>localized, not catastrophic</strong>: the stylistically distinct
-              neighbors (Gauguin, Seurat) hold at control levels, and the broad "impressionist painting" capability is
-              untouched (0.036). SPEED<sup><a href="#ref1">[1]</a></sup> does not collapse the neighborhood; it springs
-              a leak at its single weakest point, exactly where its admitted rank-saturation dilemma predicts.</p>
           </div>
         </section>
 
         <!-- ===================== THE ANATOMY OF COLLAPSE ===================== -->
         <section class="card">
-          <h2 id="the-anatomy-of-collapse">The Anatomy of Collapse: 5 Interlocking Mechanisms</h2>
+          <h2 id="the-anatomy-of-collapse">The Anatomy of General Collapse: 5 Interlocking Mechanisms Along With a Previous Finding</h2>
           <p>The progressive degradation from N=5 to N=40 is not a single point of failure, but a compounding collapse of five distinct mathematical mechanisms explicitly acknowledged (but never tested at scale) in the SPEED<sup><a href="#ref1">[1]</a></sup> architecture.</p>
           
           <div style="overflow-x:auto;">
@@ -778,27 +816,9 @@
             </table>
           </div>
 
-          <p>Crucially, the waterbed effect we observed earlier (where Rembrandt was damaged despite DPA protection) acts as the <em>embryonic form</em> of this limitation. In the sparse regime (N=5), IPF drops distant concepts and DPA hoards capacity, causing a small, localized leak. In the concentrated regime (N=40), this structural vulnerability is <strong>amplified by a multiplicative scaling factor</strong>: as the null-space shrinks, the required erasure update magnitude explodes, and as the concentrated erasure direction broadens, the unprotected surface area in embedding space enlarges. These forces multiply to produce the monotonic degradation observed across all concept categories.</p>
+          <p><strong>Additionally, the waterbed effect we observed earlier (where Rembrandt and Hokusai were damaged despite DPA protection) is evident here as well as the CLIP error increases for both when N goes from 5 to 40, thus reaffirming our belief in this limitation.</strong></p>
         </section>
 
-        <!-- ===================== WHY ONE ===================== -->
-        <section class="card">
-          <h2 id="why-only-one-neighbor-failed">Why Only One Neighbor Failed</h2>
-          <p>The failure is geometric, not random. SPEED<sup><a href="#ref1">[1]</a></sup> pushes its edit along the
-            <em>shared direction</em> of everything in the erased set, while keeping that edit orthogonal to retained
-            concepts. When you erase 40 impressionists, that shared direction collapses onto one thing — soft, plein-air
-            impressionist landscape — because that is what most of those 40 painters are.</p>
-          <p>Place each held-out neighbor relative to that direction. <strong>Pissarro is that direction</strong>: the
-            most prototypical impressionist of the three, near-indistinguishable from the Monets and Sisleys being
-            erased — so when the null-space runs low on degrees of freedom, he is the one concept it cannot keep
-            orthogonal. <strong>Gauguin</strong> (flat cloisonnist planes) and <strong>Seurat</strong> (rigid
-            pointillist dots) sit <em>off</em> that axis; their distinctive techniques give the projection room to
-            protect them. It is also why only Pissarro's drift <em>grows with N</em> — every additional impressionist
-            reinforces the exact direction he lives on.</p>
-          <p>One honest caveat: this is a single collapsing artist, so the geometric story is the best-supported
-            explanation rather than a proven one. The clean confirmation would be to invert the experiment — erase 40
-            <em>pointillists</em> and predict that Seurat becomes the casualty while Pissarro survives.</p>
-        </section>
 
         <!-- ===================== ABLATION: THE REFINEMENT CONTRADICTION ===================== -->
         <section class="card">
@@ -879,31 +899,10 @@
           </div>
         </section>
 
-        <!-- ===================== ROBUSTNESS: FIDELITY VS IDENTITY ===================== -->
-        <section class="card">
-          <h2 id="robustness-fidelity-vs-identity">Robustness: Fidelity vs. Identity (Exp. 1)</h2>
-          <p>A common vulnerability in concept erasure is creating a "semantic illusion"—fooling the text encoder (CLIP)
-            into recognizing a retained concept, while quietly trashing the pixel-level image quality with artifacts,
-            blur, and structural breakage. To test if SPEED's<sup><a href="#ref1">[1]</a></sup> preservation of
-            neighbors was an illusion, we re-scanned the multi-concept erasure images.</p>
-          <p>Instead of CLIP, we computed <strong>LPIPS</strong> (Learned Perceptual Image Patch Similarity) against the
-            baseline, which explicitly catches perceptual degradation that semantic metrics ignore. If SPEED<sup><a
-                href="#ref1">[1]</a></sup> was cheating, canary LPIPS would spike above the control baseline.</p>
-
-          <div class="verdict-box">
-            <h3 style="color: var(--success);">SPEED<sup><a href="#ref1">[1]</a></sup> genuinely preserves perceptual
-              fidelity</h3>
-            <p>The results were an honest negative: SPEED<sup><a href="#ref1">[1]</a></sup> completely passed the test.
-              In the 3-concept erasure regime, the perceptual damage to the protected canaries (Pissarro LPIPS = 0.244,
-              Seurat = 0.260) was strictly <strong>bounded below</strong> the baseline drift of the style-far controls
-              (Rembrandt = 0.331, Hokusai = 0.272). SPEED<sup><a href="#ref1">[1]</a></sup> doesn't just preserve the
-              semantic label of its neighbors—it preserves their true, pixel-level structural fidelity.</p>
-          </div>
-        </section>
 
         <!-- ===================== LIMITATION 2: EVASION VIA PARAPHRASING ===================== -->
         <section class="card">
-          <h2 id="limitation-2">Limitation 2: Evasion Vulnerability (Exp. 2)</h2>
+          <h2 id="limitation-2">Exp. 2: Evasion Vulnerability</h2>
           <p>A true safety or concept-erasure mechanism must be robust against evasion. SPEED's<sup><a
                 href="#ref1">[1]</a></sup> paper <sup><a href="#ref1">[1]</a></sup> evaluates robustness against
             <em>nudity</em> prompts using adversarial attacks, but crucially leaves its <strong>style erasure</strong>
