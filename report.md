@@ -206,6 +206,11 @@ We verified the stated strengths of the SPEED algorithm by testing its null-spac
 - **✅ Macro-style is perfectly preserved**
 - **❌ Highly localized semantic features suffer collateral damage**
 
+### 6.4 The Waterbed Effect of Over-Protection
+
+Counter-intuitively, distant control concepts like Rembrandt and Hokusai suffer more drift than the immediate canary neighbors. This exposes a fundamental mathematical flaw in SPEED's Influence-Based Prior Filtering (IPF) and Directed Prior Augmentation (DPA).
+
+IPF drops distant concepts from the protection list because they are seemingly unaffected by an unconstrained erasure. However, DPA then hoards the remaining null-space capacity by generating hundreds of augmented fake embeddings to build a buffer zone around the retained canaries. Because the mathematical update is forced entirely into whatever unprotected dimensions remain, the shock of the erasure is squeezed directly into the distant concepts. *"SPEED builds a perfect concrete bunker for nearby concepts, but does so by detonating the erasure directly inside the unprotected homes of distant concepts."*
 ---
 
 ## 7. Limitation 1: Neighbor Collateral Damage Due to Rank Saturation
