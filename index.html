@@ -347,22 +347,93 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
           </tbody>
         </table>
 
-        <div class="image-grid">
+
+        <h3>Erased Artists: Suppression Confirmed</h3>
+        <p>The three targeted artists — Van Gogh, Picasso, Monet — are cleanly suppressed. Their prompt no longer produces images in their style.</p>
+        <div class="image-grid" style="grid-template-columns: repeat(3, 1fr);">
           <div class="image-card">
-            <img src="experiment3/results/multi_concept/baseline/retain_canary/gauguin/seed0.png" alt="Gauguin, original model">
-            <div class="image-label">Gauguin — original</div>
+            <img src="experiment3/results/multi_concept/baseline/erased/vangogh/seed0.png" alt="Van Gogh baseline">
+            <div class="image-label">Van Gogh — baseline</div>
           </div>
           <div class="image-card">
-            <img src="experiment3/results/multi_concept/speed_3c/retain_canary/gauguin/seed0.png" alt="Gauguin after 3-concept erasure">
+            <img src="experiment3/results/multi_concept/speed_3c/erased/vangogh/seed0.png" alt="Van Gogh after erasure" style="border: 2px solid var(--success);">
+            <div class="image-label">Van Gogh — erased ✓</div>
+          </div>
+          <div class="image-card" style="display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg-secondary);border-radius:8px;font-size:0.85rem;color:var(--text-secondary);">
+            CLIP drift: <strong style="margin-left:0.3rem;">0.388</strong> — strong suppression
+          </div>
+
+          <div class="image-card">
+            <img src="experiment3/results/multi_concept/baseline/erased_in_2c_3c/picasso/seed0.png" alt="Picasso baseline">
+            <div class="image-label">Picasso — baseline</div>
+          </div>
+          <div class="image-card">
+            <img src="experiment3/results/multi_concept/speed_3c/erased_in_2c_3c/picasso/seed0.png" alt="Picasso after erasure" style="border: 2px solid var(--success);">
+            <div class="image-label">Picasso — erased ✓</div>
+          </div>
+          <div class="image-card" style="display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg-secondary);border-radius:8px;font-size:0.85rem;color:var(--text-secondary);">
+            CLIP drift: <strong style="margin-left:0.3rem;">0.332</strong> — strong suppression
+          </div>
+
+          <div class="image-card">
+            <img src="experiment3/results/multi_concept/baseline/erased_in_3c/monet/seed0.png" alt="Monet baseline">
+            <div class="image-label">Monet — baseline</div>
+          </div>
+          <div class="image-card">
+            <img src="experiment3/results/multi_concept/speed_3c/erased_in_3c/monet/seed0.png" alt="Monet after erasure" style="border: 2px solid var(--success);">
+            <div class="image-label">Monet — erased ✓</div>
+          </div>
+          <div class="image-card" style="display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg-secondary);border-radius:8px;font-size:0.85rem;color:var(--text-secondary);">
+            CLIP drift: <strong style="margin-left:0.3rem;">0.359</strong> — strong suppression
+          </div>
+        </div>
+
+        <h3>Canary Neighbors: Null-Space Guarantee Holds</h3>
+        <p>The three impressionist neighbors — Gauguin, Seurat, Pissarro — were <em>not</em> erased. After the 3-concept edit, their output is visually and semantically unchanged. The null-space guarantee is working exactly as claimed.</p>
+        <div class="image-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="image-card">
+            <img src="experiment3/results/multi_concept/baseline/retain_canary/gauguin/seed0.png" alt="Gauguin baseline">
+            <div class="image-label">Gauguin — baseline</div>
+          </div>
+          <div class="image-card">
+            <img src="experiment3/results/multi_concept/speed_3c/retain_canary/gauguin/seed0.png" alt="Gauguin after 3c erasure">
             <div class="image-label">Gauguin — after N=3 erasure (intact)</div>
+          </div>
+          <div class="image-card" style="display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg-secondary);border-radius:8px;font-size:0.85rem;color:var(--text-secondary);">
+            CLIP drift: <strong style="margin-left:0.3rem;">0.109</strong> — matches controls
+          </div>
+
+          <div class="image-card">
+            <img src="experiment3/results/multi_concept/baseline/retain_canary/seurat/seed0.png" alt="Seurat baseline">
+            <div class="image-label">Seurat — baseline</div>
+          </div>
+          <div class="image-card">
+            <img src="experiment3/results/multi_concept/speed_3c/retain_canary/seurat/seed0.png" alt="Seurat after 3c erasure">
+            <div class="image-label">Seurat — after N=3 erasure (intact)</div>
+          </div>
+          <div class="image-card" style="display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg-secondary);border-radius:8px;font-size:0.85rem;color:var(--text-secondary);">
+            CLIP drift: <strong style="margin-left:0.3rem;">0.049</strong> — near-zero, pristine
+          </div>
+
+          <div class="image-card">
+            <img src="experiment3/results/multi_concept/baseline/retain_canary/pissarro/seed0.png" alt="Pissarro baseline">
+            <div class="image-label">Pissarro — baseline</div>
+          </div>
+          <div class="image-card">
+            <img src="experiment3/results/multi_concept/speed_3c/retain_canary/pissarro/seed0.png" alt="Pissarro after 3c erasure">
+            <div class="image-label">Pissarro — after N=3 erasure (intact)</div>
+          </div>
+          <div class="image-card" style="display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg-secondary);border-radius:8px;font-size:0.85rem;color:var(--text-secondary);">
+            CLIP drift: <strong style="margin-left:0.3rem;">0.076</strong> — matches controls
           </div>
         </div>
 
         <div class="verdict-box">
           <h3>Finding: genuine robustness</h3>
-          <p>The canaries drift <em>no more than</em> the style-far controls — Gauguin (0.109) is statistically indistinguishable from Rembrandt (0.114), a painter with nothing in common with the targets. There is no concentrated leakage onto the neighbors. For sparse, mixed erasure, SPEED's null-space does exactly what it advertises. This is an honest negative result — and it told us the limitation, if one existed, had to live somewhere harder.</p>
+          <p>The canaries drift <em>no more than</em> the style-far controls — Gauguin (0.109) is statistically indistinguishable from Rembrandt (0.114), a painter with nothing in common with the targets. There is no concentrated leakage onto the neighbors. For sparse, mixed erasure, SPEED's null-space does exactly what it advertises. This is an honest positive result — and it told us the limitation, if one existed, had to live somewhere harder.</p>
         </div>
       </section>
+
 
       <!-- ===================== PROBE 2: CONCENTRATED ===================== -->
       <section class="card">
