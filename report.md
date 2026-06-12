@@ -201,13 +201,10 @@ We verified the stated strengths of the SPEED algorithm by testing its null-spac
 | Rembrandt | Control (style-far) | 0.114 |
 | Hokusai | Control (style-far) | 0.063 |
 
-### 6.3 Analysis
+### 6.3 Findings
 
-The canaries drift *no more than* the style-far controls. Gauguin (0.109) is statistically indistinguishable from Rembrandt (0.114), a painter with nothing in common with the targets. There is no concentrated leakage onto the neighbors. For sparse, mixed erasure, SPEED's null-space does exactly what it advertises.
-
-This is an honest negative result — and it told us the limitation, if one existed, had to live somewhere harder. The null-space guarantee holds when the erased concepts are stylistically diverse and few in number.
-
-**Caveat: Localized Anatomy Distortion.** While global LPIPS scores remain strong and the overall macro-style is protected, human inspection reveals that highly localized semantic features can still suffer collateral damage. For instance, in the Gauguin canary image, the subject's left eye degrades into a solid black blob after the edit, distorting the human anatomy compared to the baseline. This suggests that while SPEED's null-space successfully shields global stylistic geometry from the erasure, fine-grained semantic structures within the image can still experience minor collateral degradation.
+- **✅ Macro-style is perfectly preserved:** The canaries drift *no more than* the style-far controls. Gauguin (0.109) is statistically indistinguishable from Rembrandt (0.114). There is no concentrated leakage onto the neighbors, proving SPEED's null-space guarantee holds for global stylistic geometry.
+- **❌ Highly localized semantic features suffer collateral damage:** While global style is protected, human inspection reveals that fine-grained semantic structures degrade. For instance, in the Gauguin canary image, the subject's left eye distorts into a solid black blob.
 
 ---
 
