@@ -321,6 +321,8 @@ SPEED completely passed the test. The perceptual damage to the protected canarie
 
 SPEED does not just preserve the semantic label of its neighbors — it preserves their true, pixel-level structural fidelity. The null-space guarantee operates at the perceptual level, not just at the CLIP embedding level.
 
+**Caveat: Localized Anatomy Distortion.** While global LPIPS scores remain strong and the overall macro-style is protected, human inspection reveals that highly localized semantic features can still suffer collateral damage. For instance, in the Gauguin canary image, the subject's left eye degrades into a solid black blob after the edit, distorting the human anatomy compared to the baseline. This suggests that while SPEED's null-space successfully shields global stylistic geometry from the erasure, fine-grained semantic structures within the image can still experience minor collateral degradation.
+
 ---
 
 ## 11. Limitation 2: Evasion Vulnerability via Lexical Overfitting
