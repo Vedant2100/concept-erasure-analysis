@@ -67,10 +67,13 @@
 
 
 
-      <h1>SPEED<sup><a href="#ref1">[1]</a></sup>: Scalable, Precise, and Efficient Concept Erasure<br>Project Analysis
-      </h1>
+      <header style="text-align: center; margin-bottom: 3rem;">
+        <h2 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.3rem; color: var(--text-secondary); border-bottom: none; padding-bottom: 0;">EE243 Advanced Computer Vision — Spring 2026 Project</h2>
+        <p style="margin: 0 0 1.5rem 0; font-size: 1rem; color: var(--text-secondary);">Team: Vedant Borkute and Kedar Shiralkar</p>
+        <h1 style="margin-top: 0;">SPEED<sup><a href="#ref1">[1]</a></sup>: Scalable, Precise, and Efficient Concept Erasure<br>Project Analysis</h1>
+      </header>
 
-      <h2 id="tldr">TL;DR</h2>
+      <h2 id="tldr" style="margin-top: 0;">TL;DR</h2>
       <p>Large-scale text-to-image models are trained on internet-scale data and inevitably learn to generate harmful,
         copyrighted, or otherwise undesirable content. <strong>Concept erasure</strong> is the task of surgically
         removing specific visual concepts from a pretrained model's weights — without retraining from scratch and
@@ -1145,6 +1148,24 @@
       </section>
     </div>
   </div>
+
+  <button id="backToTop" class="back-to-top" aria-label="Back to top">
+    ↑ Top
+  </button>
+
+  <script>
+    const backToTopBtn = document.getElementById("backToTop");
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 500) {
+        backToTopBtn.classList.add("visible");
+      } else {
+        backToTopBtn.classList.remove("visible");
+      }
+    });
+    backToTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  </script>
 </body>
 
 </html>
