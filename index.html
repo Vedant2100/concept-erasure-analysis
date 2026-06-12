@@ -568,8 +568,11 @@
             <li style="margin-bottom: 0.75rem;">
               <strong>✅ Macro-style is perfectly preserved:</strong> The canaries drift <em>no more than</em> the style-far controls — Gauguin (0.109) is statistically indistinguishable from Rembrandt (0.114). There is no concentrated leakage onto the neighbors, proving SPEED's<sup><a href="#ref1">[1]</a></sup> null-space guarantee holds for global stylistic geometry.
             </li>
-            <li>
+            <li style="margin-bottom: 0.75rem;">
               <strong>❌ Highly localized semantic features suffer collateral damage:</strong> While global style is protected, human inspection reveals that fine-grained semantic structures degrade. For instance, in the Gauguin canary image above, the subject's left eye distorts into a solid black blob.
+            </li>
+            <li>
+              <strong>ℹ️ Distant controls float slightly more than locked neighbors:</strong> Counter-intuitively, distant controls (Rembrandt 0.114) drift slightly more than the closest protected neighbors (Seurat 0.049). This reveals SPEED's<sup><a href="#ref1">[1]</a></sup> Influence-Based Prior Filtering (IPF) in action: distant concepts are deemed safely unaffected and dropped from the strict mathematical lock-down to save capacity, allowing them to float slightly in the background noise.
             </li>
           </ul>
         </div>
