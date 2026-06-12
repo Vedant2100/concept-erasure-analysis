@@ -205,7 +205,6 @@ We verified the stated strengths of the SPEED algorithm by testing its null-spac
 
 - **✅ Macro-style is perfectly preserved**
 - **❌ Highly localized semantic features suffer collateral damage**
-- **ℹ️ Distant controls float slightly more than locked neighbors**
 
 ---
 

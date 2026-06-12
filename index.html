@@ -562,6 +562,40 @@
             </div>
           </div>
 
+          <h3>Control Artists: Distant Concepts Float Slightly</h3>
+          <p>Because distant concepts like Rembrandt and Hokusai are structurally unaffected by the targets, SPEED's<sup><a href="#ref1">[1]</a></sup> Influence-Based Prior Filtering (IPF) safely removes them from the strict mathematical protection list. This allows them to float slightly more than tightly-locked canaries, though this drift is functionally invisible.</p>
+          <div class="image-grid" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="image-card">
+              <img src="experiment3/results/multi_concept/baseline/retain_control_far/rembrandt/seed0.png"
+                alt="Rembrandt baseline">
+              <div class="image-label">Rembrandt — baseline</div>
+            </div>
+            <div class="image-card">
+              <img src="experiment3/results/multi_concept/speed_3c/retain_control_far/rembrandt/seed0.png"
+                alt="Rembrandt after 3c erasure">
+              <div class="image-label">Rembrandt — after N=3 erasure (intact)</div>
+            </div>
+            <div class="image-card"
+              style="display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg-secondary);border-radius:8px;font-size:0.85rem;color:var(--text-secondary);">
+              CLIP drift: <strong style="margin-left:0.3rem;">0.114</strong> — functional noise floor
+            </div>
+
+            <div class="image-card">
+              <img src="experiment3/results/multi_concept/baseline/retain_control_far/hokusai/seed0.png"
+                alt="Hokusai baseline">
+              <div class="image-label">Hokusai — baseline</div>
+            </div>
+            <div class="image-card">
+              <img src="experiment3/results/multi_concept/speed_3c/retain_control_far/hokusai/seed0.png"
+                alt="Hokusai after 3c erasure">
+              <div class="image-label">Hokusai — after N=3 erasure (intact)</div>
+            </div>
+            <div class="image-card"
+              style="display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg-secondary);border-radius:8px;font-size:0.85rem;color:var(--text-secondary);">
+              CLIP drift: <strong style="margin-left:0.3rem;">0.063</strong> — functional noise floor
+            </div>
+          </div>
+
         <div class="verdict-box">
           <h3>Findings</h3>
           <ul style="list-style: none; padding-left: 0;">
@@ -570,9 +604,6 @@
             </li>
             <li style="margin-bottom: 0.75rem;">
               <strong>❌ Highly localized semantic features suffer collateral damage</strong>
-            </li>
-            <li>
-              <strong>ℹ️ Distant controls float slightly more than locked neighbors</strong>
             </li>
           </ul>
         </div>
