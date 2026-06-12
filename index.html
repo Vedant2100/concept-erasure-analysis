@@ -9,6 +9,24 @@
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
     mermaid.initialize({ startOnLoad: true, theme: 'default' });
   </script>
+
+  <style>
+    sup a {
+      text-decoration: none;
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 0.75em;
+    }
+    sup a:hover {
+      text-decoration: underline;
+    }
+    #references ol {
+      padding-left: 1.5rem;
+    }
+    #references li {
+      margin-bottom: 0.75rem;
+    }
+  </style>
 </head>
 <body>
   
@@ -46,7 +64,7 @@
 
 <h2 id="tldr">TL;DR</h2>
 <p>Large-scale text-to-image models are trained on internet-scale data and inevitably learn to generate harmful, copyrighted, or otherwise undesirable content. <strong>Concept erasure</strong> is the task of surgically removing specific visual concepts from a pretrained model's weights — without retraining from scratch and without post-hoc filters that can be bypassed.</p>
-<p>This project traces the lineage from the original ESD method (Gandikota et al., 2023) through to <strong>SPEED</strong> (Li et al., ICLR 2026), identifying SPEED as the current open-source frontier. The code, configuration scripts, visual results, and detailed analyses for our empirical probes are hosted on dedicated branches: <em>all-experiments</em> and <em>experiment-3</em>.</p>
+<p>This project traces the lineage from the original ESD method (Gandikota et al., 2023) <sup><a href="#ref2">[2]</a></sup> through to <strong>SPEED</strong> (Li et al., ICLR 2026) <sup><a href="#ref1">[1]</a></sup>, identifying SPEED as the current open-source frontier. The code, configuration scripts, visual results, and detailed analyses for our empirical probes are hosted on dedicated branches: <em>all-experiments</em> and <em>experiment-3</em>.</p>
 
 <h2 id="lineage">1. Research Lineage & The Frontier</h2>
 
@@ -460,7 +478,7 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
       <!-- ===================== LIMITATION 2: EVASION VIA PARAPHRASING ===================== -->
       <section class="card">
         <h2 id="limitation-2">Limitation 2: Evasion Vulnerability (Lexical Overfitting)</h2>
-        <p>A true safety or concept-erasure mechanism must be robust against evasion. SPEED's paper evaluates robustness against <em>nudity</em> prompts using adversarial attacks, but crucially leaves its <strong>style erasure</strong> un-evaluated against simple paraphrasing.</p>
+        <p>A true safety or concept-erasure mechanism must be robust against evasion. SPEED's paper <sup><a href="#ref1">[1]</a></sup> evaluates robustness against <em>nudity</em> prompts using adversarial attacks, but crucially leaves its <strong>style erasure</strong> un-evaluated against simple paraphrasing.</p>
         <p>We discovered that SPEED's null-space projection is mathematically precise but <strong>lexically overfit</strong>. It ties the erasure strictly to the text embeddings of the exact target tokens (e.g., "Van Gogh"). If a user describes the style without using the exact name, the erasure is trivially bypassed.</p>
         
         <h3>The Paraphrase Evasion Test</h3>
@@ -569,14 +587,24 @@ Unlike many recent mass-erasure approaches, SPEED provides publicly available ch
     
     </main>
 
-    <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
-<hr />
-<ol>
-<li id="fn1"><p>Li, O., Wang, Y., Hu, X., Jiang, H., Hao, Y., Feng, F. (2026). "SPEED: Scalable, Precise, and Efficient Concept Erasure for Diffusion Models." <em>ICLR 2026</em>.</p></li>
-<li id="fn2"><p>Gandikota, R., et al. (2023). "Erasing Concepts from Diffusion Models." <em>ICCV 2023</em>.</p></li>
-<li id="fn3"><p>Amara, I., et al. (2025). "Erasing More Than Intended? How Concept Erasure Degrades the Generation of Non-Target Concepts." <em>arXiv:2501.09833</em>.</p></li>
-</ol>
-</section>
+    <section id="references" style="margin-top: 3rem;">
+      <h2>References</h2>
+      <ol style="font-size: 0.95rem; line-height: 1.7;">
+        <li id="ref1">Li, O., Wang, Y., Hu, X., Jiang, H., Hao, Y., Feng, F. (2026). "SPEED: Scalable, Precise, and Efficient Concept Erasure for Diffusion Models." <em>ICLR 2026</em>.</li>
+        <li id="ref2">Gandikota, R., Materzynska, J., Fiotto-Kaufman, J., Bau, D. (2023). "Erasing Concepts from Diffusion Models." <em>ICCV 2023</em>.</li>
+        <li id="ref3">Gandikota, R., Orgad, H., Belinkov, Y., Oh, J., Bau, D. (2024). "Unified Concept Editing in Diffusion Models." <em>WACV 2024</em>.</li>
+        <li id="ref4">Rombach, R., Blattmann, A., Lorenz, D., Esser, P., Ommer, B. (2022). "High-Resolution Image Synthesis with Latent Diffusion Models." <em>CVPR 2022</em>.</li>
+        <li id="ref5">Schramowski, P., Brack, M., Deiseroth, B., Kersting, K. (2023). "Safe Latent Diffusion: Mitigating Inappropriate Degeneration in Diffusion Models." <em>CVPR 2023</em>.</li>
+        <li id="ref6">Kumari, N., Zhang, B., Wang, S.-Y., Shechtman, E., Zhang, R., Zhu, J.-Y. (2023). "Ablating Concepts in Text-to-Image Diffusion Models." <em>ICCV 2023</em>.</li>
+        <li id="ref7">Lu, C., Zhou, P., Feng, C., Zhu, J., Chen, W., Jiang, Y.-G. (2024). "MACE: Mass Concept Erasure in Diffusion Models." <em>CVPR 2024</em>.</li>
+        <li id="ref8">Gong, Z., Guo, D., Zhu, Z., Li, Y., Chen, H. (2024). "RECE: Reliable and Efficient Concept Erasure of Text-to-Image Diffusion Models via Lightweight Erasers." <em>ECCV 2024</em>.</li>
+        <li id="ref9">Zhang, J., et al. (2024). "AdvUnlearn: Adversarial Unlearning for Robust Concept Erasure." <em>NeurIPS 2024</em>.</li>
+        <li id="ref10">Lee, S., et al. (2025). "GLoCE: Global-Local Concept Erasure in Diffusion Models." <em>CVPR 2025</em>.</li>
+        <li id="ref11">Seo, J., et al. (2026). "ETC: Erasing Thousands of Concepts from Diffusion Models." <em>CVPR 2026</em>.</li>
+        <li id="ref12">Amara, I., et al. (2025). "Erasing More Than Intended? How Concept Erasure Degrades the Generation of Non-Target Concepts." <em>arXiv:2501.09833</em>.</li>
+        <li id="ref13">Lu, K., Kriplani, N., Cohen, N., et al. (2025). "When Are Concepts Erased From Diffusion Models?" <em>NeurIPS 2025</em>.</li>
+      </ol>
+    </section>
   </div>
   </div>
 </body>
