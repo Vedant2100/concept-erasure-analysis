@@ -53,7 +53,6 @@
               <li><a href="#the-anatomy-of-collapse">The Anatomy of General Collapse</a></li>
               <li><a href="#ablation-the-refinement-contradiction">Ablation: The Refinement Contradiction (Exp. 1)</a></li>
               <li><a href="#limitation-2">Exp. 2: Evasion Vulnerability</a></li>
-              <li><a href="#methodology-amp-pitfalls-we-corrected">Methodology & Pitfalls We Corrected</a></li>
             </ul>
           </li>
           <li><a href="#references">5. References</a></li>
@@ -67,7 +66,7 @@
       <header style="text-align: center; margin-bottom: 3rem;">
         <h1 style="margin-top: 0; margin-bottom: 0.5rem;">EE243 Advanced Computer Vision — Spring 2026 Project</h1>
         <p style="margin: 0; font-size: 1.1rem; color: var(--text-secondary);">Team: Vedant Borkute and Kedar Shiralkar</p>
-        <p style="margin: 0.5rem 0 0 0; font-size: 1.1rem;"><a href="https://youtu.be/hX8Q0es9nnw" target="_blank" style="color: var(--primary-color); font-weight: bold; text-decoration: none;">Link to Code Walkthrough</a></p>
+        <p style="margin: 0.5rem 0 0 0; font-size: 1.1rem;"><a href="https://youtu.be/EpI6sX5P-m8" target="_blank" style="color: var(--primary-color); font-weight: bold; text-decoration: none;">Link to Code Walkthrough</a></p>
       </header>
 
       <h2 id="tldr" style="margin-top: 0;">TL;DR</h2>
@@ -1068,45 +1067,6 @@
                   href="#ref1">[1]</a></sup> closed-form null-space projection, by contrast, behaves like a brittle
               lexical filter: if you don't trigger the exact token, the style leaks straight out of the model's prior
               essentially untouched.</p>
-          </div>
-        </section>
-
-        <!-- ===================== METHODOLOGY / PITFALLS ===================== -->
-        <section class="card">
-          <h2 id="methodology-amp-pitfalls-we-corrected">Methodology &amp; Pitfalls We Corrected</h2>
-          <p>Getting to a trustworthy number here was harder than it looks. Three measurement traps each produced a
-            convincing-but-wrong result before we caught them — and every safeguard in the pipeline above exists because
-            of one of them.</p>
-
-          <h3>1. Pixel MSE could not tell damage from noise</h3>
-          <p>Our first instinct was to measure neighbor damage with pixel-space MSE between baseline and erased images.
-            It failed badly: a <em>retained, protected</em> artist (Cézanne) scored MSE above <strong>10,000</strong> on
-            some seeds, while a supposedly "damaged" neighbor scored ~440. MSE is dominated by ordinary seed-to-seed
-            composition variation, not style change — so it cannot distinguish real erasure damage from diffusion
-            stochasticity. That is why every number in this report uses <strong>CLIP image-to-image drift</strong>,
-            which responds to style rather than pixel layout.</p>
-
-          <h3>2. The NSFW safety checker faked a collapse</h3>
-          <p>An early concentrated-erasure run showed a dramatic "Gauguin collapses to 0.267 drift" signal — and it was
-            entirely an artifact. Stable Diffusion's NSFW safety checker blanks flagged generations to <em>solid
-              black</em>, and it fires on nude-heavy painters like Gauguin (his Tahitian series). A black frame compared
-            against a normal painting maxes out CLIP distance, manufacturing a fake collapse. We fixed it at the source:
-            generation now runs in <code>fp32</code> with the safety checker disabled, and the analyzer explicitly
-            excludes any black frame and reports how many valid seeds each number rests on. The "zero corrupt frames"
-            note on the results above is the receipt for this fix.</p>
-
-          <h3>3. A neighbor "suppression" claim that reversed under measurement</h3>
-          <p>An initial single-concept framing claimed SPEED<sup><a href="#ref1">[1]</a></sup> visibly suppressed a
-            neighbor's color saturation. Measuring it directly told the opposite story — saturation actually rose
-            slightly. It was confirmation bias reading damage into noise. Discarding that false start is what pushed us
-            toward the controlled, multi-seed, control-calibrated design used here.</p>
-
-          <div class="verdict-box">
-            <h3>Why this matters</h3>
-            <p>Each pitfall would have produced a <em>more dramatic</em> headline than the real finding. The selective
-              Pissarro leak survived all three corrections — which is precisely why we trust it. The controls, the seed
-              averaging, the CLIP metric, and the black-frame exclusion are not decoration; they are the difference
-              between a real limitation and an artifact.</p>
           </div>
         </section>
 
